@@ -1,0 +1,31 @@
+server:
+  port: ${APPLICATION_PORT:8080}
+
+spring:
+  application:
+    name: Better-Iter Application
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT}/${DATABASE_NAME:iter}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        show_sql: true
+        default_batch_fetch_size: 100
+
+
+logging:
+  level:
+    org.hibernate.sql: debug
+    org.hibernate.type: trace
