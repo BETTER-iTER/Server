@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout java code
+        uses: actions/checkout@v3
+
+      - name: Set up Jdk 11 ver
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: set yaml secret
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          spring.datasource.url: ${{ secrets.DATABASE_URL }}
+          spring.datasource.username: ${{ secrets.DATABASE_USERNAME }}
+          spring.datasource.password: ${{ secrets.DATABASE_PASSWORD }}
+
+      - name: Grant execute Permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Clean & Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Docker build
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p {{ secrets.DOCKER_PASSWORD }} 
+          docker build -t better-iter:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
+        
+        
+        
+
