@@ -23,7 +23,7 @@ jobs:
       - name: set yaml secret
         uses: microsoft/variable-substitution@v1
         with:
-          files: ${{ env.RESOURCE_PATH }}
+          files: ./src/main/resources/application.yml
         env:
           spring.datasource.url: ${{ secrets.DATABASE_URL }}
           spring.datasource.username: ${{ secrets.DATABASE_USERNAME }}
