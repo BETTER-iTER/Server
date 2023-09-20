@@ -9,12 +9,14 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  ## Database
   datasource:
     url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT}/${DATABASE_NAME:iter}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: root
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  ## JPA
   jpa:
     hibernate:
       ddl-auto: create
@@ -23,6 +25,34 @@ spring:
       hibernate:
         show_sql: true
         default_batch_fetch_size: 100
+
+  ## Oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - profile_image
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+### JWT
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access:
+    expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
+  refresh:
+    expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
 
 
 logging:
