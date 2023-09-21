@@ -49,10 +49,8 @@ spring:
 ### JWT
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access:
-    expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
-  refresh:
-    expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
+  access-expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
+  refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
 
 
 logging:

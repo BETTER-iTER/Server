@@ -22,4 +22,9 @@ public class KakaoOauthController {
     ) {
         return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<Void> test() {
+        return ResponseEntity.ok(this.kakaoOauthService.test());
+    }
 }
