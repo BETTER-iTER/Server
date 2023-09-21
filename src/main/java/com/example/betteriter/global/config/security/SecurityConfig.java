@@ -17,7 +17,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login/callback/**", "/test")
+                .antMatchers("/login/callback/**")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

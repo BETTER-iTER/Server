@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+
+/**
+ * - oauth 로그인 후 응답 객체
+ **/
 @Getter
 @Setter
 @Builder

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -19,12 +21,7 @@ public class KakaoOauthController {
     @GetMapping("/login/callback/kakao")
     public ResponseEntity<UserOauthLoginResponseDto> kakaoOauthLogin(
             @RequestParam String code
-    ) {
+    ) throws IOException {
         return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<Void> test() {
-        return ResponseEntity.ok(this.kakaoOauthService.test());
     }
 }

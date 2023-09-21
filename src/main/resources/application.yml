@@ -38,8 +38,7 @@ spring:
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope:
-              - profile_nickname
-              - profile_image
+              - account_email
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
