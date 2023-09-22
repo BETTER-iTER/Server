@@ -30,6 +30,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
+    private static final String TOKEN_TYPE = "Bearer";
     private final static String PROVIDER_NAME = "kakao";
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
@@ -130,7 +131,7 @@ public class KakaoOauthService {
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(accessToken.getExpiredTime() / 1000);
 
         return UserOauthLoginResponseDto.builder()
-                .accessToken(accessToken.getTokenValue())
+                .accessToken(TOKEN_TYPE + " " + accessToken.getTokenValue())
                 .refreshToken(refreshToken.getTokenValue())
                 .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();

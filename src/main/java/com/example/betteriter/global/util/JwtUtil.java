@@ -2,9 +2,7 @@ package com.example.betteriter.global.util;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.user.dto.oauth.ServiceToken;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,5 +51,34 @@ public class JwtUtil {
                 .tokenValue(token)
                 .expiredTime(expiration)
                 .build();
+    }
+
+    private String getPayloadFromToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(this.jwtProperties.getSecret())
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (ExpiredJwtException exception) {
+            return exception.getClaims().getSubject();
+        } catch (JwtException exception) {
+            return null;
+        }
+    }
+
+    // token 유효성 검증
+    public boolean validateToken(String token) {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(this.jwtProperties.getSecret()).parseClaimsJws(token);
+            return !claimsJws.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException exception) {
+            log.warn("만료된 jwt 입니다.");
+        } catch (UnsupportedJwtException exception) {
+            log.warn("지원되지 않는 jwt 입니다.");
+        } catch (IllegalArgumentException exception) {
+            log.warn("jwt 에 오류가 존재합니다.");
+        }
+        return false;
     }
 }
