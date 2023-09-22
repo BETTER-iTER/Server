@@ -14,4 +14,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class UserOauthLoginResponseDto {
+    private String accessToken;
+    private String refreshToken;
+    private String expiredTime;
 }
