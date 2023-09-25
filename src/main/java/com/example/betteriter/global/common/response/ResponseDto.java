@@ -25,7 +25,7 @@ public class ResponseDto<T> {
         return new ResponseDto<>(true, "2000", "OK", result);
     }
     
-    public static <T> ResponseDto<T> onFail(ErrorCode code, T result) {
+    public static <T> ResponseDto<T> onFail(T result, ErrorCode code) {
         return new ResponseDto<>(false, code.getCode(), code.getMessage(), result);
     }
 }
