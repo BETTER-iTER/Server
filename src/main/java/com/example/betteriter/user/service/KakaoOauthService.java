@@ -1,12 +1,12 @@
 package com.example.betteriter.user.service;
 
+import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.user.domain.User;
 import com.example.betteriter.user.dto.RoleType;
 import com.example.betteriter.user.dto.UserOauthLoginResponseDto;
 import com.example.betteriter.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.user.dto.oauth.KakaoToken;
-import com.example.betteriter.user.dto.oauth.ServiceToken;
 import com.example.betteriter.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +35,7 @@ public class KakaoOauthService {
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     private final JwtUtil jwtUtil;
+    private final JwtProperties jwtProperties;
 
     /**
      * - findUser : 회원 저장 및 리턴
@@ -125,14 +126,14 @@ public class KakaoOauthService {
 
     /* 서비스 jwt 발급 */
     private UserOauthLoginResponseDto getServiceToken(User user) {
-        ServiceToken accessToken = this.jwtUtil.createAccessToken(String.valueOf(user.getId()));
-        ServiceToken refreshToken = this.jwtUtil.createRefreshToken();
+        String accessToken = this.jwtUtil.createAccessToken(String.valueOf(user.getId()));
+        String refreshToken = this.jwtUtil.createRefreshToken();
 
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(accessToken.getExpiredTime() / 1000);
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
 
         return UserOauthLoginResponseDto.builder()
-                .accessToken(TOKEN_TYPE + " " + accessToken.getTokenValue())
-                .refreshToken(refreshToken.getTokenValue())
+                .accessToken(TOKEN_TYPE + " " + accessToken)
+                .refreshToken(refreshToken)
                 .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
     }
