@@ -45,6 +45,14 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+  ### REDIS
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    username: ${REDIS_USERNAME:root}
+    password: ${REDIS_PASSWORD}
+
 ### JWT
 jwt:
   bearer: ${JWT_BEARER:Bearer}
@@ -53,6 +61,7 @@ jwt:
   access-header: ${JWT_ACCESS_HEADER:Authorization} # Access Token 헤더
   refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
   refresh-header: ${JWT_REFRESH_HEADER:Refresh-Authorization} # Refresh Token 헤더
+
 
 
 logging:
