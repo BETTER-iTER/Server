@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -19,6 +21,18 @@ import java.util.UUID;
 @Service
 public class JwtUtil {
     private final JwtProperties jwtProperties;
+
+    // HttpServletRequest 부터 Access Token 추출
+    public Optional<String> extractAccessToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(this.jwtProperties.getAccessHeader()))
+                .filter(accessToken -> accessToken.startsWith(jwtProperties.getBearer()))
+                .map(accessToken -> accessToken.replace(jwtProperties.getBearer(), ""));
+    }
+
+    // HttpServletRequest 부터 Refresh Token 추출
+    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(this.jwtProperties.getRefreshHeader()));
+    }
 
     // access token 생성
     public ServiceToken createAccessToken(String payload) {
