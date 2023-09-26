@@ -47,6 +47,36 @@ public class JwtUtil {
         return getToken(token, this.jwtProperties.getRefreshExpiration());
     }
 
+
+    // access token 으로부터 회원 아이디 추출
+    public Optional<String> getUserIdFromToken(String token) {
+        try {
+            return Optional.ofNullable(Jwts.parser()
+                    .setSigningKey(this.jwtProperties.getSecret())
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject());
+        } catch (Exception exception) {
+            log.error("Access Token is not valid");
+            return Optional.empty();
+        }
+    }
+
+    // token 유효성 검증
+    public boolean validateToken(String token) {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(this.jwtProperties.getSecret()).parseClaimsJws(token);
+            return !claimsJws.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException exception) {
+            log.warn("만료된 jwt 입니다.");
+        } catch (UnsupportedJwtException exception) {
+            log.warn("지원되지 않는 jwt 입니다.");
+        } catch (IllegalArgumentException exception) {
+            log.warn("jwt 에 오류가 존재합니다.");
+        }
+        return false;
+    }
+
     // 실제 token 생성 로직
     private String createToken(String payload, Long accessExpiration) {
         Claims claims = Jwts.claims().setSubject(payload);
@@ -65,34 +95,5 @@ public class JwtUtil {
                 .tokenValue(token)
                 .expiredTime(expiration)
                 .build();
-    }
-
-    private String getPayloadFromToken(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(this.jwtProperties.getSecret())
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (ExpiredJwtException exception) {
-            return exception.getClaims().getSubject();
-        } catch (JwtException exception) {
-            return null;
-        }
-    }
-
-    // token 유효성 검증
-    public boolean validateToken(String token) {
-        try {
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(this.jwtProperties.getSecret()).parseClaimsJws(token);
-            return !claimsJws.getBody().getExpiration().before(new Date());
-        } catch (ExpiredJwtException exception) {
-            log.warn("만료된 jwt 입니다.");
-        } catch (UnsupportedJwtException exception) {
-            log.warn("지원되지 않는 jwt 입니다.");
-        } catch (IllegalArgumentException exception) {
-            log.warn("jwt 에 오류가 존재합니다.");
-        }
-        return false;
     }
 }

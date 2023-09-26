@@ -1,10 +1,13 @@
 package com.example.betteriter.global.config.security;
 
+import com.example.betteriter.user.domain.User;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * - Security Context Holder 에 주입되는 Authentication 을 구현한 AbstractAuthenticationToken
@@ -13,8 +16,18 @@ import java.util.Collection;
 
 @Getter
 public class UserAuthentication extends AbstractAuthenticationToken {
-    public UserAuthentication(Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
+
+    private final Long userId;
+
+    public UserAuthentication(User user) {
+        super(authorities(user));
+        this.userId = user.getId();
+    }
+
+    private static List<GrantedAuthority> authorities(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
+        return authorities;
     }
 
     @Override
