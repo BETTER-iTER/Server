@@ -37,6 +37,11 @@ public class UserAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return userId;
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return true;
     }
 }

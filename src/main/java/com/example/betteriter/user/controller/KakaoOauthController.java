@@ -27,6 +27,7 @@ public class KakaoOauthController {
 
     @GetMapping("/test")
     public String test() {
+        log.info("테스트 성공!");
         return "테스트 성공!";
     }
 }

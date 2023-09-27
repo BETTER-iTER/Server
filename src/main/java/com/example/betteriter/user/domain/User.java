@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -42,6 +40,6 @@ public class User {
     @Column(name = "usr_job")
     private int job;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<Integer> interests = new ArrayList<>();
+//    @ElementCollection(fetch = FetchType.LAZY)
+//    private List<Integer> interests = new ArrayList<>();
 }

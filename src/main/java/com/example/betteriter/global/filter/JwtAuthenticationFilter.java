@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        if (request.getMethod().equals("OPTIONS") || request.getRequestURI().equals("/login/callback/kakao")) {
+        if (request.getMethod().equals("OPTIONS")) {
             filterChain.doFilter(request, response);
             // 이후 현재 필터 진행 방지
             return;
@@ -78,8 +78,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Case 02) 일반 API 요청인 경우
         else {
             checkAccessTokenAndAuthentication(request, response, filterChain);
+            log.info("API 요청 예외 없이 정상 처리");
         }
 
+        log.info("다음 필터로 넘어가기전");
+        log.info("hh");
         // Authentication Exception 없이 정상 인증처리 된 경우
         filterChain.doFilter(request, response);
     }
@@ -155,14 +158,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             User user = this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
                     .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
-            saveAuthentication(user);
+
+            // SecurityContext 에 인증된 Authentication 저장
+            UserAuthentication authentication = new UserAuthentication(user);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
             request.setAttribute("UnauthorizedUserException", exception);
         }
-    }
-
-    private void saveAuthentication(User user) {
-        UserAuthentication userAuthentication = new UserAuthentication(user);
-        SecurityContextHolder.getContext().setAuthentication(userAuthentication);
     }
 }
