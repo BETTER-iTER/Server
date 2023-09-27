@@ -1,13 +1,15 @@
 package com.example.betteriter.global.util;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
-import com.example.betteriter.user.dto.oauth.ServiceToken;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -20,51 +22,44 @@ import java.util.UUID;
 public class JwtUtil {
     private final JwtProperties jwtProperties;
 
+    // HttpServletRequest 부터 Access Token 추출
+    public Optional<String> extractAccessToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(this.jwtProperties.getAccessHeader()))
+                .filter(StringUtils::hasText)
+                .filter(accessToken -> accessToken.startsWith(jwtProperties.getBearer()))
+                .map(accessToken -> accessToken.replace(jwtProperties.getBearer(), ""));
+    }
+
+    // HttpServletRequest 부터 Refresh Token 추출
+    public String extractRefreshToken(HttpServletRequest request) {
+        return request.getHeader(this.jwtProperties.getRefreshHeader());
+    }
+
     // access token 생성
-    public ServiceToken createAccessToken(String payload) {
-        String token = createToken(payload, this.jwtProperties.getAccessExpiration());
-        return getToken(token, this.jwtProperties.getAccessExpiration());
+    public String createAccessToken(String payload) {
+        return createToken(payload, this.jwtProperties.getAccessExpiration());
     }
 
 
     // refresh token 생성
-    public ServiceToken createRefreshToken() {
-        String token = createToken(UUID.randomUUID().toString(), this.jwtProperties.getRefreshExpiration());
-        return getToken(token, this.jwtProperties.getRefreshExpiration());
+    public String createRefreshToken() {
+        return createToken(UUID.randomUUID().toString(), this.jwtProperties.getRefreshExpiration());
+
     }
 
-    // 실제 token 생성 로직
-    private String createToken(String payload, Long accessExpiration) {
-        Claims claims = Jwts.claims().setSubject(payload);
-        Date accessTokenExpiresIn = new Date(new Date().getTime() + this.jwtProperties.getAccessExpiration());
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(SignatureAlgorithm.HS512, this.jwtProperties.getSecret())
-                .compact();
-    }
-
-    private ServiceToken getToken(String token, Long expiration) {
-        return ServiceToken.builder()
-                .tokenValue(token)
-                .expiredTime(expiration)
-                .build();
-    }
-
-    private String getPayloadFromToken(String token) {
+    // access token 으로부터 회원 아이디 추출
+    public String getUserIdFromToken(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(this.jwtProperties.getSecret())
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
-        } catch (ExpiredJwtException exception) {
-            return exception.getClaims().getSubject();
-        } catch (JwtException exception) {
-            return null;
+        } catch (Exception exception) {
+            log.error("Access Token is not valid");
         }
+        return null;
     }
 
     // token 유효성 검증
@@ -81,4 +76,19 @@ public class JwtUtil {
         }
         return false;
     }
+
+    // 실제 token 생성 로직
+    private String createToken(String payload, Long tokenExpiration) {
+        Claims claims = Jwts.claims().setSubject(payload);
+        Date tokenExpiresIn = new Date(new Date().getTime() + tokenExpiration);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(tokenExpiresIn)
+                .signWith(SignatureAlgorithm.HS512, this.jwtProperties.getSecret())
+                .compact();
+    }
 }
+
+
