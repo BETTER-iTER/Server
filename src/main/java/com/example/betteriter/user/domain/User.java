@@ -39,9 +39,6 @@ public class User {
     @Column(name = "usr_nickname", unique = true)
     private String nickName;
 
-    @Column(name = "usr_age")
-    private int age;
-
     @Column(name = "usr_job")
     private int job;
 
