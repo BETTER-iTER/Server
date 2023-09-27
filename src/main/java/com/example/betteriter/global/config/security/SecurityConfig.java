@@ -26,9 +26,12 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .csrf().disable()
+                .httpBasic().disable()
+                .formLogin().disable()
+                .headers().frameOptions().disable()
+                .and()
                 .authorizeRequests()
-                .antMatchers("/login/callback/**")
-                .permitAll()
+                .antMatchers("/login/callback/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
@@ -45,5 +48,4 @@ public class SecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

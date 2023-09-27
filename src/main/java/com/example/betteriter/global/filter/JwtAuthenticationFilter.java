@@ -6,10 +6,13 @@ import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.user.domain.User;
 import com.example.betteriter.user.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -28,6 +30,11 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
  * - JWT 기반의 인증 방식에서 핵심이 되는 인증 필터
  * # API 요청에 있어서 JWT 가 요청 헤더에 담겨서 올 때, 유효성 검증/인증 성공/인증 실패 처리
  * # 동시에 Refresh Token 이 같이 오는 경우, Access Token + Refresh Token 재발급
+ * <p>
+ * << AuthenticationException >>
+ * 1. 토큰의 유효성이 만료되었거나 유효하지 않은 경우 : BadCredentialsException
+ * 2. 사용자 정보가 없는 경우 : UsernameNotFoundException
+ * 3. 토큰이 없는 경우 : AuthenticationCredentialsNotFoundException
  **/
 @Component
 @RequiredArgsConstructor
@@ -42,14 +49,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
-        // CORS pre-light 요청
-        if (request.getMethod().equals("OPTIONS")) {
-            response.setStatus(HttpStatus.OK.value());
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        if (request.getMethod().equals("OPTIONS") || request.getRequestURI().equals("/login/callback/kakao")) {
+            filterChain.doFilter(request, response);
+            // 이후 현재 필터 진행 방지
             return;
         }
-
         /*
           -  사용자 요청에서 Refresh Token 추출
           -> Refresh Token 존재하는 경우는 Access Token(만료된) 재발급인 경우밖에 없음
@@ -61,27 +67,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (refreshToken != null) {
             try {
                 String accessToken = this.jwtUtil.extractAccessToken(request)
-                        .orElseThrow(() -> new IllegalArgumentException("There is no Access Token"));
+                        .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("There is no Access Token"));
                 reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
             } catch (AuthenticationException exception) {
                 log.info("JwtAuthentication UnauthorizedUserException!");
-                request.setAttribute("UnauthorizedUserException", exception);
-            } catch (IllegalArgumentException exception) {
-                log.info("JwtAuthentication IllegalArgumentException!");
                 request.setAttribute("UnauthorizedUserException", exception);
             }
         }
 
         // Case 02) 일반 API 요청인 경우
         else {
-            try {
-                checkAccessTokenAndAuthentication(request, response, filterChain);
-            } catch (AuthenticationException exception) {
-                request.setAttribute("UnauthorizedUserException", exception);
-            }
-            filterChain.doFilter(request, response);
+            checkAccessTokenAndAuthentication(request, response, filterChain);
         }
 
+        // Authentication Exception 없이 정상 인증처리 된 경우
+        filterChain.doFilter(request, response);
     }
 
     // Case 01) Access Token + Refresh Token 재발급 메소드
@@ -91,12 +91,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("reissueAccessTokenAndRefreshToken() called!");
         // 요청으로 받은 Refresh Token 의 유효성 검증 및 서버 Refresh Token 과 비교
-        if (!validateRefreshToken(refreshToken) || !isRefreshTokenMatch(refreshToken, accessToken)) {
-            throw new AuthenticationException("Authentication Error Occurred");
+
+        try {
+            if (validateRefreshToken(refreshToken) || isRefreshTokenMatch(refreshToken, accessToken)) {
+                String newAccessToken = this.jwtUtil.createAccessToken(this.jwtUtil.getUserIdFromToken(accessToken));
+                String newRefreshToken = this.reIssueRefreshToken(this.jwtUtil.getUserIdFromToken(accessToken));
+                sendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
+            }
+        } catch (IllegalArgumentException | JwtException exception) {
+            throw new BadCredentialsException("Authentication Error Occurred");
         }
-        String newAccessToken = this.jwtUtil.createAccessToken(this.jwtUtil.getUserIdFromToken(accessToken));
-        String newRefreshToken = reIssueRefreshToken(this.jwtUtil.getUserIdFromToken(accessToken));
-        sendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
     }
 
     /**
@@ -128,8 +132,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 2. 해당 Key 에 해당하는 Redis Value 업데이트
      **/
     private String reIssueRefreshToken(String userId) {
-        String reIssuedRefreshToken = jwtUtil.createRefreshToken();
         this.redisUtil.deleteData(userId); // 기존 refresh token 삭제
+        String reIssuedRefreshToken = jwtUtil.createRefreshToken();
         this.redisUtil.setData(userId, reIssuedRefreshToken); // refresh token 저장
         return reIssuedRefreshToken;
     }
@@ -142,19 +146,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      **/
     private void checkAccessTokenAndAuthentication(HttpServletRequest request,
                                                    HttpServletResponse response,
-                                                   FilterChain filterChain) throws ServletException, IOException, AuthenticationException {
+                                                   FilterChain filterChain) {
 
         log.info("checkAccessTokenAndAuthentication() called!");
+        try {
+            String accessToken = this.jwtUtil.extractAccessToken(request)
+                    .orElseThrow(() -> new JwtException("jwtException"));
 
-        Optional<String> optionalAccessToken = this.jwtUtil.extractAccessToken(request);
-        if (optionalAccessToken.isEmpty() || !this.jwtUtil.validateToken(optionalAccessToken.get())) {
-            throw new AuthenticationException("Authentication Error Occurred");
-        } else {
-            String accessToken = optionalAccessToken.get();
-            this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
-                    .ifPresent(this::saveAuthentication);
-            // 다음 Security Filter 호출
-            filterChain.doFilter(request, response);
+            User user = this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
+                    .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
+            saveAuthentication(user);
+        } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
+            request.setAttribute("UnauthorizedUserException", exception);
         }
     }
 
