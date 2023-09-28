@@ -22,7 +22,7 @@ public class ResponseDto<T> {
     
     
     public static <T> ResponseDto<T> onSuccess(T result) {
-        return new ResponseDto<>(true, "2000", "OK", result);
+        return new ResponseDto<>(true, ErrorCode._OK.getCode(), ErrorCode._OK.getMessage(), result);
     }
     
     public static <T> ResponseDto<T> onFail(T result, ErrorCode code) {
