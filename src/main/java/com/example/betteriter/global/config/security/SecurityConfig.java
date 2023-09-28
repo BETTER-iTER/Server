@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login/callback/**").permitAll() // 특정 URI 예외 처리
+                .antMatchers("/login/callback/**", "/user/**").permitAll() // 특정 URI 예외 처리
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
