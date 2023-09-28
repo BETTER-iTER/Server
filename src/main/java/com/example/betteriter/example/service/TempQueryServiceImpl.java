@@ -13,7 +13,7 @@ public class TempQueryServiceImpl implements TempQueryService {
 
     @Override
     public void checkFlag(Integer flag) {
-        if (flag == 1) {
+        if (flag == 3) {
             throw new TempHandler(ErrorCode.TEST_BAD_REQUEST);
         }
     }

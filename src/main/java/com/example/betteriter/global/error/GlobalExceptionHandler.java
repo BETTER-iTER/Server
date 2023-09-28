@@ -76,7 +76,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, HttpStatus status,
             WebRequest request
     ) {
-        ResponseDto<Object> responseDto = ResponseDto.onFail(errorCode, null);
+        ResponseDto<Object> responseDto = ResponseDto.onFail(null, errorCode);
         return super.handleExceptionInternal(
                 e,
                 responseDto,
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, HttpStatus status,
             WebRequest request
     ) {
-        ResponseDto<Object> responseDto = ResponseDto.onFail(errorCode, null);
+        ResponseDto<Object> responseDto = ResponseDto.onFail(null, errorCode);
         return super.handleExceptionInternal(
                 e,
                 responseDto,
