@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class PasswordUtil {
-    public static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,20}$";
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public PasswordUtil(BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -20,7 +19,7 @@ public class PasswordUtil {
     }
 
     /* 비밀번호 동일성 체크 */
-    public boolean isEqual(String password, String encodedPassword) {
-        return bCryptPasswordEncoder.matches(password, encodedPassword);
+    public boolean isEqual(String inputPassword, String encodedPassword) {
+        return bCryptPasswordEncoder.matches(inputPassword, encodedPassword);
     }
 }

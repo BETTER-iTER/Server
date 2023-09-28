@@ -4,7 +4,7 @@ import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.user.domain.User;
 import com.example.betteriter.user.dto.RoleType;
-import com.example.betteriter.user.dto.UserOauthLoginResponseDto;
+import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.user.dto.oauth.KakaoToken;
 import com.example.betteriter.user.repository.UserRepository;
@@ -21,8 +21,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 
@@ -30,7 +28,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
-    private static final String TOKEN_TYPE = "Bearer";
     private final static String PROVIDER_NAME = "kakao";
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
@@ -41,19 +38,19 @@ public class KakaoOauthService {
      * - findUser : 회원 저장 및 리턴
      * - getServiceToken : 실제 서비스 jwt 발급
      **/
-    public UserOauthLoginResponseDto kakaoOauthLogin(String code) throws IOException {
-        User user = findUser(code);
-        return getServiceToken(user);
+    public UserServiceTokenResponseDto kakaoOauthLogin(String code) throws IOException {
+        return this.jwtUtil.getServiceToken(findUser(code));
     }
 
-
+    /**
+     * step 00 : 회원 조회
+     **/
     private User findUser(String code) throws IOException {
         ClientRegistration kakaoClientRegistration
                 = this.inMemoryClientRegistrationRepository.findByRegistrationId(PROVIDER_NAME);
         KakaoToken kakaoToken = getKakaoToken(code, kakaoClientRegistration);
         return saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
     }
-
 
     /**
      * step 01 : 카카오 jwt 요청
@@ -122,19 +119,5 @@ public class KakaoOauthService {
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
                 .block();
-    }
-
-    /* 서비스 jwt 발급 */
-    private UserOauthLoginResponseDto getServiceToken(User user) {
-        String accessToken = this.jwtUtil.createAccessToken(String.valueOf(user.getId()));
-        String refreshToken = this.jwtUtil.createRefreshToken();
-
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
-
-        return UserOauthLoginResponseDto.builder()
-                .accessToken(TOKEN_TYPE + " " + accessToken)
-                .refreshToken(refreshToken)
-                .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .build();
     }
 }

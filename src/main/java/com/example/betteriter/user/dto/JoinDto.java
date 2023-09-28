@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
-import java.util.List;
 
 @Getter
 @Setter
@@ -30,8 +29,8 @@ public class JoinDto {
     @NotNull(message = "직업을 선택해야 합니다.")
     private int job;
 
-    @Size(min = 1, max = 3, message = "관심사는 1개이상 3개 이하여야 합니다.")
-    private List<Integer> interest;
+    @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
+    private String interests;
 
     public User toEntity(String encryptPassword) {
         return User.builder()
@@ -39,7 +38,8 @@ public class JoinDto {
                 .password(encryptPassword)
                 .nickName(nickName)
                 .job(job)
-                .interests(interest)
+                .role(RoleType.ROLE_USER)
+                .interests(interests)
                 .build();
     }
 }

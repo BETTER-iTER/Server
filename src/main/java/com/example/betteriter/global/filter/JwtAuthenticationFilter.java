@@ -81,8 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("API 요청 예외 없이 정상 처리");
         }
 
-        log.info("다음 필터로 넘어가기전");
-        log.info("hh");
+        log.info("passed to next filter");
         // Authentication Exception 없이 정상 인증처리 된 경우
         filterChain.doFilter(request, response);
     }

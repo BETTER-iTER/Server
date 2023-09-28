@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserOauthLoginResponseDto {
+public class UserServiceTokenResponseDto {
     private String accessToken;
     private String refreshToken;
     private String expiredTime;
