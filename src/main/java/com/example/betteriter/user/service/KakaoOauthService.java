@@ -57,7 +57,8 @@ public class KakaoOauthService {
      * - https://kauth.kakao.com/oauth/token
      * - application/x-www-form-urlencoded
      **/
-    private KakaoToken getKakaoToken(String code, ClientRegistration kakaoClientRegistration) {
+    private KakaoToken getKakaoToken(String code,
+                                     ClientRegistration kakaoClientRegistration) {
         return WebClient.create()
                 .post()
                 .uri(kakaoClientRegistration.getProviderDetails().getTokenUri())

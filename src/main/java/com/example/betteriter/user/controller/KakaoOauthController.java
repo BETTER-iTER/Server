@@ -24,10 +24,4 @@ public class KakaoOauthController {
     ) throws IOException {
         return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
     }
-
-    @GetMapping("/test")
-    public String test() {
-        log.info("테스트 성공!");
-        return "테스트 성공!";
-    }
 }

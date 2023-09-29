@@ -25,6 +25,7 @@ import java.util.UUID;
 @Service
 public class JwtUtil {
     private final JwtProperties jwtProperties;
+    private final RedisUtil redisUtil;
 
     // HttpServletRequest 부터 Access Token 추출
     public Optional<String> extractAccessToken(HttpServletRequest request) {
@@ -72,7 +73,7 @@ public class JwtUtil {
         String refreshToken = this.createRefreshToken();
 
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
-
+        this.redisUtil.setData(String.valueOf(user.getId()), refreshToken);
         return UserServiceTokenResponseDto.builder()
                 .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
                 .refreshToken(refreshToken)
