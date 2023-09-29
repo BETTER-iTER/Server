@@ -1,9 +1,11 @@
 package com.example.betteriter.user.service;
 
-import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
+import com.example.betteriter.global.util.RedisUtil;
+import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.user.domain.User;
+import com.example.betteriter.user.dto.EmailDto;
 import com.example.betteriter.user.dto.JoinDto;
 import com.example.betteriter.user.dto.LoginDto;
 import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
@@ -28,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordUtil passwordUtil;
-    private final JwtProperties jwtProperties;
     private final JwtUtil jwtUtil;
+    private final RedisUtil redisUtil;
+    private final EmailService emailService;
 
     @Override
     public User loadUserByUsername(String userEmail) throws UsernameNotFoundException {
@@ -44,16 +47,50 @@ public class UserService implements UserDetailsService {
         return this.userRepository.save(joinDto.toEntity(encryptPassword)).getId();
     }
 
+    /* 이메일 인증 */
+    public void email(EmailDto emailDto) {
+
+    }
+
+
     /* 로그인 */
     @Transactional
     public UserServiceTokenResponseDto login(LoginDto loginRequestDto) {
         User user = this.loadUserByUsername(loginRequestDto.getEmail());
-
         if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
+
+        // -> 여기서 SecurityContext 에 저장된 UserAuthentication 존재 x
         UserAuthentication userAuthentication = new UserAuthentication(user);
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
-        return this.jwtUtil.getServiceToken(user);
+        UserServiceTokenResponseDto serviceToken = jwtUtil.getServiceToken(user);
+
+        this.redisUtil.setData(String.valueOf(user.getId()), serviceToken.getRefreshToken()); // 토큰 발급 후 Redis 에 Refresh token 저장
+        return serviceToken;
     }
+
+    /* 로그아웃 */
+    @Transactional
+    public Long logout() {
+        User user = getUser();
+        this.redisUtil.deleteData(String.valueOf(user.getId()));
+        return user.getId();
+    }
+
+    /* 회원 탈퇴 */
+    @Transactional
+    public void withdraw() {
+        User user = getUser();
+        this.userRepository.delete(user);
+    }
+
+    private User getUser() {
+        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
+    }
+
+
+    // 이메일 인증 시 랜덤 문자열 생성
+
 }
