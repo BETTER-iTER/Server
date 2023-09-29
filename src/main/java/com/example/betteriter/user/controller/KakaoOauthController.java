@@ -1,6 +1,6 @@
 package com.example.betteriter.user.controller;
 
-import com.example.betteriter.user.dto.UserOauthLoginResponseDto;
+import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.user.service.KakaoOauthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +19,9 @@ public class KakaoOauthController {
     private final KakaoOauthService kakaoOauthService;
 
     @GetMapping("/login/callback/kakao")
-    public ResponseEntity<UserOauthLoginResponseDto> kakaoOauthLogin(
+    public ResponseEntity<UserServiceTokenResponseDto> kakaoOauthLogin(
             @RequestParam String code
     ) throws IOException {
         return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "테스트 성공!";
     }
 }

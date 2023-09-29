@@ -1,23 +1,23 @@
 package com.example.betteriter.user.domain;
 
 import com.example.betteriter.user.dto.RoleType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 @Slf4j
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,16 +35,52 @@ public class User {
     @Column(name = "usr_role")
     private RoleType role;
 
-    // 기타 회원 정보
+    // ======= 기타 회원 정보 ======== //
     @Column(name = "usr_nickname", unique = true)
     private String nickName;
-
-    @Column(name = "usr_age")
-    private int age;
 
     @Column(name = "usr_job")
     private int job;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<Integer> interests = new ArrayList<>();
+    @Column(name = "usr_intersts")
+    private String interests;
+
+    /**
+     * 권한 설정
+     **/
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(getRole().name()));
+        return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

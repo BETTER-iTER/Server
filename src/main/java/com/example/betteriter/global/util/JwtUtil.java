@@ -1,6 +1,8 @@
 package com.example.betteriter.global.util;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
+import com.example.betteriter.user.domain.User;
+import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +25,7 @@ import java.util.UUID;
 @Service
 public class JwtUtil {
     private final JwtProperties jwtProperties;
+    private final RedisUtil redisUtil;
 
     // HttpServletRequest 부터 Access Token 추출
     public Optional<String> extractAccessToken(HttpServletRequest request) {
@@ -60,6 +65,20 @@ public class JwtUtil {
             log.error("Access Token is not valid");
         }
         return null;
+    }
+
+    // kakao oauth 로그인 & 일반 로그인 시 jwt 응답 생성
+    public UserServiceTokenResponseDto getServiceToken(User user) {
+        String accessToken = this.createAccessToken(String.valueOf(user.getId()));
+        String refreshToken = this.createRefreshToken();
+
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
+        this.redisUtil.setData(String.valueOf(user.getId()), refreshToken);
+        return UserServiceTokenResponseDto.builder()
+                .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
+                .refreshToken(refreshToken)
+                .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .build();
     }
 
     // token 유효성 검증
