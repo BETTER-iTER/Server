@@ -21,7 +21,8 @@ public class JoinDto {
             message = "비밀번호는 영어/숫자/특수문자를 포함해야합니다.")
     private String password;
 
-    @NotBlank(message = "올바른 닉네임 형식이 아닙니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9가-힣]{1,10}$",
+            message = "닉네임은 특수문자 없이 1 ~ 10 글자로 설정 해주세요.")
     private String nickName;
 
     @NotNull(message = "직업을 선택해야 합니다.")

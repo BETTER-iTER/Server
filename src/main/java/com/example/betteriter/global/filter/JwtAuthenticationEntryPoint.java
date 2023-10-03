@@ -1,12 +1,12 @@
 package com.example.betteriter.global.filter;
 
 import com.example.betteriter.user.exception.ErrorMessage;
-import com.example.betteriter.user.exception.UnauthorizedUserException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -34,8 +34,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         try (OutputStream os = response.getOutputStream()) {
             JavaTimeModule javaTimeModule = new JavaTimeModule();
             LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul"))
-            );
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul")));
             javaTimeModule.addSerializer(LocalDateTime.class, localDateTimeSerializer);
             ObjectMapper objectMapper = new ObjectMapper().registerModule(javaTimeModule);
             objectMapper.writeValue(os, ErrorMessage.of(exception, HttpStatus.UNAUTHORIZED));
@@ -47,12 +46,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-
-        Object errorObject = request.getAttribute("UnauthorizedUserException");
-        if (errorObject != null) {
-            log.info("errorObject is Not Null");
-            sendErrorUnauthorized(response);
-        }
+        log.error("Authentication Exception Occurs!");
+        sendErrorUnauthorized(response);
     }
 
     // 인증 안된 경우
@@ -61,7 +56,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json,charset=utf-8");
         makeResultResponse(
                 response,
-                new UnauthorizedUserException("로그인이 필요합니다.")
+                new BadCredentialsException("로그인이 필요합니다.")
         );
     }
 }

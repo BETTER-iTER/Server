@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+/**
+ * 1. 카카오 oauth 로그인 시 처음 회원 인지 반환
+ * 2. 회원가입 후 관심 분야 반환 해야 하나?
+ **/
+
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -41,5 +47,4 @@ public class UserController {
         this.userService.withdraw();
         return ResponseEntity.ok().build();
     }
-
 }

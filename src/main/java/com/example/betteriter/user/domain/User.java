@@ -1,6 +1,7 @@
 package com.example.betteriter.user.domain;
 
 import com.example.betteriter.user.dto.RoleType;
+import com.example.betteriter.user.dto.oauth.KakaoJoinDto;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -82,5 +83,11 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void completeKakaoJoin(KakaoJoinDto kakaoJoinDto) {
+        nickName = kakaoJoinDto.getNickname();
+        job = kakaoJoinDto.getJob();
+        interests = kakaoJoinDto.getInterests();
     }
 }

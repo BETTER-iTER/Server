@@ -9,5 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 public class EmailAuthenticationDto {
     private String email;
-    private int code;
+    private String code;
 }
