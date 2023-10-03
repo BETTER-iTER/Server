@@ -78,6 +78,7 @@ public class JwtUtil {
                 .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .isExisted(user.getNickName() != null)
                 .build();
     }
 

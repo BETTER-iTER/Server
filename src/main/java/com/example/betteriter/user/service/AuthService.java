@@ -3,7 +3,6 @@ package com.example.betteriter.user.service;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
-import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
 import com.example.betteriter.infra.EmailService;
@@ -59,7 +58,6 @@ public class AuthService implements UserDetailsService {
         this.emailService.sendEmailForJoin(emailDto.getEmail(), authCode);
     }
 
-
     /* 로그인 */
     @Transactional
     public UserServiceTokenResponseDto login(LoginDto loginRequestDto) {
@@ -67,16 +65,9 @@ public class AuthService implements UserDetailsService {
         if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
-
-        // -> 여기서 SecurityContext 에 저장된 UserAuthentication 존재 x
-        UserAuthentication userAuthentication = new UserAuthentication(user);
-        SecurityContextHolder.getContext().setAuthentication(userAuthentication);
-        UserServiceTokenResponseDto serviceToken = jwtUtil.getServiceToken(user);
-
-        System.out.println(SecurityUtil.getCurrentUserEmail());
-        this.redisUtil.setData(String.valueOf(user.getId()), serviceToken.getRefreshToken()); // 토큰 발급 후 Redis 에 Refresh token 저장
-        return serviceToken;
+        return saveAuthenticationAndReturnToken(user);
     }
+
 
     /* 비밀번호 재설정 이메일 요청 */
     @Transactional
@@ -104,14 +95,20 @@ public class AuthService implements UserDetailsService {
             log.debug("AuthService.verifyAuthCode() Exception Occurs!");
             throw new RuntimeException("인증 코드의 유효기간이 이미 지났습니다.");
         }
-        if (!String.valueOf(emailAuthenticationDto.getCode()).equals(authCode)) {
-            log.debug("AuthService.verifyAuthCode() Exception Occurs!");
+        // 2. 요청 auth code 와 redis 저장된 auth code 가 다른지 확인
+        if (!emailAuthenticationDto.getCode().equals(authCode)) {
+            log.warn("AuthService.verifyAuthCode() Exception Occurs!");
             throw new RuntimeException("요청 받은 인증 코드의 검증이 실패했습니다.");
         }
-        // 2.인증 코드 검증 성공(redis 데이터 삭제)
+        // 3.인증 코드 검증 성공(redis 데이터 삭제)
         this.redisUtil.deleteData(emailAuthenticationDto.getEmail());
     }
 
+
+    /* 닉네임 중복 여부 */
+    public Boolean checkNickname(String nickname) {
+        return this.userRepository.countByNickName(nickname) == 0;
+    }
 
     // ================================================================================ //
 
@@ -157,5 +154,16 @@ public class AuthService implements UserDetailsService {
             log.debug("UserService.createCode() exception occurs");
             throw new RuntimeException("이메일 인증 코드 생성 중 예외가 발생했습니다.");
         }
+    }
+
+    // SecurityContext 에 Authentication 저장 및 ServiceToken 발급
+    private UserServiceTokenResponseDto saveAuthenticationAndReturnToken(User user) {
+        // -> 여기서 SecurityContext 에 저장된 UserAuthentication 존재 x
+        UserAuthentication userAuthentication = new UserAuthentication(user);
+        SecurityContextHolder.getContext().setAuthentication(userAuthentication);
+        UserServiceTokenResponseDto serviceToken = jwtUtil.getServiceToken(user);
+
+        this.redisUtil.setData(String.valueOf(user.getId()), serviceToken.getRefreshToken()); // 토큰 발급 후 Redis 에 Refresh token 저장
+        return serviceToken;
     }
 }

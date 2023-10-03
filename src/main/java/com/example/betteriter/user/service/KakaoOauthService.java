@@ -2,19 +2,23 @@ package com.example.betteriter.user.service;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
+import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.user.domain.User;
 import com.example.betteriter.user.dto.RoleType;
 import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.user.dto.info.KakaoOauthUserInfo;
+import com.example.betteriter.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.user.dto.oauth.KakaoToken;
 import com.example.betteriter.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -98,7 +102,6 @@ public class KakaoOauthService {
     private User saveUserWithKakaoUserInfo(KakaoToken kakaoToken,
                                            ClientRegistration kakaoClientRegistration) throws IOException {
         Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
-        System.out.println(attributes);
         KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();
@@ -120,5 +123,16 @@ public class KakaoOauthService {
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
                 .block();
+    }
+
+    /* 카카오 회원가입 마무리 */
+    @Transactional
+    public void completeKakaoJoin(KakaoJoinDto request) {
+        getUser().completeKakaoJoin(request);
+    }
+
+    private User getUser() {
+        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
     }
 }

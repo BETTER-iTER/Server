@@ -6,9 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -20,13 +19,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-/**
- * - JwtAuthenticationEntryPoint : JwtAuthenticationFilter 에서 발생한 인증 예외(Authentication Exception(=401)) 처리
- * - commence() 메소드에서 구현
- **/
 @Component
 @Slf4j
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class JwtAccessDeniedHandler implements AccessDeniedHandler {
+
     private static void makeResultResponse(
             HttpServletResponse response,
             Exception exception
@@ -37,26 +33,27 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul")));
             javaTimeModule.addSerializer(LocalDateTime.class, localDateTimeSerializer);
             ObjectMapper objectMapper = new ObjectMapper().registerModule(javaTimeModule);
-            objectMapper.writeValue(os, ErrorMessage.of(exception, HttpStatus.UNAUTHORIZED));
+            objectMapper.writeValue(os, ErrorMessage.of(exception, HttpStatus.FORBIDDEN));
             os.flush();
         }
     }
 
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
-        log.error("Authentication Exception Occurs!");
-        sendErrorUnauthorized(response);
+    public void handle(HttpServletRequest request,
+                       HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        log.error("AccessDenied Exception Occurs!");
+        sendErrorAccessDenied(response);
+
     }
 
-    // 인증 안된 경우
-    private void sendErrorUnauthorized(HttpServletResponse response) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    // 권한 없는 경우
+    private void sendErrorAccessDenied(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json,charset=utf-8");
         makeResultResponse(
                 response,
-                new BadCredentialsException("로그인이 필요합니다.")
+                new AccessDeniedException("접근 권한이 없습니다.")
         );
     }
 }

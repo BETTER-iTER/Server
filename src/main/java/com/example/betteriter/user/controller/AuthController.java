@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * - 회원 회원가입/로그인 등 인증,인가와 관련된 작
+ * - 회원 회원가입/로그인 등 인증,인가와 관련된 작업
  **/
 
 @Slf4j
@@ -38,6 +38,7 @@ public class AuthController {
             @RequestBody @Valid JoinDto request) {
         return new ResponseEntity<>(this.authService.join(request), HttpStatus.CREATED);
     }
+
 
     /**
      * 2. 회원가입을 위한 이메일 인증 요청
@@ -104,5 +105,18 @@ public class AuthController {
     ) {
         this.authService.resetPassword(request);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 7. 닉네임 중복 여부 판단 컨트롤러
+     * - /auth/nickname/check
+     * - 닉네임 중복 되지 않는 경우(사용 가능) -> true
+     * - 닉네임 중복 되는 경우(사용 불가능) -> false
+     **/
+    @GetMapping("/nickname/check")
+    public ResponseEntity<Boolean> checkNickname(
+            @RequestParam String nickname
+    ) {
+        return new ResponseEntity<>(this.authService.checkNickname(nickname), HttpStatus.OK);
     }
 }

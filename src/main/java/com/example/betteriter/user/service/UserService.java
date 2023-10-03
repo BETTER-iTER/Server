@@ -25,20 +25,29 @@ public class UserService {
     /* 로그아웃 */
     @Transactional
     public Long logout() {
-        User user = getUser();
-        this.redisUtil.deleteData(String.valueOf(user.getId()));
+        User user = getUserAndDeleteRefreshToken();
+        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
         return user.getId();
     }
+
 
     /* 회원 탈퇴 */
     @Transactional
     public void withdraw() {
-        User user = getUser();
+        User user = getUserAndDeleteRefreshToken();
+        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
         this.userRepository.delete(user);
     }
 
     private User getUser() {
         return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
+    }
+
+    private User getUserAndDeleteRefreshToken() {
+        log.info(SecurityUtil.getCurrentUserEmail());
+        User user = getUser();
+        this.redisUtil.deleteData(String.valueOf(user.getId()));
+        return user;
     }
 }
