@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ 'main' ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: CI
@@ -67,14 +70,13 @@ jobs:
           tags: $ {{ secrets.DOCKER_USERNAME }}/clockbox:latest
 
       # Deploy to prod
-      - name: Deploy yo prod
+      - name: Deploy yo EC2 Server
         uses: appleboy/ssh-action@master
         id: deploy-dev
         with:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: 8080
+          port: 22
           key: ${{ secrets.PRIVATE_KEY }}
           script:
             sudo docker ps
