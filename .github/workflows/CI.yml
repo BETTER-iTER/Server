@@ -67,7 +67,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: $ {{ secrets.DOCKER_USERNAME }}/better-iter:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
 
       # Deploy to prod
       - name: Deploy yo EC2 Server
