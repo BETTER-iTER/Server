@@ -70,9 +70,8 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
 
       # Deploy to prod
-      - name: Deploy yo EC2 Server
+      - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@master
-        id: deploy-dev
         with:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.USERNAME }}
