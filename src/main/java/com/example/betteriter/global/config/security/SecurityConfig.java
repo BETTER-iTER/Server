@@ -1,5 +1,6 @@
 package com.example.betteriter.global.config.security;
 
+import com.example.betteriter.global.config.web.CorsConfig;
 import com.example.betteriter.global.filter.JwtAccessDeniedHandler;
 import com.example.betteriter.global.filter.JwtAuthenticationEntryPoint;
 import com.example.betteriter.global.filter.JwtAuthenticationFilter;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
+    private final CorsConfig corsConfig;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -62,6 +63,7 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilter(corsConfig.corsFilter()) // CORS
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
