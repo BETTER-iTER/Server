@@ -60,7 +60,9 @@ dependencies {
     implementation 'org.junit.vintage:junit-vintage-engine:5.10.0'
 
     // document
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    implementation 'org.springdoc:springdoc-openapi-ui'
+    implementation 'io.springfox:springfox-swagger2'
+    implementation 'io.springfox:springfox-swagger-ui'
 }
 
 tasks.named('test') {
