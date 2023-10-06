@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class TempCommandServiceImpl {
+public class TempCommandServiceImpl implements TempCommandService {
 
 }

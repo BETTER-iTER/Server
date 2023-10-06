@@ -1,7 +1,9 @@
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.15'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.example'
@@ -11,9 +13,14 @@ java {
     sourceCompatibility = '11'
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+asciidoctor {
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
     }
 }
 
@@ -57,6 +64,11 @@ dependencies {
     implementation 'org.junit.platform:junit-platform-runner:1.10.0'
     implementation 'org.junit.vintage:junit-vintage-engine:5.10.0'
 
+
+    // document
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 }
 
 tasks.named('test') {
