@@ -2,27 +2,29 @@ package com.example.betteriter.user.service;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
+import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.user.domain.User;
 import com.example.betteriter.user.dto.RoleType;
-import com.example.betteriter.user.dto.UserOauthLoginResponseDto;
+import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.user.dto.info.KakaoOauthUserInfo;
+import com.example.betteriter.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.user.dto.oauth.KakaoToken;
 import com.example.betteriter.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 
@@ -30,7 +32,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Service
 public class KakaoOauthService {
-    private static final String TOKEN_TYPE = "Bearer";
     private final static String PROVIDER_NAME = "kakao";
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
@@ -41,12 +42,13 @@ public class KakaoOauthService {
      * - findUser : 회원 저장 및 리턴
      * - getServiceToken : 실제 서비스 jwt 발급
      **/
-    public UserOauthLoginResponseDto kakaoOauthLogin(String code) throws IOException {
-        User user = findUser(code);
-        return getServiceToken(user);
+    public UserServiceTokenResponseDto kakaoOauthLogin(String code) throws IOException {
+        return this.jwtUtil.getServiceToken(findUser(code));
     }
 
-
+    /**
+     * step 00 : 회원 조회
+     **/
     private User findUser(String code) throws IOException {
         ClientRegistration kakaoClientRegistration
                 = this.inMemoryClientRegistrationRepository.findByRegistrationId(PROVIDER_NAME);
@@ -54,13 +56,13 @@ public class KakaoOauthService {
         return saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
     }
 
-
     /**
      * step 01 : 카카오 jwt 요청
      * - https://kauth.kakao.com/oauth/token
      * - application/x-www-form-urlencoded
      **/
-    private KakaoToken getKakaoToken(String code, ClientRegistration kakaoClientRegistration) {
+    private KakaoToken getKakaoToken(String code,
+                                     ClientRegistration kakaoClientRegistration) {
         return WebClient.create()
                 .post()
                 .uri(kakaoClientRegistration.getProviderDetails().getTokenUri())
@@ -100,7 +102,6 @@ public class KakaoOauthService {
     private User saveUserWithKakaoUserInfo(KakaoToken kakaoToken,
                                            ClientRegistration kakaoClientRegistration) throws IOException {
         Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
-        System.out.println(attributes);
         KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();
@@ -124,17 +125,14 @@ public class KakaoOauthService {
                 .block();
     }
 
-    /* 서비스 jwt 발급 */
-    private UserOauthLoginResponseDto getServiceToken(User user) {
-        String accessToken = this.jwtUtil.createAccessToken(String.valueOf(user.getId()));
-        String refreshToken = this.jwtUtil.createRefreshToken();
+    /* 카카오 회원가입 마무리 */
+    @Transactional
+    public void completeKakaoJoin(KakaoJoinDto request) {
+        getUser().completeKakaoJoin(request);
+    }
 
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
-
-        return UserOauthLoginResponseDto.builder()
-                .accessToken(TOKEN_TYPE + " " + accessToken)
-                .refreshToken(refreshToken)
-                .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .build();
+    private User getUser() {
+        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
     }
 }

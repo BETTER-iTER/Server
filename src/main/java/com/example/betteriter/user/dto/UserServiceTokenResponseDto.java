@@ -1,5 +1,6 @@
 package com.example.betteriter.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +14,10 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserOauthLoginResponseDto {
+public class UserServiceTokenResponseDto {
     private String accessToken;
     private String refreshToken;
     private String expiredTime;
+    @JsonProperty("isExisted")
+    private boolean isExisted;
 }

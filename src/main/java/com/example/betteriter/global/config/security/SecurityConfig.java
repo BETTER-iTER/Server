@@ -1,12 +1,16 @@
 package com.example.betteriter.global.config.security;
 
+import com.example.betteriter.global.filter.JwtAccessDeniedHandler;
 import com.example.betteriter.global.filter.JwtAuthenticationEntryPoint;
 import com.example.betteriter.global.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,6 +23,19 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .antMatchers("/css/**", "/js/**", "/img/**", "/error", "/favicon.ico", "/resources/**", "/swagger-ui/**", "/v3/api-docs/**");
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,16 +48,21 @@ public class SecurityConfig {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login/callback/**", "/temp/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .antMatchers("/login/callback/**").permitAll()
+                // 특정 URI 예외 처리
+                // antMatchers().permitAll() 을 통해 특정 API 요청은
+                // jwtAuthenticationFilter 에 걸려도 ExceptionTranslationFilter 을 거치지 않는다 x
+                .antMatchers("/login/callback/**", "/auth/**", "/temp/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Authentication
+                .accessDeniedHandler(jwtAccessDeniedHandler) // Authorization
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

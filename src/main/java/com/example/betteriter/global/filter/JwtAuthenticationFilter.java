@@ -30,7 +30,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
  * - JWT 기반의 인증 방식에서 핵심이 되는 인증 필터
  * # API 요청에 있어서 JWT 가 요청 헤더에 담겨서 올 때, 유효성 검증/인증 성공/인증 실패 처리
  * # 동시에 Refresh Token 이 같이 오는 경우, Access Token + Refresh Token 재발급
- * <p>
  * << AuthenticationException >>
  * 1. 토큰의 유효성이 만료되었거나 유효하지 않은 경우 : BadCredentialsException
  * 2. 사용자 정보가 없는 경우 : UsernameNotFoundException
@@ -51,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-        if (request.getMethod().equals("OPTIONS") || request.getRequestURI().equals("/login/callback/kakao")) {
+        if (request.getMethod().equals("OPTIONS")) {
             filterChain.doFilter(request, response);
             // 이후 현재 필터 진행 방지
             return;
@@ -71,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
             } catch (AuthenticationException exception) {
                 log.info("JwtAuthentication UnauthorizedUserException!");
-                request.setAttribute("UnauthorizedUserException", exception);
+//                request.setAttribute("UnauthorizedUserException", exception);
             }
         }
 
@@ -80,6 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             checkAccessTokenAndAuthentication(request, response, filterChain);
         }
 
+        log.info("passed to next filter");
         // Authentication Exception 없이 정상 인증처리 된 경우
         filterChain.doFilter(request, response);
     }
@@ -91,7 +91,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("reissueAccessTokenAndRefreshToken() called!");
         // 요청으로 받은 Refresh Token 의 유효성 검증 및 서버 Refresh Token 과 비교
-
         try {
             if (validateRefreshToken(refreshToken) || isRefreshTokenMatch(refreshToken, accessToken)) {
                 String newAccessToken = this.jwtUtil.createAccessToken(this.jwtUtil.getUserIdFromToken(accessToken));
@@ -155,14 +154,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             User user = this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
                     .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
-            saveAuthentication(user);
-        } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
-            request.setAttribute("UnauthorizedUserException", exception);
-        }
-    }
 
-    private void saveAuthentication(User user) {
-        UserAuthentication userAuthentication = new UserAuthentication(user);
-        SecurityContextHolder.getContext().setAuthentication(userAuthentication);
+            // SecurityContext 에 인증된 Authentication 저장
+            UserAuthentication authentication = new UserAuthentication(user);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
+        }
     }
 }
