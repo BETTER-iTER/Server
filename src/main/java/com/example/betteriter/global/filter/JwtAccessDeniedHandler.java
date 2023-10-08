@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+/* 인증이 필요한 자원에 대한 요청 인증이 실패한 경우 AuthenticationException 발생한 경우 동작 */
 @Component
 @Slf4j
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
