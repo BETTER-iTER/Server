@@ -73,6 +73,7 @@ jobs:
   deploy:
     name: CD
     runs-on: ubuntu-latest
+    needs: build
     steps:
       # Deploy to prod
       - name: Deploy to EC2 Server
