@@ -90,6 +90,7 @@ jobs:
             docker image rm $(docker images -q)
             docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
             docker run -d -p 8080:8080 --name ${{ secrets.CONTAINER_NAME }} --env-file .env ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
+            docker ps
           
       
 
