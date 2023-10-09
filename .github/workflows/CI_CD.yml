@@ -10,6 +10,7 @@ permissions:
   contents: read
 
 jobs:
+  ## CI
   build:
     name: CI
     runs-on: ubuntu-latest
@@ -68,7 +69,11 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
-
+  ## CD
+  deploy:
+    name: CD
+    runs-on: ubuntu-latest
+    steps:
       # Deploy to prod
       - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@master
@@ -80,9 +85,9 @@ jobs:
           script:
             sudo docker ps
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
-        #           sudo docker run -d -p 8080:8080 --env-file .env ${{ secrets.DOCKER_USERNAME}}/better-iter
-        #           sudo docker image prune -f
-
+            sudo docker ps
+          #           sudo docker run -d -p 8080:8080 --env-file .env ${{ secrets.DOCKER_USERNAME}}/better-iter
+          #           sudo docker image prune -f
 
 
 
