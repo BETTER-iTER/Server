@@ -73,13 +73,13 @@ jobs:
       - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.USERNAME }}
+          host: ${{ secrets.HOST_IP }} # EC2 퍼블릭 IPv4 DNS
+          username: ${{ secrets.USERNAME }} # ubuntu
           port: 22
-          key: ${{ secrets.PRIVATE_KEY }}
+          key: ${{ secrets.PRIVATE_KEY }} # pem
           script:
             sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
         #           sudo docker run -d -p 8080:8080 --env-file .env ${{ secrets.DOCKER_USERNAME}}/better-iter
         #           sudo docker image prune -f
 
