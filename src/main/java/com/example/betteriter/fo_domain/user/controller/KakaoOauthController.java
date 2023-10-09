@@ -15,7 +15,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RestController
 public class KakaoOauthController {
-
     private final KakaoOauthService kakaoOauthService;
 
     @GetMapping("/login/callback/kakao")

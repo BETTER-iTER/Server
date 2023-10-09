@@ -53,7 +53,7 @@ public class SecurityConfig {
                 // 특정 URI 예외 처리
                 // antMatchers().permitAll() 을 통해 특정 API 요청은
                 // jwtAuthenticationFilter 에 걸려도 ExceptionTranslationFilter 을 거치지 않는다 x
-                .antMatchers("/login/callback/**", "/auth/**", "/temp/**").permitAll()
+                .antMatchers("/login/callback/**", "/auth/**", "/temp/**", "/test/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

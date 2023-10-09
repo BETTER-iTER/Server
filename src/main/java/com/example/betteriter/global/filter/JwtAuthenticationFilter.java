@@ -70,7 +70,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
             } catch (AuthenticationException exception) {
                 log.info("JwtAuthentication UnauthorizedUserException!");
-//                request.setAttribute("UnauthorizedUserException", exception);
             }
         }
 

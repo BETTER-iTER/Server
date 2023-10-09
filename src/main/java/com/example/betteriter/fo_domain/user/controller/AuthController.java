@@ -71,7 +71,7 @@ public class AuthController {
     }
 
     /**
-     * 4. 로그인
+     * 4. 일반 로그인
      * - /auth/login
      **/
     @PostMapping("/login")
