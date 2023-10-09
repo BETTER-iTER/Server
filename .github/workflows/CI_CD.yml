@@ -73,6 +73,7 @@ jobs:
   deploy:
     name: CD
     runs-on: ubuntu-latest
+    needs: build
     steps:
       # Deploy to prod
       - name: Deploy to EC2 Server
@@ -83,13 +84,15 @@ jobs:
           port: 22
           key: ${{ secrets.PRIVATE_KEY }} # pem
           script: |
-            docker -v
-            docker ps -a
+            docker ps
+            docker stop ${{ secrets.CONTAINER_NAME }} 
+            docker rm ${{ secrets.CONTAINER_NAME }}
+            docker image rm $(docker images -q)
             docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
-            docker images
-
-          #           sudo docker run -d -p 8080:8080 --env-file .env ${{ secrets.DOCKER_USERNAME}}/better-iter
-          #           sudo docker image prune -f
+            docker run -d -p 8080:8080 --name ${{ secrets.CONTAINER_NAME }} --env-file .env ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
+            docker ps
+          
+      
 
 
 
