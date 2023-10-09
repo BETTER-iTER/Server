@@ -12,7 +12,7 @@ spring:
   ## Database
   datasource:
     url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT}/${DATABASE_NAME:iter}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: root
+    username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -69,7 +69,7 @@ spring:
           timeout: 5000
           writetimeout: 5000
       auth-code-expiration-millis: 1800000 # 30 * 60 mills (인증 코드 만료 기간)
-      
+
 ### JWT
 jwt:
   bearer: ${JWT_BEARER:Bearer}
