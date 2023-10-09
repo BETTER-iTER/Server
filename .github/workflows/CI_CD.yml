@@ -83,9 +83,11 @@ jobs:
           port: 22
           key: ${{ secrets.PRIVATE_KEY }} # pem
           script:
-            sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
-            sudo docker ps
+            docker ps
+            docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
+            docker ps
+            docker images
+
           #           sudo docker run -d -p 8080:8080 --env-file .env ${{ secrets.DOCKER_USERNAME}}/better-iter
           #           sudo docker image prune -f
 
