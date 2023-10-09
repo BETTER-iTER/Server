@@ -82,7 +82,7 @@ jobs:
           username: ${{ secrets.USERNAME }} # ubuntu
           port: 22
           key: ${{ secrets.PRIVATE_KEY }} # pem
-          script:
+          script: |
             docker -v
             docker ps -a
             docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
