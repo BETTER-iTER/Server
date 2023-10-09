@@ -1,6 +1,6 @@
 package com.example.betteriter.global.filter;
 
-import com.example.betteriter.user.exception.ErrorMessage;
+import com.example.betteriter.fo_domain.user.exception.ErrorMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;

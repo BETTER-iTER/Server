@@ -1,6 +1,6 @@
 package com.example.betteriter.global.config.security;
 
-import com.example.betteriter.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.User;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

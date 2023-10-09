@@ -1,7 +1,8 @@
 package com.example.betteriter.user.domain;
 
 
-import com.example.betteriter.user.dto.RoleType;
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.dto.RoleType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

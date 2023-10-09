@@ -1,7 +1,8 @@
 package com.example.betteriter.example.controller;
 
-import com.example.betteriter.example.dto.TempResponse;
-import com.example.betteriter.example.service.TempQueryServiceImpl;
+import com.example.betteriter.bo_domain.example.controller.TempController;
+import com.example.betteriter.bo_domain.example.dto.TempResponse;
+import com.example.betteriter.bo_domain.example.service.TempQueryServiceImpl;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
