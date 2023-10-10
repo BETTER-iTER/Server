@@ -1,9 +1,6 @@
 package com.example.betteriter.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
@@ -12,6 +9,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class LoginDto {
     @Email(message = "올바른 이메일 형식이 아닙니다.")
