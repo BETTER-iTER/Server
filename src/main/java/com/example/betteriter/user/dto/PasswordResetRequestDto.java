@@ -17,7 +17,6 @@ public class PasswordResetRequestDto {
 
     @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하여야 합니다.")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,20}$",
-            message = "비밀번호는 영어/숫자/특수문자를 포함해야합니다."
-    )
+            message = "비밀번호는 영어/숫자/특수문자를 포함해야합니다.")
     private String password;
 }

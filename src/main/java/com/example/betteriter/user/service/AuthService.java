@@ -30,7 +30,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Service
 public class AuthService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final PasswordUtil passwordUtil;
     private final JwtUtil jwtUtil;

@@ -39,7 +39,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final JwtProperties jwtProperties;
