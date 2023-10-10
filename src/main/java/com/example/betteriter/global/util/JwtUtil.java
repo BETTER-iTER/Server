@@ -1,8 +1,8 @@
 package com.example.betteriter.global.util;
 
 import com.example.betteriter.global.config.properties.JwtProperties;
-import com.example.betteriter.user.domain.User;
-import com.example.betteriter.user.dto.UserServiceTokenResponseDto;
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
