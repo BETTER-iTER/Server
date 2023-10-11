@@ -35,15 +35,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      #      - name: set yaml secret
-      #        uses: microsoft/variable-substitution@v1
-      #        with:
-      #          files: ./src/main/resources/application.yml
-      #        env:
-      #          spring.datasource.url: ${{ secrets.DATABASE_URL }}
-      #          spring.datasource.username: ${{ secrets.DATABASE_USERNAME }}
-      #          spring.datasource.password: ${{ secrets.DATABASE_PASSWORD }}
-
       - name: Grant execute Permission for gradlew
         run: chmod +x gradlew
 
