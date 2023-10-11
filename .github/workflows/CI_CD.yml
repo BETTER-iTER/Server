@@ -2,7 +2,7 @@ name: CI/CD Automation using github actions and Docker
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: '*'
   pull_request:
     branches: [ 'main' ]
 
@@ -35,14 +35,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: set yaml secret
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./src/main/resources/application.yml
-        env:
-          spring.datasource.url: ${{ secrets.DATABASE_URL }}
-          spring.datasource.username: ${{ secrets.DATABASE_USERNAME }}
-          spring.datasource.password: ${{ secrets.DATABASE_PASSWORD }}
+      #      - name: set yaml secret
+      #        uses: microsoft/variable-substitution@v1
+      #        with:
+      #          files: ./src/main/resources/application.yml
+      #        env:
+      #          spring.datasource.url: ${{ secrets.DATABASE_URL }}
+      #          spring.datasource.username: ${{ secrets.DATABASE_USERNAME }}
+      #          spring.datasource.password: ${{ secrets.DATABASE_PASSWORD }}
 
       - name: Grant execute Permission for gradlew
         run: chmod +x gradlew
@@ -76,17 +76,18 @@ jobs:
     needs: build
     steps:
       # Deploy to prod
-      - name: Deploy to EC2 Server
-        uses: appleboy/ssh-action@master
+      - name: Connect to WAS & Execute Application
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.HOST_IP }} # EC2 퍼블릭 IPv4 DNS
           username: ${{ secrets.USERNAME }} # ubuntu
           port: 22
           key: ${{ secrets.PRIVATE_KEY }} # pem
           script: |
+            docker -v
             docker ps
-            docker stop ${{ secrets.CONTAINER_NAME }} 
-            docker rm ${{ secrets.CONTAINER_NAME }}
+            docker stop $(docker ps -aq)
+            docker rm $(docker ps -aq)
             docker image rm $(docker images -q)
             docker pull ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
             docker run -d -p 8080:8080 --name ${{ secrets.CONTAINER_NAME }} --env-file .env ${{ secrets.DOCKER_USERNAME }}/better-iter:latest
