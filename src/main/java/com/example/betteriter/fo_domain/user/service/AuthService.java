@@ -1,18 +1,18 @@
 package com.example.betteriter.fo_domain.user.service;
 
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.dto.JoinDto;
+import com.example.betteriter.fo_domain.user.dto.LoginDto;
+import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
+import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.example.betteriter.fo_domain.user.util.PasswordUtil;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
 import com.example.betteriter.infra.EmailService;
-import com.example.betteriter.fo_domain.user.domain.User;
-import com.example.betteriter.fo_domain.user.dto.JoinDto;
-import com.example.betteriter.fo_domain.user.dto.LoginDto;
-import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
-import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
-import com.example.betteriter.fo_domain.user.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -64,7 +64,7 @@ public class AuthService implements UserDetailsService {
         if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
-        return saveAuthenticationAndReturnToken(user);
+        return this.saveAuthenticationAndReturnToken(user);
     }
 
 
