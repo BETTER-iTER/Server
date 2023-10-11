@@ -1,8 +1,8 @@
 package com.example.betteriter.global.util;
 
-import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
+import com.example.betteriter.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,12 +71,11 @@ public class JwtUtil {
         String accessToken = this.createAccessToken(String.valueOf(user.getId()));
         String refreshToken = this.createRefreshToken();
 
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
         this.redisUtil.setData(String.valueOf(user.getId()), refreshToken);
         return UserServiceTokenResponseDto.builder()
                 .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
                 .refreshToken(refreshToken)
-                .expiredTime(expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .expiredTime(LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000))
                 .isExisted(user.getNickName() != null)
                 .build();
     }

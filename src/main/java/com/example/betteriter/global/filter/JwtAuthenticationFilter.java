@@ -1,11 +1,14 @@
 package com.example.betteriter.global.filter;
 
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.dto.ReissueTokenResponseDto;
+import com.example.betteriter.fo_domain.user.repository.UserRepository;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
-import com.example.betteriter.fo_domain.user.domain.User;
-import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -56,17 +60,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         /*
           -  사용자 요청에서 Refresh Token 추출
-          -> Refresh Token 존재하는 경우는 Access Token(만료된) 재발급인 경우밖에 없음
+          -> Refresh Token 존재하는 경우는 Access Token(만료된) 재발급인 경우밖에 없음(임의의 API 요청인 경우, refresh token 을 같이 담아서 요청)
           -> 위의 경우 제외하고 모든 요청에서 Refresh Token == null
         */
         String refreshToken = this.jwtUtil.extractRefreshToken(request);
 
         // Case 01) Access Token 재발급인 경우(Authorization Header Access Token 유효성 x)
-        if (refreshToken != null) {
+        if (refreshToken != null && request.getRequestURI().contains("/reissue")) {
             try {
                 String accessToken = this.jwtUtil.extractAccessToken(request)
                         .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("There is no Access Token"));
-                reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
+                this.reissueAccessTokenAndRefreshToken(response, accessToken, refreshToken);
+                return;
             } catch (AuthenticationException exception) {
                 log.info("JwtAuthentication UnauthorizedUserException!");
             }
@@ -74,26 +79,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Case 02) 일반 API 요청인 경우
         else {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
+            this.checkAccessTokenAndAuthentication(request, response, filterChain);
         }
 
         log.info("passed to next filter");
         // Authentication Exception 없이 정상 인증처리 된 경우
+        // 기존 필터 체인 호출 !!
         filterChain.doFilter(request, response);
     }
 
     // Case 01) Access Token + Refresh Token 재발급 메소드
     private void reissueAccessTokenAndRefreshToken(HttpServletResponse response,
                                                    String accessToken,
-                                                   String refreshToken) throws AuthenticationException {
+                                                   String refreshToken) throws AuthenticationException, IOException {
 
         log.info("reissueAccessTokenAndRefreshToken() called!");
         // 요청으로 받은 Refresh Token 의 유효성 검증 및 서버 Refresh Token 과 비교
         try {
-            if (validateRefreshToken(refreshToken) || isRefreshTokenMatch(refreshToken, accessToken)) {
+            if (this.validateRefreshToken(refreshToken) || this.isRefreshTokenMatch(refreshToken, accessToken)) {
                 String newAccessToken = this.jwtUtil.createAccessToken(this.jwtUtil.getUserIdFromToken(accessToken));
                 String newRefreshToken = this.reIssueRefreshToken(this.jwtUtil.getUserIdFromToken(accessToken));
-                sendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
+                this.sendAccessTokenAndRefreshToken(response, newAccessToken, newRefreshToken);
             }
         } catch (IllegalArgumentException | JwtException exception) {
             throw new BadCredentialsException("Authentication Error Occurred");
@@ -105,11 +111,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 1. 상태 코드 설정
      * 2. 응답 헤더에 설정 (jwtProperties 에서 정보 가져옴)
      **/
-    private void sendAccessTokenAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
+    private void sendAccessTokenAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
+        // refresh token, access token 을 응답 본문에 넣어 응답
+        ReissueTokenResponseDto reissueTokenResponseDto = ReissueTokenResponseDto.builder()
+                .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
+                .refreshToken(refreshToken)
+                .expiredTime(expireTime)
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
         response.setStatus(SC_OK);
-        response.setHeader(jwtProperties.getAccessHeader(), accessToken);
-        response.setHeader(jwtProperties.getRefreshHeader(), refreshToken);
-        log.info("Access Token, Refresh token 응답 헤더 설정 완료");
+        response.setContentType("application/json"); // JSON 형태로 응답
+        response.setCharacterEncoding("UTF-8");
+        String jsonResponse = mapper.writeValueAsString(reissueTokenResponseDto);
+        response.getWriter().write(jsonResponse);
     }
 
 

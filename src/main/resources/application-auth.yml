@@ -1,0 +1,32 @@
+## auth(인증)
+spring:
+  config:
+    activate:
+      on-profile: "auth"
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+## JWT
+jwt:
+  bearer: ${JWT_BEARER:Bearer}
+  secret: ${JWT_SECRET_KEY}
+  access-expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
+  access-header: ${JWT_ACCESS_HEADER:Authorization} # Access Token 헤더
+  refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
+  refresh-header: ${JWT_REFRESH_HEADER:Authorization-refresh} # Refresh Token 헤더

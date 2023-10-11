@@ -1,0 +1,22 @@
+## prod(운영) env
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        default_batch_fetch_size: 100
+
+## 운영 환경 = info
+logging:
+  level:
+    org.hibernate.sql: info
+    org.hibernate.type: info

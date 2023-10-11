@@ -5,82 +5,87 @@ spring:
   application:
     name: Better-Iter Application
 
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+  profiles:
+    group:
+      "dev": "dev, auth, datasource, mail, redis" # 개발 환경 프로파일
+      "prod": "prod, auth, datasource, mail, redis" # 운영 환경 프로파일
 
-  ## Database
-  datasource:
-    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT}/${DATABASE_NAME:iter}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  ## JPA
-  jpa:
-    hibernate:
-      ddl-auto: create
-
-    properties:
-      hibernate:
-        show_sql: true
-        default_batch_fetch_size: 100
-
-  ## Oauth
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: ${KAKAO_REDIRECT_URI}
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
-            scope:
-              - account_email
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
-
-  ### REDIS
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD}
-
-  ### mail
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${EMAIL_USERNAME}
-    password: ${EMAIL_PASSWORD:password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-      auth-code-expiration-millis: 1800000 # 30 * 60 mills (인증 코드 만료 기간)
-
-### JWT
-jwt:
-  bearer: ${JWT_BEARER:Bearer}
-  secret: ${JWT_SECRET_KEY}
-  access-expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
-  access-header: ${JWT_ACCESS_HEADER:Authorization} # Access Token 헤더
-  refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
-  refresh-header: ${JWT_REFRESH_HEADER:Authorization-refresh} # Refresh Token 헤더
-
-
-logging:
-  level:
-    org.hibernate.sql: debug
-    org.hibernate.type: trace
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+#
+#  ## Database
+#  datasource:
+#    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT}/${DATABASE_NAME:iter}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+#    username: ${DATABASE_USERNAME}
+#    password: ${DATABASE_PASSWORD}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#  ## JPA
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
+#
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        default_batch_fetch_size: 100
+#
+#  ## Oauth
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          kakao:
+#            client-id: ${KAKAO_CLIENT_ID}
+#            client-secret: ${KAKAO_CLIENT_SECRET}
+#            redirect-uri: ${KAKAO_REDIRECT_URI}
+#            client-authentication-method: POST
+#            authorization-grant-type: authorization_code
+#            scope:
+#              - account_email
+#        provider:
+#          kakao:
+#            authorization-uri: https://kauth.kakao.com/oauth/authorize
+#            token-uri: https://kauth.kakao.com/oauth/token
+#            user-info-uri: https://kapi.kakao.com/v2/user/me
+#            user-name-attribute: id
+#
+#  ### REDIS
+#  redis:
+#    host: ${REDIS_HOST:localhost}
+#    port: ${REDIS_PORT:6379}
+#    password: ${REDIS_PASSWORD}
+#
+#  ### mail
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: ${EMAIL_USERNAME}
+#    password: ${EMAIL_PASSWORD:password}
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+#          connectiontimeout: 5000
+#          timeout: 5000
+#          writetimeout: 5000
+#      auth-code-expiration-millis: 1800000 # 30 * 60 mills (인증 코드 만료 기간)
+#
+#### JWT
+#jwt:
+#  bearer: ${JWT_BEARER:Bearer}
+#  secret: ${JWT_SECRET_KEY}
+#  access-expiration: ${JWT_ACCESS_EXPIRE:3600000} # 1시간
+#  access-header: ${JWT_ACCESS_HEADER:Authorization} # Access Token 헤더
+#  refresh-expiration: ${JWT_REFRESH_EXPIRE:86400000} # 1일
+#  refresh-header: ${JWT_REFRESH_HEADER:Authorization-refresh} # Refresh Token 헤더
+#
+#
+#logging:
+#  level:
+#    org.hibernate.sql: debug
+#    org.hibernate.type: trace
