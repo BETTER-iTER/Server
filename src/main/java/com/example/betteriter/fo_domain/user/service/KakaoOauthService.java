@@ -1,15 +1,15 @@
 package com.example.betteriter.fo_domain.user.service;
 
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.dto.RoleType;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
+import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoToken;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.SecurityUtil;
-import com.example.betteriter.fo_domain.user.domain.User;
-import com.example.betteriter.fo_domain.user.dto.RoleType;
-import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -43,7 +43,7 @@ public class KakaoOauthService {
      * - getServiceToken : 실제 서비스 jwt 발급
      **/
     public UserServiceTokenResponseDto kakaoOauthLogin(String code) throws IOException {
-        return this.jwtUtil.getServiceToken(findUser(code));
+        return this.jwtUtil.createServiceToken(findUser(code));
     }
 
     /**

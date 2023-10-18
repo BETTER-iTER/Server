@@ -111,7 +111,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 1. 상태 코드 설정
      * 2. 응답 헤더에 설정 (jwtProperties 에서 정보 가져옴)
      **/
-    private void sendAccessTokenAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+    private void sendAccessTokenAndRefreshToken(HttpServletResponse response,
+                                                String accessToken,
+                                                String refreshToken) throws IOException {
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000);
         // refresh token, access token 을 응답 본문에 넣어 응답
         ReissueTokenResponseDto reissueTokenResponseDto = ReissueTokenResponseDto.builder()
@@ -128,6 +130,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
         String jsonResponse = mapper.writeValueAsString(reissueTokenResponseDto);
         response.getWriter().write(jsonResponse);
+        response.flushBuffer();
     }
 
 
@@ -175,6 +178,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserAuthentication authentication = new UserAuthentication(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
+            request.setAttribute("exception", exception);
             log.debug("Authentication occurs! - {}", exception.getClass());
         }
     }

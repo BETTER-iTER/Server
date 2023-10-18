@@ -18,6 +18,7 @@ public class PasswordUtil {
 
     /* 비밀번호 동일성 체크 */
     public boolean isEqual(String inputPassword, String encodedPassword) {
-        return bCryptPasswordEncoder.matches(inputPassword, encodedPassword);
+        Boolean result = bCryptPasswordEncoder.matches(inputPassword, encodedPassword);
+        return result;
     }
 }

@@ -1,0 +1,19 @@
+version: "3"
+services:
+  mysql:
+    image: mysql
+    container_name: better-iter_mysql
+    environment:
+      MYSQL_DATABASE: iterdb # 데이터베이스 자동 생성
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3307:3306
+
+  redis:
+    image: redis
+    container_name: better-iter_redis
+    ports:
+      - 6378:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+

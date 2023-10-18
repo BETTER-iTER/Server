@@ -1,12 +1,13 @@
 package com.example.betteriter.fo_domain.user.service;
 
+import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.example.betteriter.global.error.exception.ErrorCode;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.global.util.SecurityUtil;
-import com.example.betteriter.fo_domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ public class UserService {
     /* 로그아웃 */
     @Transactional
     public Long logout() {
-        User user = getUserAndDeleteRefreshToken();
+        User user = this.getUserAndDeleteRefreshToken();
         SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
         return user.getId();
     }
@@ -34,20 +35,19 @@ public class UserService {
     /* 회원 탈퇴 */
     @Transactional
     public void withdraw() {
-        User user = getUserAndDeleteRefreshToken();
+        User user = this.getUserAndDeleteRefreshToken();
         SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
         this.userRepository.delete(user);
     }
 
-    private User getUser() {
-        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
-    }
-
     private User getUserAndDeleteRefreshToken() {
-        log.info(SecurityUtil.getCurrentUserEmail());
-        User user = getUser();
+        User user = this.getUser();
         this.redisUtil.deleteData(String.valueOf(user.getId()));
         return user;
+    }
+
+    private User getUser() {
+        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UserHandler(ErrorCode._USER_NOT_FOUND));
     }
 }

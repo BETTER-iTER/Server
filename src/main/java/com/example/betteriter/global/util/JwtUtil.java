@@ -67,7 +67,7 @@ public class JwtUtil {
     }
 
     // kakao oauth 로그인 & 일반 로그인 시 jwt 응답 생성
-    public UserServiceTokenResponseDto getServiceToken(User user) {
+    public UserServiceTokenResponseDto createServiceToken(User user) {
         String accessToken = this.createAccessToken(String.valueOf(user.getId()));
         String refreshToken = this.createRefreshToken();
 

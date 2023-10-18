@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.user.domain;
 
 import com.example.betteriter.fo_domain.user.dto.RoleType;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
+import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +19,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS")
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
