@@ -1,12 +1,11 @@
 package com.example.betteriter.global.filter;
 
-import com.example.betteriter.fo_domain.user.exception.ErrorMessage;
+import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.error.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul")));
             javaTimeModule.addSerializer(LocalDateTime.class, localDateTimeSerializer);
             ObjectMapper objectMapper = new ObjectMapper().registerModule(javaTimeModule);
-            objectMapper.writeValue(os, ErrorMessage.of(exception, HttpStatus.UNAUTHORIZED));
+            objectMapper.writeValue(os, ResponseDto.onFail(exception.getClass().getSimpleName(), ErrorCode._UNAUTHORIZED));
             os.flush();
         }
     }
@@ -47,16 +46,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
         log.error("Authentication Exception Occurs!");
-        sendErrorUnauthorized(response);
+        Exception exception = (Exception) request.getAttribute("exception");
+        sendErrorUnauthorized(request, response, exception);
     }
 
     // 인증 안된 경우
-    private void sendErrorUnauthorized(HttpServletResponse response) throws IOException {
+    private void sendErrorUnauthorized(HttpServletRequest request,
+                                       HttpServletResponse response,
+                                       Exception exception) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json,charset=utf-8");
-        makeResultResponse(
-                response,
-                new BadCredentialsException("로그인이 필요합니다.")
-        );
+        makeResultResponse(response, exception);
     }
 }

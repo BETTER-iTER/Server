@@ -4,16 +4,22 @@ import com.example.betteriter.fo_domain.user.dto.JoinDto;
 import com.example.betteriter.fo_domain.user.dto.LoginDto;
 import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
+import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.service.AuthService;
+import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import static com.example.betteriter.global.error.exception.ErrorCode._METHOD_ARGUMENT_ERROR;
 
 /**
  * - 회원 회원가입/로그인 등 인증,인가와 관련된 작업
@@ -24,7 +30,6 @@ import javax.validation.Valid;
 @RequestMapping("/auth")
 @RestController
 public class AuthController {
-
     private final AuthService authService;
 
     /**
@@ -34,9 +39,12 @@ public class AuthController {
      * - /auth/join
      **/
     @PostMapping("/join")
-    public ResponseEntity<Long> join(
-            @RequestBody @Valid JoinDto request) {
-        return new ResponseEntity<>(this.authService.join(request), HttpStatus.CREATED);
+    public ResponseDto<Long> join(
+            @RequestBody @Valid JoinDto request,
+            BindingResult bindingResult
+    ) {
+        this.checkRequestValidation(bindingResult);
+        return ResponseDto.onSuccess(this.authService.join(request));
     }
 
 
@@ -49,11 +57,13 @@ public class AuthController {
      * 사용자가 인증 번호 클릭 -> 서버에서 판단 후 승인 or 거부
      */
     @PostMapping("/join/emails")
-    public ResponseEntity<Void> requestEmail(
-            @RequestBody @Valid EmailDto emailDto
+    public ResponseDto<Void> requestEmail(
+            @RequestBody @Valid EmailDto emailDto,
+            BindingResult bindingResult
     ) {
+        this.checkRequestValidation(bindingResult);
         this.authService.requestEmailForJoin(emailDto);
-        return ResponseEntity.ok().build();
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -63,11 +73,13 @@ public class AuthController {
      * - /auth/check/code
      **/
     @PostMapping("/emails/verification")
-    public ResponseEntity<Void> verifyAuthCode(
-            @RequestBody @Valid EmailAuthenticationDto emailAuthenticationDto
+    public ResponseDto<Void> verifyAuthCode(
+            @RequestBody @Valid EmailAuthenticationDto emailAuthenticationDto,
+            BindingResult bindingResult
     ) {
+        this.checkRequestValidation(bindingResult);
         this.authService.verifyAuthCode(emailAuthenticationDto);
-        return ResponseEntity.ok().build();
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -76,7 +88,9 @@ public class AuthController {
      **/
     @PostMapping("/login")
     public ResponseEntity<UserServiceTokenResponseDto> login(
-            @RequestBody @Valid LoginDto loginRequestDto) {
+            @RequestBody @Valid LoginDto loginRequestDto,
+            BindingResult bindingResult) {
+        this.checkRequestValidation(bindingResult);
         return new ResponseEntity<>(this.authService.login(loginRequestDto), HttpStatus.OK);
     }
 
@@ -86,25 +100,30 @@ public class AuthController {
      * - 비밀번호 재설정을 위한 이메일 요청 이미 해당 회원정보가 있어야 함
      **/
     @PostMapping("/password/emails")
-    public ResponseEntity<Void> requestEmailForPassword(
-            @RequestBody @Valid EmailDto emailDto
+    public ResponseDto<Void> requestEmailForPassword(
+            @RequestBody @Valid EmailDto emailDto,
+            BindingResult bindingResult
     ) {
-        this.authService.requestEmailForPassword(emailDto);
-        return ResponseEntity.ok().build();
+        this.checkRequestValidation(bindingResult);
+        this.authService.requestEmailForPasswordReset(emailDto);
+        return ResponseDto.onSuccess(null);
     }
 
     /**
      * 6. 비밀번호 재설정 요청 컨트롤러
      * - /auth/password/reset
+     * - 비밀번호 이메일 인증 /password/emails 후 진행
      * - 새로운 비밀번호를 입력받아 설정
      * - 해당 유저가 존재 여부 확인 및 일반 회원가입 유저인지 다시 확인
      **/
     @PatchMapping("/password/reset")
-    public ResponseEntity<Void> resetPassword(
-            @RequestBody PasswordResetRequestDto request
+    public ResponseDto<Void> resetPassword(
+            @RequestBody PasswordResetRequestDto request,
+            BindingResult bindingResult
     ) {
+        this.checkRequestValidation(bindingResult);
         this.authService.resetPassword(request);
-        return ResponseEntity.ok().build();
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -114,9 +133,18 @@ public class AuthController {
      * - 닉네임 중복 되는 경우(사용 불가능) -> false
      **/
     @GetMapping("/nickname/check")
-    public ResponseEntity<Boolean> checkNickname(
+    public ResponseDto<Boolean> checkNickname(
             @RequestParam String nickname
     ) {
-        return new ResponseEntity<>(this.authService.checkNickname(nickname), HttpStatus.OK);
+        return ResponseDto.onSuccess(this.authService.checkNickname(nickname));
+    }
+
+    /* 컨트롤러에 들어온 요청 DTO 유효성 검증 */
+    private void checkRequestValidation(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            log.debug("filedError occurs : {}", fieldError.getDefaultMessage());
+            throw new UserHandler(_METHOD_ARGUMENT_ERROR);
+        }
     }
 }

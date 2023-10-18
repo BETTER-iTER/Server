@@ -2,10 +2,9 @@ package com.example.betteriter.fo_domain.user.controller;
 
 
 import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +30,8 @@ public class UserController {
      * 2. 백에서 Refresh Token 삭제
      **/
     @PostMapping("/logout")
-    public ResponseEntity<Long> logout() {
-        return new ResponseEntity<>(this.userService.logout(), HttpStatus.OK);
+    public ResponseDto<Long> logout() {
+        return ResponseDto.onSuccess(this.userService.logout());
     }
 
     /**
@@ -42,8 +41,8 @@ public class UserController {
      * 2. User 정보 삭제
      **/
     @DeleteMapping("/withdraw")
-    public ResponseEntity<Void> withdraw() {
+    public ResponseDto<Void> withdraw() {
         this.userService.withdraw();
-        return ResponseEntity.ok().build();
+        return ResponseDto.onSuccess(null);
     }
 }

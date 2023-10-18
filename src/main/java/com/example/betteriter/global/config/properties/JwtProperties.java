@@ -1,12 +1,14 @@
 package com.example.betteriter.global.config.properties;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConfigurationProperties(prefix = "jwt")
 @Getter
-@Setter
+@ConstructorBinding
+@AllArgsConstructor
 public class JwtProperties {
     private String bearer;
     private String secret;
