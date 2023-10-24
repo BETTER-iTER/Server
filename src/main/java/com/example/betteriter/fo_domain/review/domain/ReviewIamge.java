@@ -25,6 +25,6 @@ public class ReviewIamge {
     @Column(name = "iamge_url", nullable = false)
     private String imgUrl;
 
-    @Column(name = "order", nullable = false)
-    private int order;
+    @Column(name = "order_num", nullable = false)
+    private int orderNum;
 }
