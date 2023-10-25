@@ -54,8 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         if (request.getMethod().equals("OPTIONS")) {
-            filterChain.doFilter(request, response);
             // 이후 현재 필터 진행 방지
+            log.info("Preflight Request !");
+            response.setStatus(SC_OK);
             return;
         }
         /*
@@ -86,6 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Authentication Exception 없이 정상 인증처리 된 경우
         // 기존 필터 체인 호출 !!
         filterChain.doFilter(request, response);
+
     }
 
     // Case 01) Access Token + Refresh Token 재발급 메소드

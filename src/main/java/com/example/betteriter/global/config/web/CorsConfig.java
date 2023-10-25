@@ -9,6 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class CorsConfig implements WebMvcConfigurer {
 
+    /*
+        1. Access-Control-Allow-Origin
+        2. Access-Control-Allow-Headers
+        3. Access-Control-Allow-Methods
+        4. Access-Control-Allow-Credentials
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
