@@ -54,10 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         if (request.getMethod().equals("OPTIONS")) {
-            // 이후 현재 필터 진행 방지
-
-            log.info(request.getHeader("Origin"));
-            log.info(response.getHeader("Access-Control-Allow-Origin"));
+            // 이후 현재 필터 진행 방지(Preflight Request)
             log.info("Preflight Request !");
             response.setStatus(SC_OK);
             return;
