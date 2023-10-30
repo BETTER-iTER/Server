@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.user.controller;
 
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
-import com.example.betteriter.fo_domain.user.service.KakaoOauthService;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
+import com.example.betteriter.fo_domain.user.service.KakaoOauthService;
+import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,10 +18,10 @@ public class KakaoOauthController {
     private final KakaoOauthService kakaoOauthService;
 
     @GetMapping("/login/callback/kakao")
-    public ResponseEntity<UserServiceTokenResponseDto> kakaoOauthLogin(
+    public ResponseDto<UserServiceTokenResponseDto> kakaoOauthLogin(
             @RequestParam String code
     ) throws IOException {
-        return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
+        return ResponseDto.onSuccess(this.kakaoOauthService.kakaoOauthLogin(code));
     }
 
     /**
@@ -30,9 +30,9 @@ public class KakaoOauthController {
      * - /auth/kakao/join
      **/
     @PostMapping("/kakao/join")
-    public ResponseEntity<Void> completeKakaoJoin(
+    public ResponseDto<Void> completeKakaoJoin(
             @RequestBody @Valid KakaoJoinDto request) {
         this.kakaoOauthService.completeKakaoJoin(request);
-        return ResponseEntity.ok().build();
+        return ResponseDto.onSuccess(null);
     }
 }
