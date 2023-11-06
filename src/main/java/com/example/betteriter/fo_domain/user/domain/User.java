@@ -1,7 +1,9 @@
 package com.example.betteriter.fo_domain.user.domain;
 
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.domain.ReviewLike;
+import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.fo_domain.user.dto.RoleType;
-import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Getter
@@ -37,15 +40,24 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "usr_role")
     private RoleType role;
 
-    // ======= 기타 회원 정보 ======== //
-    @Column(name = "usr_nickname", unique = true)
-    private String nickName;
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> following = new ArrayList<>(); // 해당 회원이 가지는 팔로워 수
 
-    @Column(name = "usr_job")
-    private int job;
+    @OneToMany(mappedBy = "followee")
+    private List<Follow> followee = new ArrayList<>(); // 해당 회원이 가지는 팔로잉 수
 
-    @Column(name = "usr_intersts")
-    private String interests;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ReviewScrap> reviewScraps = new ArrayList<>(); // 유저가 스크랩한 리뷰
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ReviewLike> reviewLikes = new ArrayList<>(); // 유저가 좋아요한 리뷰
+
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
+    private List<Review> reviews = new ArrayList<>(); // 유저가 작성한 리뷰
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private UserDetail userDetail; // 유저 상세 정보
+
 
     /**
      * 권한 설정
@@ -84,11 +96,5 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void completeKakaoJoin(KakaoJoinDto kakaoJoinDto) {
-        nickName = kakaoJoinDto.getNickname();
-        job = kakaoJoinDto.getJob();
-        interests = kakaoJoinDto.getInterests();
     }
 }
