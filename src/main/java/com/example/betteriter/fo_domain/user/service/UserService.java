@@ -41,12 +41,13 @@ public class UserService {
     }
 
     private User getUserAndDeleteRefreshToken() {
-        User user = this.getUser();
+        User user = this.getCurrentUser();
         this.redisUtil.deleteData(String.valueOf(user.getId()));
         return user;
     }
 
-    private User getUser() {
+    /* 현재 로그인한 회원 정보 가져오기 */
+    public User getCurrentUser() {
         return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
                 .orElseThrow(() -> new UserHandler(ErrorCode._USER_NOT_FOUND));
     }

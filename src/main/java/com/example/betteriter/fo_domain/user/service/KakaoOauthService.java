@@ -128,7 +128,7 @@ public class KakaoOauthService {
     /* 카카오 회원가입 마무리 */
     @Transactional
     public void completeKakaoJoin(KakaoJoinDto request) {
-        getUser().completeKakaoJoin(request);
+        getUser().getUserDetail().completeKakaoJoin(request);
     }
 
     private User getUser() {

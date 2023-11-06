@@ -13,6 +13,7 @@ import javax.mail.internet.MimeMessage;
 @RequiredArgsConstructor
 @Service
 public class EmailService {
+
     private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")

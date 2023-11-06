@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Slf4j
 @Getter
@@ -16,7 +15,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "NEWS")
 public class News extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,12 +26,12 @@ public class News extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "event_date", nullable = false)
-    private Timestamp eventDate;
-
     @Column(name = "content")
     private String content;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
+    @Column(name = "news_url")
+    private String newsUrl;
 }

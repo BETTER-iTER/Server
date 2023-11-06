@@ -6,6 +6,7 @@ import com.example.betteriter.fo_domain.user.dto.LoginDto;
 import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
+import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
 import com.example.betteriter.fo_domain.user.util.PasswordUtil;
 import com.example.betteriter.global.config.properties.JwtProperties;
@@ -35,6 +36,7 @@ import static com.example.betteriter.global.error.exception.ErrorCode.*;
 @Service
 public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final UserDetailRepository userDetailRepository;
     private final PasswordUtil passwordUtil;
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
@@ -52,8 +54,12 @@ public class AuthService implements UserDetailsService {
     public Long join(JoinDto joinDto) {
         // 이메일 중복 여부 파악
         this.checkEmailDuplication(joinDto.getEmail());
-        String encryptPassword = this.passwordUtil.encode(joinDto.getPassword());
-        return this.userRepository.save(joinDto.toEntity(encryptPassword)).getId();
+        return this.processJoin(joinDto, this.passwordUtil.encode(joinDto.getPassword()));
+    }
+
+    private Long processJoin(JoinDto joinDto, String encryptPassword) {
+        return this.userRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
+                .getId();
     }
 
     /* 로그인 */
@@ -114,7 +120,7 @@ public class AuthService implements UserDetailsService {
     /* 닉네임 중복 여부 */
     @Transactional
     public Boolean checkNickname(String nickname) {
-        return this.userRepository.countByNickName(nickname) == 0;
+        return this.userDetailRepository.countByNickName(nickname) == 0;
     }
 
     // ================================================================================ //
