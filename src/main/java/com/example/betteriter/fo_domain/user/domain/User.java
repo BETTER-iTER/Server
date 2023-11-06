@@ -41,19 +41,19 @@ public class User extends BaseEntity implements UserDetails {
     private RoleType role;
 
     @OneToMany(mappedBy = "follower")
-    private List<Follow> following = new ArrayList<>(); // 해당 회원이 가지는 팔로워 수
+    private List<Follow> following; // 해당 회원이 가지는 팔로워 수
 
     @OneToMany(mappedBy = "followee")
-    private List<Follow> followee = new ArrayList<>(); // 해당 회원이 가지는 팔로잉 수
+    private List<Follow> followee; // 해당 회원이 가지는 팔로잉 수
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ReviewScrap> reviewScraps = new ArrayList<>(); // 유저가 스크랩한 리뷰
+    private List<ReviewScrap> reviewScraps; // 유저가 스크랩한 리뷰
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ReviewLike> reviewLikes = new ArrayList<>(); // 유저가 좋아요한 리뷰
+    private List<ReviewLike> reviewLikes; // 유저가 좋아요한 리뷰
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>(); // 유저가 작성한 리뷰
+    private List<Review> reviews; // 유저가 작성한 리뷰
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserDetail userDetail; // 유저 상세 정보

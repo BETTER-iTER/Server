@@ -1,12 +1,15 @@
 package com.example.betteriter.fo_domain.user.dto;
 
 import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.UserDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+
+import static com.example.betteriter.fo_domain.user.dto.RoleType.ROLE_USER;
 
 @Getter
 @Setter
@@ -31,14 +34,20 @@ public class JoinDto {
     @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
     private String interests;
 
-    public User toEntity(String encryptPassword) {
+    public User toUserEntity(String encryptPassword, UserDetail userDetail) {
         return User.builder()
                 .email(email)
                 .password(encryptPassword)
-                .nickName(nickName)
+                .role(ROLE_USER)
+                .userDetail(userDetail)
+                .build();
+    }
+
+    public UserDetail toUserDetailEntity() {
+        return UserDetail.builder()
                 .job(job)
-                .role(RoleType.ROLE_USER)
                 .interests(interests)
+                .nickName(nickName)
                 .build();
     }
 }
