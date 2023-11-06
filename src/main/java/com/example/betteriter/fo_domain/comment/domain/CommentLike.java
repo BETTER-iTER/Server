@@ -14,7 +14,6 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "COMMENT_LIKE")
 public class CommentLike {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

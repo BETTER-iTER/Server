@@ -12,8 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "REVIEW_IMAGE")
-public class ReviewIamge {
-
+public class ReviewImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
