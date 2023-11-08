@@ -58,7 +58,7 @@ public class AuthController {
      */
     @PostMapping("/join/emails")
     public ResponseDto<Void> requestEmail(
-            @RequestBody @Valid EmailDto emailDto,
+            @Valid @RequestBody EmailDto emailDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
@@ -74,7 +74,7 @@ public class AuthController {
      **/
     @PostMapping("/emails/verification")
     public ResponseDto<Void> verifyAuthCode(
-            @RequestBody @Valid EmailAuthenticationDto emailAuthenticationDto,
+            @Valid @RequestBody EmailAuthenticationDto emailAuthenticationDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
@@ -88,7 +88,7 @@ public class AuthController {
      **/
     @PostMapping("/login")
     public ResponseEntity<UserServiceTokenResponseDto> login(
-            @RequestBody @Valid LoginDto loginRequestDto,
+            @Valid @RequestBody LoginDto loginRequestDto,
             BindingResult bindingResult) {
         this.checkRequestValidation(bindingResult);
         return new ResponseEntity<>(this.authService.login(loginRequestDto), HttpStatus.OK);
@@ -101,7 +101,7 @@ public class AuthController {
      **/
     @PostMapping("/password/emails")
     public ResponseDto<Void> requestEmailForPassword(
-            @RequestBody @Valid EmailDto emailDto,
+            @Valid @RequestBody EmailDto emailDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
@@ -118,7 +118,7 @@ public class AuthController {
      **/
     @PatchMapping("/password/reset")
     public ResponseDto<Void> resetPassword(
-            @RequestBody PasswordResetRequestDto request,
+            @Valid @RequestBody PasswordResetRequestDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);

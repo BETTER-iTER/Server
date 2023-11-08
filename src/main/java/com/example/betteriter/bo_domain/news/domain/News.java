@@ -2,6 +2,7 @@ package com.example.betteriter.bo_domain.news.domain;
 
 
 import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
+import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
@@ -44,5 +45,13 @@ public class News extends BaseEntity {
                 .imageUrl(imageUrl)
                 .newsUrl(newsUrl)
                 .build();
+    }
+
+    public void update(UpdateITNewsRequestDto request, User newWriter) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.imageUrl = request.getImageUrl();
+        this.newsUrl = request.getNewsUrl();
+        this.writer = newWriter;
     }
 }
