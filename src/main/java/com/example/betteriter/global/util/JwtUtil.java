@@ -76,7 +76,7 @@ public class JwtUtil {
                 .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000))
-                .isExisted(user.getUserDetail().getNickName() != null)
+                .isExisted(user.getUsersDetail().getNickName() != null)
                 .build();
     }
 

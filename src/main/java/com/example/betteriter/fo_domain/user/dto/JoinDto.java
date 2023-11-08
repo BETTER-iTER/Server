@@ -1,15 +1,19 @@
 package com.example.betteriter.fo_domain.user.dto;
 
 import com.example.betteriter.fo_domain.user.domain.User;
-import com.example.betteriter.fo_domain.user.domain.UserDetail;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
+import com.example.betteriter.global.constant.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.example.betteriter.fo_domain.user.dto.RoleType.ROLE_USER;
+import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 
 @Getter
 @Setter
@@ -32,22 +36,30 @@ public class JoinDto {
     private int job;
 
     @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
-    private String interests;
+    private String categories;
 
-    public User toUserEntity(String encryptPassword, UserDetail userDetail) {
+    public User toUserEntity(String encryptPassword, UsersDetail usersDetail) {
         return User.builder()
                 .email(email)
                 .password(encryptPassword)
-                .role(ROLE_USER)
-                .userDetail(userDetail)
+                .categories(this.toCategory())
+                .roleType(ROLE_USER)
+                .usersDetail(usersDetail)
                 .build();
     }
 
-    public UserDetail toUserDetailEntity() {
-        return UserDetail.builder()
+    public UsersDetail toUserDetailEntity() {
+        return UsersDetail.builder()
                 .job(job)
-                .interests(interests)
                 .nickName(nickName)
                 .build();
+    }
+
+    /* User 가 입력한 관심 카테고리 이름으로 Category List 생성 메소드 */
+    private List<Category> toCategory() {
+        List<String> userCategories = Arrays.asList(this.categories.split(","));
+        return Arrays.stream(Category.values())
+                .filter(category -> userCategories.contains(category.getName()))
+                .collect(Collectors.toList());
     }
 }
