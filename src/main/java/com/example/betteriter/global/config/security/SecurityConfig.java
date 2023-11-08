@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .antMatchers("/login/callback/**",
                         "/auth/**", "/temp/**", "/reissue")
                 .permitAll()
+                .antMatchers("/news/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
