@@ -8,10 +8,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-
-import static com.example.betteriter.global.common.entity.Status.ACTIVE;
 
 @Getter
 @MappedSuperclass
@@ -19,9 +19,6 @@ import static com.example.betteriter.global.common.entity.Status.ACTIVE;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private final Status status = ACTIVE;
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

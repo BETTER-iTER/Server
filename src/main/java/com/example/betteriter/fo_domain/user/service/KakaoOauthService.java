@@ -1,7 +1,6 @@
 package com.example.betteriter.fo_domain.user.service;
 
 import com.example.betteriter.fo_domain.user.domain.User;
-import com.example.betteriter.fo_domain.user.dto.RoleType;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+
+import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -109,7 +110,7 @@ public class KakaoOauthService {
                 User.builder()
                         .oauthId(oauthId)
                         .email(kakaoEmail)
-                        .role(RoleType.ROLE_USER)
+                        .roleType(ROLE_USER)
                         .build()));
     }
 
@@ -128,7 +129,7 @@ public class KakaoOauthService {
     /* 카카오 회원가입 마무리 */
     @Transactional
     public void completeKakaoJoin(KakaoJoinDto request) {
-        getUser().getUserDetail().completeKakaoJoin(request);
+        getUser().getUsersDetail().completeKakaoJoin(request);
     }
 
     private User getUser() {

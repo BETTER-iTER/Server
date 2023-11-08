@@ -1,4 +1,4 @@
-package com.example.betteriter.fo_domain.user.dto;
+package com.example.betteriter.global.constant;
 
 import lombok.Getter;
 

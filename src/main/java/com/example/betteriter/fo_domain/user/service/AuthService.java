@@ -37,10 +37,12 @@ import static com.example.betteriter.global.error.exception.ErrorCode.*;
 public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserDetailRepository userDetailRepository;
+
+    private final EmailService emailService;
+
     private final PasswordUtil passwordUtil;
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
-    private final EmailService emailService;
     private final JwtProperties jwtProperties;
 
     @Override

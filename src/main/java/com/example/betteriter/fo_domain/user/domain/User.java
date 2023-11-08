@@ -3,8 +3,9 @@ package com.example.betteriter.fo_domain.user.domain;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.user.dto.RoleType;
 import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Category;
+import com.example.betteriter.global.constant.RoleType;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import java.util.List;
 public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "usr_id")
     private Long id;
 
     @Column(name = "usr_oauth_id", unique = true)
@@ -36,15 +38,22 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "usr_pwd", unique = true)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "usr_role")
-    private RoleType role;
+    private RoleType roleType;
 
-    @OneToMany(mappedBy = "follower")
-    private List<Follow> following; // 해당 회원이 가지는 팔로워 수
+    private boolean isExpert;
+
+    /* User 가 관심 등록한 카테고리 리스트 */
+    @ElementCollection(targetClass = Category.class)
+    @CollectionTable(name = "USERS_CATEGORY",
+            joinColumns = @JoinColumn(name = "usr_id"))
+    @Enumerated(EnumType.STRING)
+    private List<Category> categories;
 
     @OneToMany(mappedBy = "followee")
-    private List<Follow> followee; // 해당 회원이 가지는 팔로잉 수
+    private List<Follow> following; // 회원이 팔로잉 하는 유저 리스트
+
+    @OneToMany(mappedBy = "follower")
+    private List<Follow> follower; // 회원을 팔로잉 하는 유저 리스트
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ReviewScrap> reviewScraps; // 유저가 스크랩한 리뷰
@@ -56,8 +65,7 @@ public class User extends BaseEntity implements UserDetails {
     private List<Review> reviews; // 유저가 작성한 리뷰
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private UserDetail userDetail; // 유저 상세 정보
-
+    private UsersDetail usersDetail; // 유저 상세 정보
 
     /**
      * 권한 설정
@@ -65,7 +73,7 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(getRole().name()));
+        authorities.add(new SimpleGrantedAuthority(roleType.name()));
         return authorities;
     }
 

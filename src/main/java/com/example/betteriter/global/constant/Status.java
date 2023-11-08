@@ -1,4 +1,4 @@
-package com.example.betteriter.global.common.entity;
+package com.example.betteriter.global.constant;
 
 import lombok.Getter;
 

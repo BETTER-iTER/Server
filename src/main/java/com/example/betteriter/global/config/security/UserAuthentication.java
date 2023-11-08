@@ -26,7 +26,7 @@ public class UserAuthentication extends AbstractAuthenticationToken {
 
     private static List<GrantedAuthority> authorities(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
+        authorities.add(new SimpleGrantedAuthority(user.getRoleType().name()));
         return authorities;
     }
 

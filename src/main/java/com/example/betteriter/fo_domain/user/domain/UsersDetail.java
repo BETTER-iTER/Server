@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-public class UserDetail {
+@Entity(name = "USERS_DETAIL")
+public class UsersDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,9 +22,6 @@ public class UserDetail {
 
     @Column(name = "usr_job")
     private int job;
-
-    @Column(name = "usr_intersts")
-    private String interests;
 
     @Column(name = "usr_profile_img")
     private String profileImage;
@@ -47,6 +44,5 @@ public class UserDetail {
     public void completeKakaoJoin(KakaoJoinDto kakaoJoinDto) {
         nickName = kakaoJoinDto.getNickname();
         job = kakaoJoinDto.getJob();
-        interests = kakaoJoinDto.getInterests();
     }
 }
