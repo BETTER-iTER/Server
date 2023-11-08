@@ -1,21 +1,18 @@
 package com.example.betteriter.bo_domain.news.controller;
 
 import com.example.betteriter.bo_domain.news.dto.CreateITNewsRequestDto;
+import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
+import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.bo_domain.news.service.NewsService;
+import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
-/**
- * 홈 화면에 조회되는 최신 IT 뉴스 관련 컨트롤러
- **/
+
 @Slf4j
 @RequestMapping("/news")
 @RequiredArgsConstructor
@@ -24,10 +21,29 @@ public class NewsController {
     private final NewsService newsService;
 
     @PostMapping
-    public ResponseEntity<Long> createITNews(
+    public ResponseDto<Long> createITNews(
             @Valid @RequestBody CreateITNewsRequestDto request
     ) {
-        return new ResponseEntity<>(
-                this.newsService.createITNews(request), HttpStatus.CREATED);
+        return ResponseDto.onSuccess(this.newsService.createITNews(request));
     }
+
+    @GetMapping
+    public ResponseDto<List<ITNewsResponseDto>> getITNews() {
+        return ResponseDto.onSuccess(this.newsService.getITNews());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseDto<Void> updateITNews(
+            @Valid @RequestBody UpdateITNewsRequestDto request,
+            @PathVariable Long id) {
+        this.newsService.updateITNews(id, request);
+        return ResponseDto.onSuccess();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseDto<Void> deleteITNews(@PathVariable Long id) {
+        this.newsService.deleteITNews(id);
+        return ResponseDto.onSuccess();
+    }
+
 }

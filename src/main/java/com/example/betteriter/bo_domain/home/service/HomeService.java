@@ -32,7 +32,7 @@ public class HomeService {
     @Transactional(readOnly = true)
     public GetHomeResponseDto getHome() {
 
-        List<ITNewsResponseDto> recentItNews = this.newsService.getItNews();
+        List<ITNewsResponseDto> recentItNews = this.newsService.getItNewsForHome();
         Map<String, List<ReviewResponseDto>> categoryReviews = this.reviewService.getUserCategoryReviews();
         List<ReviewResponseDto> followingReviews = this.reviewService.getFollowingReviews();
         List<ReviewResponseDto> mostScrapedAndLikedReviews = this.reviewService.getMostScrapedAndLikedReviews();

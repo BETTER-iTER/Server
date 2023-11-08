@@ -38,6 +38,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "usr_pwd", unique = true)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "usr_role")
     private RoleType roleType;
 
     private boolean isExpert;

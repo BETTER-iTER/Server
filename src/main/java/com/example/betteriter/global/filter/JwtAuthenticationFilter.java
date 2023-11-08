@@ -173,6 +173,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String accessToken = this.jwtUtil.extractAccessToken(request)
                     .orElseThrow(() -> new JwtException("jwtException"));
 
+            // accessToken 을 통해 User Payload 가져 오고 회원 조회
             User user = this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
                     .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
 
