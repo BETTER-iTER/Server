@@ -1,6 +1,7 @@
 package com.example.betteriter.bo_domain.news.domain;
 
 
+import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
@@ -34,4 +35,14 @@ public class News extends BaseEntity {
 
     @Column(name = "news_url")
     private String newsUrl;
+
+    public ITNewsResponseDto from() {
+        return ITNewsResponseDto.builder()
+                .id(id)
+                .title(title)
+                .content(content)
+                .imageUrl(imageUrl)
+                .newsUrl(newsUrl)
+                .build();
+    }
 }
