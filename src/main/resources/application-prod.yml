@@ -18,5 +18,5 @@ spring:
 ## 운영 환경 = info
 logging:
   level:
-    org.hibernate.sql: info
+    org.hibernate.SQL: info
     org.hibernate.type: info

@@ -1,6 +1,10 @@
 package com.example.betteriter.fo_domain.review.service;
 
+import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
+import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
@@ -11,6 +15,7 @@ import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,9 +26,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
+    private final UserService userService;
+    private final ManufacturerService manufacturerService;
+
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final UserService userService;
+
+
+    /* 리뷰 등록 */
+    @Transactional
+    public Long createReview(CreateReviewRequestDto request) {
+        Manufacturer manufacturer = this.manufacturerService.findManufacturerById(request.getManufacturerId());
+        Review review = this.reviewRepository.save(request.toEntity(manufacturer));
+        this.saveReviewImagesFromRequest(request, review);
+        return review.getId();
+    }
 
     /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
     public Map<String, List<ReviewResponseDto>> getUserCategoryReviews() {
@@ -66,5 +83,12 @@ public class ReviewService {
     /* Review 에 첫번째 이미지 가져오는 메소드 */
     private String getFirstImageWithReview(Review review) {
         return this.reviewImageRepository.findFirstImageWithReview(review);
+    }
+
+    private void saveReviewImagesFromRequest(CreateReviewRequestDto request, Review review) {
+        List<CreateReviewImageRequestDto> images = request.getImages();
+        for (CreateReviewImageRequestDto image : images) {
+            reviewImageRepository.save(image.toEntity(images.indexOf(image), review));
+        }
     }
 }

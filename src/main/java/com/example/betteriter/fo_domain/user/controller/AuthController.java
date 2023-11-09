@@ -143,7 +143,7 @@ public class AuthController {
     private void checkRequestValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError fieldError = bindingResult.getFieldErrors().get(0);
-            log.debug("filedError occurs : {}", fieldError.getDefaultMessage());
+            log.debug("fieldError occurs : {}", fieldError.getDefaultMessage());
             throw new UserHandler(_METHOD_ARGUMENT_ERROR);
         }
     }
