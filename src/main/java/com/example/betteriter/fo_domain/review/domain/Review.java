@@ -10,7 +10,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -28,12 +28,12 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User writer;
 
-    @JoinColumn(name = "made_by_id")
+    @JoinColumn(name = "manufacturer_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Manufacturer madeBy;
+    private Manufacturer manufacturer;
 
     @Enumerated(EnumType.STRING)
-    private Category category; // 리뷰 카테고리
+    private Category category;
 
     @Column(name = "product_name", nullable = false)
     private String productName;
@@ -42,20 +42,23 @@ public class Review extends BaseEntity {
     private int amount;
 
     @Column(name = "store_name", nullable = false)
-    private String storeName;
+    private int storeName;
 
     @Column(name = "bought_at", nullable = false)
-    private Timestamp boughtAt;
+    private LocalDate boughtAt;
 
     @Column(name = "star_point", nullable = false)
     private int starPoint;
 
-    @Column(name = "shot_review", nullable = false)
-    private String shotReview;
+    @Column(name = "short_review", nullable = false)
+    private String shortReview;
 
+
+    @Lob // 최대 500 자
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
 
+    @Lob // 최대 500 자
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
 

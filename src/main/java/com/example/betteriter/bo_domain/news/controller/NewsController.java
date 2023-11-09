@@ -3,10 +3,14 @@ package com.example.betteriter.bo_domain.news.controller;
 import com.example.betteriter.bo_domain.news.dto.CreateITNewsRequestDto;
 import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
+import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.service.NewsService;
 import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,8 +26,10 @@ public class NewsController {
 
     @PostMapping
     public ResponseDto<Long> createITNews(
-            @Valid @RequestBody CreateITNewsRequestDto request
+            @Valid @RequestBody CreateITNewsRequestDto request,
+            BindingResult bindingResult
     ) {
+        this.checkRequestValidation(bindingResult);
         return ResponseDto.onSuccess(this.newsService.createITNews(request));
     }
 
@@ -35,7 +41,9 @@ public class NewsController {
     @PutMapping("/{id}")
     public ResponseDto<Void> updateITNews(
             @Valid @RequestBody UpdateITNewsRequestDto request,
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            BindingResult bindingResult) {
+        this.checkRequestValidation(bindingResult);
         this.newsService.updateITNews(id, request);
         return ResponseDto.onSuccess();
     }
@@ -46,4 +54,11 @@ public class NewsController {
         return ResponseDto.onSuccess();
     }
 
+    private void checkRequestValidation(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            FieldError fieldError = bindingResult.getFieldErrors().get(0);
+            log.debug("fieldError occurs : {}", fieldError.getDefaultMessage());
+            throw new NewsHandler(ErrorCode._METHOD_ARGUMENT_ERROR);
+        }
+    }
 }

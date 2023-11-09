@@ -55,7 +55,11 @@ public enum ErrorCode {
 
 
     // News
-    _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다.");
+    _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
+
+
+    // Manufacturer
+    _MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_400", "일치하는 제조사 정보를 찾을 수 없습니다.");
 
 
     private final HttpStatus httpStatus;
