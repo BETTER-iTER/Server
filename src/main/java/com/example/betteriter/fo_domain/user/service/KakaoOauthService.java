@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.user.service;
 
 import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
@@ -128,7 +129,10 @@ public class KakaoOauthService {
     /* 카카오 회원가입 마무리 */
     @Transactional
     public void completeKakaoJoin(KakaoJoinDto request) {
-        getUser().getUsersDetail().completeKakaoJoin(request);
+        getUser().setUsersDetail(UsersDetail.builder()
+                .nickName(request.getNickname())
+                .job(request.getJob())
+                .build());
     }
 
     private User getUser() {
