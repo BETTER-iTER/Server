@@ -68,6 +68,7 @@ public class AuthService implements UserDetailsService {
     @Transactional
     public UserServiceTokenResponseDto login(LoginDto loginRequestDto) {
         User user = this.loadUserByUsername(loginRequestDto.getEmail());
+        this.checkUserLoginType(user);
         this.checkPassword(loginRequestDto, user);
         return this.saveAuthenticationAndReturnServiceToken(user);
     }
@@ -188,4 +189,12 @@ public class AuthService implements UserDetailsService {
                 serviceToken.getRefreshToken(), jwtProperties.getRefreshExpiration()); // 토큰 발급 후 Redis 에 Refresh token 저장
         return serviceToken;
     }
+
+    // 로그인 시도 회원이 카카오 로그인 회원인지 여부 판단
+    private void checkUserLoginType(User user) {
+        if (user.getOauthId() != null) {
+            throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
+        }
+    }
+
 }
