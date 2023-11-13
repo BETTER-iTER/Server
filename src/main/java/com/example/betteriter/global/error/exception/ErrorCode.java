@@ -49,6 +49,7 @@ public enum ErrorCode {
     _USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER_NOT_FOUND_400", "일치하는 회원 정보를 찾을 수 없습니다."),
     _PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "AUTH_PASSWORD_NOT_MATCH_401", "비밀번호가 일치하지 않습니다."),
     _EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_DUPLICATION_401", "이미 존재하는 이메일입니다."),
+    _EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_NOT_FOUND_401", "이메일이 존재하지 않습니다."),
     _AUTH_CODE_ALREADY_EXIT(HttpStatus.BAD_REQUEST, "AUTH_CODE_ALREADY_EXIST_401", "이미 인증 코드가 존재합니다."),
     _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST_401", "인증 코드가 존재하지 않습니다."),
     _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH_401", "인증 코드가 일치하지 않습니다."),

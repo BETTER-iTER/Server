@@ -67,20 +67,20 @@ public class AuthController {
     }
 
     /**
-     * 3. 인증 코드 검증
+     * 3. 회원가입 인증 코드 검증
      * - 사용자가 이메일로 받은 인증 코드 검증하는 컨트롤러
-     * - 회원가입 & 비밀번호 재설정 모두 사용
      * - /auth/check/code
      **/
-    @PostMapping("/emails/verification")
-    public ResponseDto<Void> verifyAuthCode(
+    @PostMapping("/join/emails/verification")
+    public ResponseDto<Void> verifyJoinAuthCode(
             @Valid @RequestBody EmailAuthenticationDto emailAuthenticationDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        this.authService.verifyAuthCode(emailAuthenticationDto);
-        return ResponseDto.onSuccess(null);
+        this.authService.verifyJoinAuthCode(emailAuthenticationDto);
+        return ResponseDto.onSuccess();
     }
+
 
     /**
      * 4. 일반 로그인
@@ -107,6 +107,21 @@ public class AuthController {
         this.checkRequestValidation(bindingResult);
         this.authService.requestEmailForPasswordReset(emailDto);
         return ResponseDto.onSuccess(null);
+    }
+
+
+    /**
+     * 비밀번호 재설정 인증 코드 검증
+     * - 사용자가 이메일로 받은 인증 코드 검증하는 컨트롤러
+     **/
+    @PostMapping("/password/emails/verification")
+    public ResponseDto<Void> verifyPasswordResetAuthCode(
+            @Valid @RequestBody EmailAuthenticationDto emailAuthenticationDto,
+            BindingResult bindingResult
+    ) {
+        this.checkRequestValidation(bindingResult);
+        this.authService.verifyPasswordResetAuthCode(emailAuthenticationDto);
+        return ResponseDto.onSuccess();
     }
 
     /**

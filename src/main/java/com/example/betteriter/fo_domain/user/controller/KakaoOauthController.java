@@ -6,6 +6,7 @@ import com.example.betteriter.fo_domain.user.service.KakaoOauthService;
 import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,10 +19,10 @@ public class KakaoOauthController {
     private final KakaoOauthService kakaoOauthService;
 
     @GetMapping("/login/callback/kakao")
-    public ResponseDto<UserServiceTokenResponseDto> kakaoOauthLogin(
+    public ResponseEntity<UserServiceTokenResponseDto> kakaoOauthLogin(
             @RequestParam String code
     ) throws IOException {
-        return ResponseDto.onSuccess(this.kakaoOauthService.kakaoOauthLogin(code));
+        return ResponseEntity.ok(this.kakaoOauthService.kakaoOauthLogin(code));
     }
 
     /**

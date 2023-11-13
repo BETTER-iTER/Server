@@ -6,7 +6,6 @@ import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoToken;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
-import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class KakaoOauthService {
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     private final JwtUtil jwtUtil;
-    private final JwtProperties jwtProperties;
 
     /**
      * - findUser : 회원 저장 및 리턴
@@ -104,6 +102,7 @@ public class KakaoOauthService {
                                            ClientRegistration kakaoClientRegistration) throws IOException {
         Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
         KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
+
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();
         return this.userRepository.findByOauthId(oauthId).orElseGet(() -> this.userRepository.save(
