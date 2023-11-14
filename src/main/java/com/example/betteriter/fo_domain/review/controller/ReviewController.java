@@ -4,6 +4,7 @@ import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 
 import static com.example.betteriter.global.error.exception.ErrorCode._METHOD_ARGUMENT_ERROR;
 
+@Tag(name = "ReviewController", description = "Review API")
 @Slf4j
 @RequestMapping("/review")
 @RequiredArgsConstructor

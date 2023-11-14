@@ -9,6 +9,11 @@ import com.example.betteriter.fo_domain.user.service.AuthService;
 import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +31,7 @@ import static com.example.betteriter.global.error.exception.ErrorCode._METHOD_AR
  **/
 
 @Slf4j
+@Tag(name = "AuthController", description = "Authentication API")
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @RestController
@@ -39,7 +45,14 @@ public class AuthController {
      * - /auth/join
      **/
     @PostMapping("/join")
+    @Operation(summary = "일반 회원가입")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "SUCCESS_200", description = "일반 회원가입 성공"),
+            @ApiResponse(responseCode = "AUTH_EMAIL_DUPLICATION_401", description = "이메일 이미 존재"),
+            @ApiResponse(responseCode = "METHOD_ARGUMENT_ERROR", description = "올바르지 않은 클라이언트 요청값")}
+    )
     public ResponseDto<Long> join(
+            @Schema(description = "일반 회원가입 요청 객체")
             @RequestBody @Valid JoinDto request,
             BindingResult bindingResult
     ) {
