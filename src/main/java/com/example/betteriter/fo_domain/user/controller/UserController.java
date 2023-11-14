@@ -3,6 +3,7 @@ package com.example.betteriter.fo_domain.user.controller;
 
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.common.response.ResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 1. 카카오 oauth 로그인 시 처음 회원 인지 반환
  * 2. 회원가입 후 관심 분야 반환 해야 하나?
  **/
-
+@Tag(name = "UserController", description = "User API")
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/user")
