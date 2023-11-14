@@ -18,6 +18,7 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
+
         Info info = new Info()
                 .title("better-iter")
                 .description("better-iter API 명세서")
