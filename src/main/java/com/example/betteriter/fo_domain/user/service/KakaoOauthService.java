@@ -43,7 +43,7 @@ public class KakaoOauthService {
      * - getServiceToken : 실제 서비스 jwt 발급
      **/
     public UserServiceTokenResponseDto kakaoOauthLogin(String code) throws IOException {
-        return this.jwtUtil.createServiceToken(findUser(code));
+        return this.jwtUtil.createServiceToken(this.findUser(code));
     }
 
     /**
