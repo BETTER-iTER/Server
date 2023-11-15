@@ -20,16 +20,33 @@ import java.util.List;
 public class SearchController {
     private final SearchService searchService;
 
+    /**
+     * - 최근 검색어 조회
+     **/
     @GetMapping("/recent")
     public ResponseDto<List<String>> getRecentSearch() {
         return ResponseDto.onSuccess(this.searchService.getRecentSearch());
     }
 
+    /**
+     * - 최근 검색어 추가
+     **/
     @PostMapping("/recent")
     public ResponseDto<Void> addRecentSearch(
             @RequestParam String search
     ) {
         this.searchService.addRecentSearch(search);
+        return ResponseDto.onSuccess();
+    }
+
+    /**
+     * - 최근 검색어 삭제
+     **/
+    @DeleteMapping("/recent")
+    public ResponseDto<Void> deleteRecentSearch(
+            @RequestParam String search
+    ) {
+        this.searchService.deleteRecentSearch(search);
         return ResponseDto.onSuccess();
     }
 }
