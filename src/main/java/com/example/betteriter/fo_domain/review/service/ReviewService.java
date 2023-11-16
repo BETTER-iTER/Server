@@ -6,12 +6,14 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
+import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.user.domain.Follow;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
+import com.example.betteriter.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.example.betteriter.global.error.exception.ErrorCode.REVIEW_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -90,5 +94,10 @@ public class ReviewService {
         for (CreateReviewImageRequestDto image : images) {
             reviewImageRepository.save(image.toEntity(images.indexOf(image), review));
         }
+    }
+
+    public Review findReviewById(Long reviewId) {
+        return this.reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewHandler(REVIEW_NOT_FOUND));
     }
 }

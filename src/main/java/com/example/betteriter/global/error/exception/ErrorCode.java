@@ -53,13 +53,18 @@ public enum ErrorCode {
     _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "USER_400", "인증 코드가 일치하지 않습니다."),
     _AUTH_SHOULD_BE_KAKAO(HttpStatus.BAD_REQUEST, "USER_400", "해당 회원은 카카오 로그인 회원입니다."),
 
+    // Review
+    REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_400", "일치하는 리뷰 정보를 찾을 수 없습니다."),
+    REVIEW_NOT_ACTIVATE(HttpStatus.BAD_REQUEST, "REVIEW_400", "삭제되었거나 비공개된 리뷰입니다."),
 
     // News
     _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
 
 
     // Manufacturer
-    _MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_400", "일치하는 제조사 정보를 찾을 수 없습니다.");
+    _MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_400", "일치하는 제조사 정보를 찾을 수 없습니다."),
+
+    ;
 
 
     private final HttpStatus httpStatus;
