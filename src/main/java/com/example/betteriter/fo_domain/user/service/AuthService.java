@@ -202,8 +202,10 @@ public class AuthService implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
         UserServiceTokenResponseDto serviceToken = jwtUtil.createServiceToken(user);
 
+        log.info("redis 저장 시작");
         this.redisUtil.setDataExpire(String.valueOf(user.getId()),
                 serviceToken.getRefreshToken(), jwtProperties.getRefreshExpiration()); // 토큰 발급 후 Redis 에 Refresh token 저장
+        log.info("redis 저장 끝");
         return serviceToken;
     }
 
