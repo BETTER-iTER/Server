@@ -7,6 +7,7 @@ import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.service.NewsService;
 import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.global.error.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 
+@Tag(name = "NewsController", description = "News API")
 @Slf4j
 @RequestMapping("/news")
 @RequiredArgsConstructor

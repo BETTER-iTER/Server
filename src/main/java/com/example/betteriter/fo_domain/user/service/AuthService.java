@@ -59,15 +59,11 @@ public class AuthService implements UserDetailsService {
         return this.processJoin(joinDto, this.passwordUtil.encode(joinDto.getPassword()));
     }
 
-    private Long processJoin(JoinDto joinDto, String encryptPassword) {
-        return this.userRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
-                .getId();
-    }
-
     /* 로그인 */
     @Transactional
     public UserServiceTokenResponseDto login(LoginDto loginRequestDto) {
         User user = this.loadUserByUsername(loginRequestDto.getEmail());
+        this.checkUserLoginType(user);
         this.checkPassword(loginRequestDto, user);
         return this.saveAuthenticationAndReturnServiceToken(user);
     }
@@ -93,31 +89,45 @@ public class AuthService implements UserDetailsService {
     /* 비밀번호 재설정 */
     @Transactional
     public void resetPassword(PasswordResetRequestDto request) {
+        // 해당 이메일 유저 존재 여부 확인 및 로그인 타입 확인
         User user = this.checkEmailExistenceAndType(request.getEmail());
         user.setPassword(this.passwordUtil.encode(request.getPassword()));
         log.info(this.passwordUtil.encode(request.getPassword()));
     }
 
-    /* 인증 코드 체크 */
+    /* 회원 가입 인증 코드 체크 */
     @Transactional
-    public void verifyAuthCode(EmailAuthenticationDto request) {
-        // 1. 이메일 중복 여부 확인
+    public void verifyJoinAuthCode(EmailAuthenticationDto request) {
+        // 1. 이메일 체크
         this.checkEmailDuplication(request.getEmail());
-        // 2.요청받은 인증코드 존재 여부 확인
+        // 2. 요청 인증 코드 검증
+        this.verifyAuthCode(request);
+    }
+
+    /* 비밀번호 재설정 인증 코드 체크 */
+    @Transactional
+    public void verifyPasswordResetAuthCode(EmailAuthenticationDto request) {
+        // 해당 이메일 유저 존재 여부 확인 및 로그인 타입 확인
+        this.checkEmailExistenceAndType(request.getEmail());
+        // 2. 요청 인증 코드 검증
+        this.verifyAuthCode(request);
+    }
+
+    private void verifyAuthCode(EmailAuthenticationDto request) {
+        // 요청받은 인증코드 존재 여부 확인
         String authCode = this.redisUtil.getData(request.getEmail());
         if (authCode == null) {
             log.debug("AuthService.verifyAuthCode() Exception Occurs! - auth code is null");
             throw new UserHandler(_AUTH_CODE_NOT_EXIST);
         }
-        // 3. 요청 auth code 와 redis 저장된 auth code 가 다른지 확인
+        // 요청 auth code 와 redis 저장된 auth code 가 다른지 확인
         if (!request.getCode().equals(authCode)) {
             log.warn("AuthService.verifyAuthCode() Exception Occurs! - auth code not match");
             throw new UserHandler(_AUTH_CODE_NOT_MATCH);
         }
-        // 4.인증 코드 검증 성공(redis 데이터 삭제)
+        // 인증 코드 검증 성공(redis 데이터 삭제)
         this.redisUtil.deleteData(request.getEmail());
     }
-
 
     /* 닉네임 중복 여부 */
     @Transactional
@@ -138,9 +148,17 @@ public class AuthService implements UserDetailsService {
         return authCode;
     }
 
+    /* 이메일 중복 여부 체크 및 인증 타입 체크 for 회원가입 */
     private void checkEmailDuplication(String email) {
         if (this.userRepository.findByEmail(email).isPresent()) {
             throw new UserHandler(_EMAIL_DUPLICATION);
+        }
+    }
+
+    /* 이메일 중복 여부 체크 및 인증 타입 체크 for 비밀번호 재설정 */
+    private void checkEmailExistence(String email) {
+        if (this.userRepository.findByEmail(email).isEmpty()) {
+            throw new UserHandler(_EMAIL_NOT_FOUND);
         }
     }
 
@@ -184,8 +202,22 @@ public class AuthService implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
         UserServiceTokenResponseDto serviceToken = jwtUtil.createServiceToken(user);
 
+        log.info("redis 저장 시작");
         this.redisUtil.setDataExpire(String.valueOf(user.getId()),
                 serviceToken.getRefreshToken(), jwtProperties.getRefreshExpiration()); // 토큰 발급 후 Redis 에 Refresh token 저장
+        log.info("redis 저장 끝");
         return serviceToken;
+    }
+
+    // 로그인 시도 회원이 카카오 로그인 회원인지 여부 판단
+    private void checkUserLoginType(User user) {
+        if (user.getOauthId() != null) {
+            throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
+        }
+    }
+
+    private Long processJoin(JoinDto joinDto, String encryptPassword) {
+        return this.userRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
+                .getId();
     }
 }

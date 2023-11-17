@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.comment.service;
 
 import com.example.betteriter.fo_domain.comment.domain.Comment;
+import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.repository.CommentRepository;
 import com.example.betteriter.fo_domain.review.domain.Review;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * - 댓글 관련 로직을 담고 있는 서비스
@@ -28,11 +31,29 @@ public class CommentService {
      * [댓글 작성]
      */
     @Transactional
-    public Long createComment(CommentResponse.CreateCommentRequestDto commentCreateDto) {
+    public Long createComment(CommentRequest.CreateCommentRequestDto commentCreateDto) {
         Review review = this.reviewService.findReviewById(commentCreateDto.getReview_id());
         User writer = this.userService.getCurrentUser();
         Comment comment = this.commentRepository.save(commentCreateDto.toEntity(review, writer));
 
         return comment.getId();
+    }
+
+    /**
+     * [댓글 삭제]
+     */
+    @Transactional
+    public Long deleteComment(CommentRequest.DeleteCommentRequestDto request) {
+        Comment comment = this.commentRepository.findCommentById(request.getReview_id());
+        this.commentRepository.delete(comment);
+
+        return comment.getId();
+    }
+
+    public CommentResponse.ReadCommentDto readComment(Long reviewId) {
+        List<Comment> commentList = this.c(comment.getGroupId());
+        return CommentResponse.ReadCommentDto.builder()
+                .commentList(comment.getComment())
+                .build();
     }
 }

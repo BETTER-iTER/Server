@@ -1,6 +1,5 @@
 package com.example.betteriter.fo_domain.user.domain;
 
-import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,9 +39,4 @@ public class UsersDetail {
 
     @Column(name = "usr_review_liked")
     private int reviewLiked; // 작성한 리뷰 좋아요 횟수
-
-    public void completeKakaoJoin(KakaoJoinDto kakaoJoinDto) {
-        nickName = kakaoJoinDto.getNickname();
-        job = kakaoJoinDto.getJob();
-    }
 }

@@ -16,6 +16,7 @@ import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +49,7 @@ public class ReviewService {
 
     /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
     public Map<String, List<ReviewResponseDto>> getUserCategoryReviews() {
-        User user = this.getCurrentUser();
-        List<Category> categories = user.getCategories(); // 유저가 등록한 관심 카테고리
+        List<Category> categories = this.getCurrentUser().getCategories(); // 유저가 등록한 관심 카테고리
         Map<String, List<ReviewResponseDto>> result = new LinkedHashMap<>();
         // 카테고리에 해당하는 최신 순 리뷰
         for (Category category : categories) {
@@ -75,7 +75,8 @@ public class ReviewService {
 
     /* 가장 많은 스크랩 + 좋아요 수를 가지는 리뷰 가져오는 리스트 */
     public List<ReviewResponseDto> getMostScrapedAndLikedReviews() {
-        return this.reviewRepository.findReviewHavingMostScrapedAndLiked().stream()
+        return this.reviewRepository.findTop7ReviewHavingMostScrapedAndLiked(PageRequest.of(0, 7))
+                .stream()
                 .map(review -> review.of(this.getFirstImageWithReview(review)))
                 .collect(Collectors.toList());
     }

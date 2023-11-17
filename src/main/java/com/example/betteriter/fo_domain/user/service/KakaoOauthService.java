@@ -1,12 +1,12 @@
 package com.example.betteriter.fo_domain.user.service;
 
 import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoToken;
 import com.example.betteriter.fo_domain.user.repository.UserRepository;
-import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +37,13 @@ public class KakaoOauthService {
     private final UserRepository userRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     private final JwtUtil jwtUtil;
-    private final JwtProperties jwtProperties;
 
     /**
      * - findUser : 회원 저장 및 리턴
      * - getServiceToken : 실제 서비스 jwt 발급
      **/
     public UserServiceTokenResponseDto kakaoOauthLogin(String code) throws IOException {
-        return this.jwtUtil.createServiceToken(findUser(code));
+        return this.jwtUtil.createServiceToken(this.findUser(code));
     }
 
     /**
@@ -104,6 +103,7 @@ public class KakaoOauthService {
                                            ClientRegistration kakaoClientRegistration) throws IOException {
         Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
         KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
+
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();
         return this.userRepository.findByOauthId(oauthId).orElseGet(() -> this.userRepository.save(
@@ -129,7 +129,10 @@ public class KakaoOauthService {
     /* 카카오 회원가입 마무리 */
     @Transactional
     public void completeKakaoJoin(KakaoJoinDto request) {
-        getUser().getUsersDetail().completeKakaoJoin(request);
+        getUser().setUsersDetail(UsersDetail.builder()
+                .nickName(request.getNickname())
+                .job(request.getJob())
+                .build());
     }
 
     private User getUser() {
