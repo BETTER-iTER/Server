@@ -4,6 +4,7 @@ package com.example.betteriter.fo_domain.comment.domain;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,4 +37,7 @@ public class Comment extends BaseEntity {
 
     @Column(name = "group_id", nullable = false)
     private Integer groupId; // 댓글 그룹: 일반 댓글은 자신의 id, 대댓글은 root 댓글의 id
+
+    @Column(name = "status", nullable = false)
+    private Status status; // 댓글 상태: ACTIVATE, INACTIVATE, DELETE
 }

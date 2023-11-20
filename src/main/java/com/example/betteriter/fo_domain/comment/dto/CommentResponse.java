@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.comment.dto;
 
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,20 +16,6 @@ public class CommentResponse {
     @AllArgsConstructor
     public static class ReadCommentDto {
         private Long reviewId;
-        private List<CommentResponseDto> commentList;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class CommentResponseDto {
-        private Long commentId;
-        private String comment;
-        private Integer orderNum;
-        private Integer groupId;
-        private String writer;
-        private String createdAt;
-        private String updatedAt;
+        private List<Comment> commentList;
     }
 }

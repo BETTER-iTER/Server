@@ -5,6 +5,7 @@ import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.service.CommentService;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
+import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
 import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +61,7 @@ public class CommentController {
      */
     @GetMapping("/read/{review_id}")
     public ResponseDto<CommentResponse.ReadCommentDto> readComment(
-            @PathVariable Long review_id
+            @ExistReview @PathVariable Long review_id
     ) {
         return ResponseDto.onSuccess(this.commentService.readComment(review_id));
     }

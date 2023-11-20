@@ -50,10 +50,15 @@ public class CommentService {
         return comment.getId();
     }
 
+    /**
+     * [댓글 조회]
+     */
     public CommentResponse.ReadCommentDto readComment(Long reviewId) {
-        List<Comment> commentList = this.c(comment.getGroupId());
+        List<Comment> commentList = this.commentRepository.findAllByReviewId(reviewId);
+
         return CommentResponse.ReadCommentDto.builder()
-                .commentList(comment.getComment())
+                .reviewId(reviewId)
+                .commentList(commentList)
                 .build();
     }
 }
