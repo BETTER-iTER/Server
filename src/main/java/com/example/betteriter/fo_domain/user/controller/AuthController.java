@@ -102,7 +102,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserServiceTokenResponseDto> login(
             @Valid @RequestBody LoginDto loginRequestDto,
-            BindingResult bindingResult) {
+            BindingResult bindingResult
+    ) {
         this.checkRequestValidation(bindingResult);
         return new ResponseEntity<>(this.authService.login(loginRequestDto), HttpStatus.OK);
     }
