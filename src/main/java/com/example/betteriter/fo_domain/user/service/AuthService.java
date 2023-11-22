@@ -65,7 +65,7 @@ public class AuthService implements UserDetailsService {
         Users users = this.loadUserByUsername(loginRequestDto.getEmail());
         this.checkUserLoginType(users);
         this.checkPassword(loginRequestDto, users);
-        return this.saveAuthenticationAndReturnServiceToken(users);
+        return this.saveAuthenticationAndCreateServiceToken(users);
     }
 
     /* 회원가입 이메일 인증 요청 */
@@ -196,16 +196,11 @@ public class AuthService implements UserDetailsService {
     }
 
     // SecurityContext 에 Authentication 저장 및 ServiceToken 발급
-    private UserServiceTokenResponseDto saveAuthenticationAndReturnServiceToken(Users users) {
+    private UserServiceTokenResponseDto saveAuthenticationAndCreateServiceToken(Users users) {
         // -> 여기서 SecurityContext 에 저장된 UserAuthentication 존재 x
         UserAuthentication userAuthentication = new UserAuthentication(users);
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
-        UserServiceTokenResponseDto serviceToken = jwtUtil.createServiceToken(users);
-
-        this.redisUtil.setDataExpire(String.valueOf(users.getId()),
-                serviceToken.getRefreshToken(), jwtProperties.getRefreshExpiration()); // 토큰 발급 후 Redis 에 Refresh token 저장
-        log.info(String.valueOf(serviceToken));
-        return serviceToken;
+        return jwtUtil.createServiceToken(users);
     }
 
     // 로그인 시도 회원이 카카오 로그인 회원인지 여부 판단

@@ -52,8 +52,8 @@ public class KakaoOauthService {
     private Users findUser(String code) throws IOException {
         ClientRegistration kakaoClientRegistration
                 = this.inMemoryClientRegistrationRepository.findByRegistrationId(PROVIDER_NAME);
-        KakaoToken kakaoToken = getKakaoToken(code, kakaoClientRegistration);
-        return saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
+        KakaoToken kakaoToken = this.getKakaoToken(code, kakaoClientRegistration);
+        return this.saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
     }
 
     /**
@@ -66,9 +66,9 @@ public class KakaoOauthService {
         return WebClient.create()
                 .post()
                 .uri(kakaoClientRegistration.getProviderDetails().getTokenUri())
-                .headers(h -> {
-                    h.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                    h.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
+                .headers(header -> {
+                    header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                    header.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
                 })
                 .bodyValue(kakaoTokenRequest(code, kakaoClientRegistration))
                 .retrieve()
@@ -101,8 +101,8 @@ public class KakaoOauthService {
      **/
     private Users saveUserWithKakaoUserInfo(KakaoToken kakaoToken,
                                             ClientRegistration kakaoClientRegistration) throws IOException {
-        Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
-        KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
+        Map<String, Object> attributes = this.getUserAttributes(kakaoToken, kakaoClientRegistration);
+        KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes); // attribute 이용해서 kakaoOauthUserInfo 생성
 
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();

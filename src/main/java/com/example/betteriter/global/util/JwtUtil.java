@@ -41,13 +41,13 @@ public class JwtUtil {
 
     // access token 생성
     public String createAccessToken(String payload) {
-        return createToken(payload, this.jwtProperties.getAccessExpiration());
+        return this.createToken(payload, this.jwtProperties.getAccessExpiration());
     }
 
 
     // refresh token 생성
     public String createRefreshToken() {
-        return createToken(UUID.randomUUID().toString(), this.jwtProperties.getRefreshExpiration());
+        return this.createToken(UUID.randomUUID().toString(), this.jwtProperties.getRefreshExpiration());
 
     }
 
@@ -66,18 +66,24 @@ public class JwtUtil {
         return null;
     }
 
-    // kakao oauth 로그인 & 일반 로그인 시 jwt 응답 생성
+    // kakao oauth 로그인 & 일반 로그인 시 jwt 응답 생성 + redis refresh 저장
     public UserServiceTokenResponseDto createServiceToken(Users users) {
         String accessToken = this.createAccessToken(String.valueOf(users.getId()));
         String refreshToken = this.createRefreshToken();
 
-        this.redisUtil.setData(String.valueOf(users.getId()), refreshToken);
-        return UserServiceTokenResponseDto.builder()
+        /* 서비스 토큰 생성 */
+        UserServiceTokenResponseDto userServiceTokenResponseDto = UserServiceTokenResponseDto.builder()
                 .accessToken(this.jwtProperties.getBearer() + " " + accessToken)
                 .refreshToken(refreshToken)
                 .expiredTime(LocalDateTime.now().plusSeconds(this.jwtProperties.getAccessExpiration() / 1000))
                 .isExisted(users.getUsersDetail() != null)
                 .build();
+
+        /* redis refresh token 저장 */
+        this.redisUtil.setDataExpire(String.valueOf(users.getId()),
+                userServiceTokenResponseDto.getRefreshToken(), this.jwtProperties.getRefreshExpiration());
+
+        return userServiceTokenResponseDto;
     }
 
     // token 유효성 검증
