@@ -2,7 +2,7 @@ package com.example.betteriter.fo_domain.search.service;
 
 import com.example.betteriter.fo_domain.search.dto.SearchLogRedis;
 import com.example.betteriter.fo_domain.search.repository.SearchRepository;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +32,9 @@ public class SearchService {
     /* 최근 검색어 조회(7) */
     @Transactional(readOnly = true)
     public List<String> getRecentSearch() {
-        User user = this.userService.getCurrentUser();
-        String key = searchLogKey(user);
-        this.removeRecentSearchLog(key, user);
+        Users users = this.userService.getCurrentUser();
+        String key = searchLogKey(users);
+        this.removeRecentSearchLog(key, users);
 
         return Objects.requireNonNull(this.searchRecentLogRedisRedisTemplate.opsForList()
                         .range(key, 0, RECENT_SEARCH_LOG_SIZE)).stream()
@@ -46,9 +46,9 @@ public class SearchService {
     /* 최근 검색어 추가 */
     @Transactional
     public void addRecentSearch(String name) {
-        User user = this.userService.getCurrentUser();
-        String key = this.searchLogKey(user);
-        this.removeRecentSearchLog(key, user); // 만료기간 지난 최근 검색어 삭제
+        Users users = this.userService.getCurrentUser();
+        String key = this.searchLogKey(users);
+        this.removeRecentSearchLog(key, users); // 만료기간 지난 최근 검색어 삭제
 
         SearchLogRedis value = SearchLogRedis.builder()
                 .name(name)
@@ -69,9 +69,9 @@ public class SearchService {
     /* 최근 검색어 삭제 */
     @Transactional
     public void deleteRecentSearch(String name) {
-        User user = this.userService.getCurrentUser();
-        String key = this.searchLogKey(user);
-        this.removeRecentSearchLog(key, user); // 만료기간 지난 최근 검색어 삭제
+        Users users = this.userService.getCurrentUser();
+        String key = this.searchLogKey(users);
+        this.removeRecentSearchLog(key, users); // 만료기간 지난 최근 검색어 삭제
 
         Set<SearchLogRedis> allKeyValue
                 = this.searchRecentLogRedisRedisTemplate.opsForZSet().range(key, 0, -1);  // 해당 key 에 대한 sorted set
@@ -83,11 +83,11 @@ public class SearchService {
         }
     }
 
-    private String searchLogKey(User user) {
-        return KEY_SUFFIX + user.getId();
+    private String searchLogKey(Users users) {
+        return KEY_SUFFIX + users.getId();
     }
 
-    private void removeRecentSearchLog(String key, User user) {
+    private void removeRecentSearchLog(String key, Users users) {
         long currentTime = System.currentTimeMillis();
         this.searchRecentLogRedisRedisTemplate.opsForZSet().removeRangeByScore(key, 0, currentTime); // 현재 시간보다 작은 score 가지는 value 모두 삭제
     }

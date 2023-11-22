@@ -1,7 +1,7 @@
 package com.example.betteriter.fo_domain.review.domain;
 
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,9 +18,9 @@ public class ReviewLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "users_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Users users;
 
     @JoinColumn(name = "review_id")
     @ManyToOne(fetch = FetchType.LAZY)

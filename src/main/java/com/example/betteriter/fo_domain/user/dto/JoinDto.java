@@ -1,6 +1,6 @@
 package com.example.betteriter.fo_domain.user.dto;
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.global.constant.Category;
 import lombok.AllArgsConstructor;
@@ -38,8 +38,8 @@ public class JoinDto {
     @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
     private String categories;
 
-    public User toUserEntity(String encryptPassword, UsersDetail usersDetail) {
-        return User.builder()
+    public Users toUserEntity(String encryptPassword, UsersDetail usersDetail) {
+        return Users.builder()
                 .email(email)
                 .password(encryptPassword)
                 .categories(this.toCategory())

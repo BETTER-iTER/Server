@@ -1,13 +1,13 @@
 package com.example.betteriter.fo_domain.user.service;
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.dto.JoinDto;
 import com.example.betteriter.fo_domain.user.dto.LoginDto;
 import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
-import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.util.PasswordUtil;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
@@ -35,7 +35,7 @@ import static com.example.betteriter.global.error.exception.ErrorCode.*;
 @RequiredArgsConstructor
 @Service
 public class AuthService implements UserDetailsService {
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
     private final UserDetailRepository userDetailRepository;
 
     private final EmailService emailService;
@@ -46,8 +46,8 @@ public class AuthService implements UserDetailsService {
     private final JwtProperties jwtProperties;
 
     @Override
-    public User loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        return this.userRepository.findByEmail(userEmail)
+    public Users loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+        return this.usersRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
     }
 
@@ -62,10 +62,10 @@ public class AuthService implements UserDetailsService {
     /* 로그인 */
     @Transactional
     public UserServiceTokenResponseDto login(LoginDto loginRequestDto) {
-        User user = this.loadUserByUsername(loginRequestDto.getEmail());
-        this.checkUserLoginType(user);
-        this.checkPassword(loginRequestDto, user);
-        return this.saveAuthenticationAndReturnServiceToken(user);
+        Users users = this.loadUserByUsername(loginRequestDto.getEmail());
+        this.checkUserLoginType(users);
+        this.checkPassword(loginRequestDto, users);
+        return this.saveAuthenticationAndReturnServiceToken(users);
     }
 
     /* 회원가입 이메일 인증 요청 */
@@ -90,8 +90,8 @@ public class AuthService implements UserDetailsService {
     @Transactional
     public void resetPassword(PasswordResetRequestDto request) {
         // 해당 이메일 유저 존재 여부 확인 및 로그인 타입 확인
-        User user = this.checkEmailExistenceAndType(request.getEmail());
-        user.setPassword(this.passwordUtil.encode(request.getPassword()));
+        Users users = this.checkEmailExistenceAndType(request.getEmail());
+        users.setPassword(this.passwordUtil.encode(request.getPassword()));
         log.info(this.passwordUtil.encode(request.getPassword()));
     }
 
@@ -150,33 +150,33 @@ public class AuthService implements UserDetailsService {
 
     /* 이메일 중복 여부 체크 및 인증 타입 체크 for 회원가입 */
     private void checkEmailDuplication(String email) {
-        if (this.userRepository.findByEmail(email).isPresent()) {
+        if (this.usersRepository.findByEmail(email).isPresent()) {
             throw new UserHandler(_EMAIL_DUPLICATION);
         }
     }
 
     /* 이메일 중복 여부 체크 및 인증 타입 체크 for 비밀번호 재설정 */
     private void checkEmailExistence(String email) {
-        if (this.userRepository.findByEmail(email).isEmpty()) {
+        if (this.usersRepository.findByEmail(email).isEmpty()) {
             throw new UserHandler(_EMAIL_NOT_FOUND);
         }
     }
 
-    private void checkPassword(LoginDto loginRequestDto, User user) {
-        if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), user.getPassword())) {
+    private void checkPassword(LoginDto loginRequestDto, Users users) {
+        if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), users.getPassword())) {
             throw new UserHandler(ErrorCode._PASSWORD_NOT_MATCH);
         }
     }
 
-    private User checkEmailExistenceAndType(String email) {
+    private Users checkEmailExistenceAndType(String email) {
         // 해당 유저가 있는지 확인
-        User user = this.userRepository.findByEmail(email)
+        Users users = this.usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
         // 해당 유저의 회원가입 타입이 일반 회원가입인지 확인
-        if (null != user.getOauthId()) {
+        if (null != users.getOauthId()) {
             throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
         }
-        return user;
+        return users;
     }
 
     // 이메일 인증 시 랜덤 문자열 생성
@@ -196,27 +196,27 @@ public class AuthService implements UserDetailsService {
     }
 
     // SecurityContext 에 Authentication 저장 및 ServiceToken 발급
-    private UserServiceTokenResponseDto saveAuthenticationAndReturnServiceToken(User user) {
+    private UserServiceTokenResponseDto saveAuthenticationAndReturnServiceToken(Users users) {
         // -> 여기서 SecurityContext 에 저장된 UserAuthentication 존재 x
-        UserAuthentication userAuthentication = new UserAuthentication(user);
+        UserAuthentication userAuthentication = new UserAuthentication(users);
         SecurityContextHolder.getContext().setAuthentication(userAuthentication);
-        UserServiceTokenResponseDto serviceToken = jwtUtil.createServiceToken(user);
+        UserServiceTokenResponseDto serviceToken = jwtUtil.createServiceToken(users);
 
-        this.redisUtil.setDataExpire(String.valueOf(user.getId()),
+        this.redisUtil.setDataExpire(String.valueOf(users.getId()),
                 serviceToken.getRefreshToken(), jwtProperties.getRefreshExpiration()); // 토큰 발급 후 Redis 에 Refresh token 저장
         log.info(String.valueOf(serviceToken));
         return serviceToken;
     }
 
     // 로그인 시도 회원이 카카오 로그인 회원인지 여부 판단
-    private void checkUserLoginType(User user) {
-        if (user.getOauthId() != null) {
+    private void checkUserLoginType(Users users) {
+        if (users.getOauthId() != null) {
             throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
         }
     }
 
     private Long processJoin(JoinDto joinDto, String encryptPassword) {
-        return this.userRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
+        return this.usersRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
                 .getId();
     }
 }

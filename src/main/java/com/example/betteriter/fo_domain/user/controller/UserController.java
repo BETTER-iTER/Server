@@ -6,10 +6,7 @@ import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -41,9 +38,11 @@ public class UserController {
      * 1. 프론트에서 가지고 있는 Access Token 삭제
      * 2. User 정보 삭제
      **/
-    @DeleteMapping("/withdraw")
-    public ResponseDto<Void> withdraw() {
-        this.userService.withdraw();
+    @DeleteMapping("/withdraw/{reasons}")
+    public ResponseDto<Void> withdraw(
+            @PathVariable String reasons
+    ) {
+        this.userService.withdraw(reasons);
         return ResponseDto.onSuccess(null);
     }
 }

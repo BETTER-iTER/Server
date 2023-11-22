@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.user.domain;
 
+import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS_DETAIL")
-public class UsersDetail {
+public class UsersDetail extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

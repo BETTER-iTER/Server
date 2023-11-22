@@ -1,7 +1,7 @@
 package com.example.betteriter.fo_domain.comment.domain;
 
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,5 +24,5 @@ public class CommentLike {
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Users users;
 }

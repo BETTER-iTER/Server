@@ -1,7 +1,7 @@
 package com.example.betteriter.fo_domain.review.repository;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,9 +13,9 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findFirst7ByCategoryOrderByCreatedAtDesc(Category category);
 
-    List<Review> findReviewByWriter(User user);
+    List<Review> findReviewByWriter(Users users);
 
-    List<Review> findFirst7ByWriterInOrderByCreatedAtDesc(List<User> writers);
+    List<Review> findFirst7ByWriterInOrderByCreatedAtDesc(List<Users> writers);
 
     // sum(count (r.reviewLiked),count(r.reviewScraped))
     @EntityGraph(attributePaths = {"reviewScraped", "reviewLiked"})

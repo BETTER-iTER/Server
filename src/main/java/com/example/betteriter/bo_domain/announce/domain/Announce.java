@@ -1,7 +1,7 @@
 package com.example.betteriter.bo_domain.announce.domain;
 
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class Announce extends BaseEntity {
 
     @JoinColumn(name = "writer_id", nullable = false)
     @ManyToOne
-    private User writerId;
+    private Users writerId;
 
     @Column(name = "title", nullable = false)
     private String title;

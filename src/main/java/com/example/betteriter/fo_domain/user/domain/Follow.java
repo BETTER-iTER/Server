@@ -24,10 +24,10 @@ public class Follow {
 
     @ManyToOne
     @JoinColumn(name = "follower")
-    private User follower; // 팔로우 하는 유저 id는 ( 나 )
+    private Users follower; // 팔로우 하는 유저 id는 ( 나 )
 
     @ManyToOne
     @JoinColumn(name = "followee")
-    private User followee; // 팔로우 당하는 유저 id ( 상대방 )
+    private Users followee; // 팔로우 당하는 유저 id ( 상대방 )
 
 }
