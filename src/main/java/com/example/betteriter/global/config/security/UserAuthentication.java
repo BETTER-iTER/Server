@@ -1,6 +1,6 @@
 package com.example.betteriter.global.config.security;
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,14 +19,14 @@ public class UserAuthentication extends AbstractAuthenticationToken {
 
     private final String userEmail;
 
-    public UserAuthentication(User user) {
-        super(authorities(user));
-        this.userEmail = user.getEmail();
+    public UserAuthentication(Users users) {
+        super(authorities(users));
+        this.userEmail = users.getEmail();
     }
 
-    private static List<GrantedAuthority> authorities(User user) {
+    private static List<GrantedAuthority> authorities(Users users) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRoleType().name()));
+        authorities.add(new SimpleGrantedAuthority(users.getRoleType().name()));
         return authorities;
     }
 

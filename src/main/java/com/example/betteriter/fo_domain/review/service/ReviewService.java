@@ -9,7 +9,7 @@ import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.user.domain.Follow;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +59,8 @@ public class ReviewService {
 
     /* 팔로우 하는 유저가 등록한 리뷰 리스트 조회 메소드 */
     public List<ReviewResponseDto> getFollowingReviews() {
-        User user = this.getCurrentUser();
-        List<User> followee = user.getFollowing().stream()
+        Users users = this.getCurrentUser();
+        List<Users> followee = users.getFollowing().stream()
                 .map(Follow::getFollowee)
                 .collect(Collectors.toList());
 
@@ -77,7 +77,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    private User getCurrentUser() {
+    private Users getCurrentUser() {
         return this.userService.getCurrentUser();
     }
 

@@ -3,7 +3,7 @@ package com.example.betteriter.fo_domain.review.domain;
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
 import lombok.*;
@@ -26,7 +26,7 @@ public class Review extends BaseEntity {
 
     @JoinColumn(name = "writer_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private Users writer;
 
     @JoinColumn(name = "manufacturer_id")
     @ManyToOne(fetch = FetchType.LAZY)

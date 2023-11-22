@@ -6,7 +6,7 @@ import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.repository.NewsRepository;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +46,8 @@ public class NewsService {
     /* ITNews 수정 */
     @Transactional
     public void updateITNews(Long id, UpdateITNewsRequestDto request) {
-        User currentUser = this.userService.getCurrentUser();
-        this.getNews(id).update(request, currentUser);
+        Users currentUsers = this.userService.getCurrentUser();
+        this.getNews(id).update(request, currentUsers);
     }
 
 
