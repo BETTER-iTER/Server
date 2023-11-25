@@ -7,7 +7,7 @@ import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.service.CommentService;
 import com.example.betteriter.fo_domain.comment.converter.CommentResponseConverter;
 import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
-import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +31,10 @@ public class CommentController {
      * 1. 1 댑스 이상 불가
      */
     @PostMapping("/create")
-    public ResponseDto<Long> createComment(
+    public ApiResponse<Long> createComment(
             @Valid @RequestBody CommentRequest.CreateCommentDto request
     ) {
-        return ResponseDto.onSuccess(this.commentService.createComment(request));
+        return ApiResponse.onSuccess(this.commentService.createComment(request));
     }
 
     /**
@@ -43,10 +43,10 @@ public class CommentController {
      * 1. 댓글 작성자만 수정 가능
      */
     @PostMapping("/delete")
-    public ResponseDto<CommentResponse.DeleteCommentDto> deleteComment(
+    public ApiResponse<CommentResponse.DeleteCommentDto> deleteComment(
             @Valid @RequestBody CommentRequest.DeleteCommentDto request
     ) {
-        return ResponseDto.onSuccess(this.commentService.deleteComment(request));
+        return ApiResponse.onSuccess(this.commentService.deleteComment(request));
     }
 
     /**
@@ -54,13 +54,13 @@ public class CommentController {
      * - /comment/read/{review_id}
      */
     @GetMapping("/read/{review_id}")
-    public ResponseDto<List<CommentResponse.GetCommentDto>> readComment(
+    public ApiResponse<List<CommentResponse.GetCommentDto>> readComment(
             @PathVariable @ExistReview Long review_id
     ) {
         log.info("review_id: {}", review_id);
         List<Comment> commentList = this.commentService.readComment(review_id);
         log.info("commentList: {}", commentList.get(0));
-        return ResponseDto.onSuccess(CommentResponseConverter.toGetCommentDto(commentList));
+        return ApiResponse.onSuccess(CommentResponseConverter.toGetCommentDto(commentList));
     }
 
 }

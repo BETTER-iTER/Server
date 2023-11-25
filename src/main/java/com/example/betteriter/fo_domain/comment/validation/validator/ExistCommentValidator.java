@@ -2,7 +2,7 @@ package com.example.betteriter.fo_domain.comment.validation.validator;
 
 import com.example.betteriter.fo_domain.comment.repository.CommentValidRepository;
 import com.example.betteriter.fo_domain.comment.validation.annotation.ExistComment;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class ExistCommentValidator implements ConstraintValidator<ExistComment, 
 
         if (!isExist) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorCode.COMMENT_NOT_EXIST.getMessage())
+            context.buildConstraintViolationWithTemplate(ErrorStatus.COMMENT_NOT_EXIST.getMessage())
                     .addConstraintViolation();
         }
 

@@ -1,7 +1,7 @@
 package com.example.betteriter.fo_domain.search.controller;
 
 import com.example.betteriter.fo_domain.search.service.SearchService;
-import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,29 +24,29 @@ public class SearchController {
      * - 최근 검색어 조회
      **/
     @GetMapping("/recent")
-    public ResponseDto<List<String>> getRecentSearch() {
-        return ResponseDto.onSuccess(this.searchService.getRecentSearch());
+    public ApiResponse<List<String>> getRecentSearch() {
+        return ApiResponse.onSuccess(this.searchService.getRecentSearch());
     }
 
     /**
      * - 최근 검색어 추가
      **/
     @PostMapping("/recent")
-    public ResponseDto<Void> addRecentSearch(
+    public ApiResponse<Void> addRecentSearch(
             @RequestParam String search
     ) {
         this.searchService.addRecentSearch(search);
-        return ResponseDto.onSuccess();
+        return ApiResponse.onSuccess(null);
     }
 
     /**
      * - 최근 검색어 삭제
      **/
     @DeleteMapping("/recent")
-    public ResponseDto<Void> deleteRecentSearch(
+    public ApiResponse<Void> deleteRecentSearch(
             @RequestParam String search
     ) {
         this.searchService.deleteRecentSearch(search);
-        return ResponseDto.onSuccess();
+        return ApiResponse.onSuccess(null);
     }
 }

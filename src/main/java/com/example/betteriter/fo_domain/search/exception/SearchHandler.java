@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.search.exception;
 
-import com.example.betteriter.global.error.exception.ErrorCode;
-import com.example.betteriter.global.error.exception.GeneralException;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.common.exception.GeneralException;
 
 public class SearchHandler extends GeneralException {
 
-        public SearchHandler(ErrorCode errorCode) {
-            super(errorCode);
+        public SearchHandler(ErrorStatus errorStatus) {
+            super(errorStatus);
         }
 }

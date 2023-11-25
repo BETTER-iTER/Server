@@ -1,11 +1,11 @@
 package com.example.betteriter.bo_domain.spec.exception;
 
-import com.example.betteriter.global.error.exception.ErrorCode;
-import com.example.betteriter.global.error.exception.GeneralException;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.common.exception.GeneralException;
 
 public class SpecHandler extends GeneralException {
 
-        public SpecHandler(ErrorCode errorCode) {
-            super(errorCode);
+        public SpecHandler(ErrorStatus errorStatus) {
+            super(errorStatus);
         }
 }

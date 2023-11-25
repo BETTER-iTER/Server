@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommentValidRepository extends JpaRepository<Comment, Long> {
 
-    boolean existsByIdAndUser_id(Long value, Long user_id);
+    boolean existsByIdAndUsers_id(Long value, Long users_id);
 }

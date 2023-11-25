@@ -11,7 +11,7 @@ import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.util.PasswordUtil;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.infra.EmailAuthenticationDto;
@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static com.example.betteriter.global.error.exception.ErrorCode.*;
+import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -164,7 +164,7 @@ public class AuthService implements UserDetailsService {
 
     private void checkPassword(LoginDto loginRequestDto, Users users) {
         if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), users.getPassword())) {
-            throw new UserHandler(ErrorCode._PASSWORD_NOT_MATCH);
+            throw new UserHandler(ErrorStatus._PASSWORD_NOT_MATCH);
         }
     }
 

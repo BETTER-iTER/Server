@@ -2,7 +2,7 @@ package com.example.betteriter.fo_domain.user.controller;
 
 
 import com.example.betteriter.fo_domain.user.service.UserService;
-import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,8 @@ public class UserController {
      * 2. 백에서 Refresh Token 삭제
      **/
     @PostMapping("/logout")
-    public ResponseDto<Long> logout() {
-        return ResponseDto.onSuccess(this.userService.logout());
+    public ApiResponse<Long> logout() {
+        return ApiResponse.onSuccess(this.userService.logout());
     }
 
     /**
@@ -39,10 +39,10 @@ public class UserController {
      * 2. User 정보 삭제
      **/
     @DeleteMapping("/withdraw/{reasons}")
-    public ResponseDto<Void> withdraw(
+    public ApiResponse<Void> withdraw(
             @PathVariable String reasons
     ) {
         this.userService.withdraw(reasons);
-        return ResponseDto.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 }

@@ -1,11 +1,11 @@
 package com.example.betteriter.bo_domain.news.exception;
 
-import com.example.betteriter.global.error.exception.ErrorCode;
-import com.example.betteriter.global.error.exception.GeneralException;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.common.exception.GeneralException;
 
 public class NewsHandler extends GeneralException {
 
-        public NewsHandler(ErrorCode errorCode) {
-            super(errorCode);
+        public NewsHandler(ErrorStatus errorStatus) {
+            super(errorStatus);
         }
 }

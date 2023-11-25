@@ -3,7 +3,7 @@ package com.example.betteriter.fo_domain.review.controller;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
-import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.example.betteriter.global.error.exception.ErrorCode._METHOD_ARGUMENT_ERROR;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._METHOD_ARGUMENT_ERROR;
 
 @Tag(name = "ReviewController", description = "Review API")
 @Slf4j
@@ -27,12 +27,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseDto<Long> createReview(
+    public ApiResponse<Long> createReview(
             @Valid @RequestBody CreateReviewRequestDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return ResponseDto.onSuccess(this.reviewService.createReview(request));
+        return ApiResponse.onSuccess(this.reviewService.createReview(request));
     }
 
 

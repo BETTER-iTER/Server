@@ -1,7 +1,7 @@
 package com.example.betteriter.global.filter;
 
-import com.example.betteriter.global.common.response.ResponseDto;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -36,7 +36,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul")));
             javaTimeModule.addSerializer(LocalDateTime.class, localDateTimeSerializer);
             ObjectMapper objectMapper = new ObjectMapper().registerModule(javaTimeModule);
-            objectMapper.writeValue(os, ResponseDto.onFail(exception.getClass().getSimpleName(), ErrorCode._UNAUTHORIZED));
+            objectMapper.writeValue(os, ApiResponse.onFailure(ErrorStatus._UNAUTHORIZED.getCode(), exception.getClass().getSimpleName(), null));
             os.flush();
         }
     }
