@@ -1,12 +1,12 @@
 package com.example.betteriter.fo_domain.user.service;
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.info.KakaoOauthUserInfo;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoToken;
-import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 @Service
 public class KakaoOauthService {
     private final static String PROVIDER_NAME = "kakao";
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     private final JwtUtil jwtUtil;
 
@@ -49,11 +49,11 @@ public class KakaoOauthService {
     /**
      * step 00 : 회원 조회
      **/
-    private User findUser(String code) throws IOException {
+    private Users findUser(String code) throws IOException {
         ClientRegistration kakaoClientRegistration
                 = this.inMemoryClientRegistrationRepository.findByRegistrationId(PROVIDER_NAME);
-        KakaoToken kakaoToken = getKakaoToken(code, kakaoClientRegistration);
-        return saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
+        KakaoToken kakaoToken = this.getKakaoToken(code, kakaoClientRegistration);
+        return this.saveUserWithKakaoUserInfo(kakaoToken, kakaoClientRegistration);
     }
 
     /**
@@ -66,9 +66,9 @@ public class KakaoOauthService {
         return WebClient.create()
                 .post()
                 .uri(kakaoClientRegistration.getProviderDetails().getTokenUri())
-                .headers(h -> {
-                    h.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                    h.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
+                .headers(header -> {
+                    header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                    header.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
                 })
                 .bodyValue(kakaoTokenRequest(code, kakaoClientRegistration))
                 .retrieve()
@@ -99,15 +99,15 @@ public class KakaoOauthService {
      * - https://kapi.kakao.com/user/me
      * - kakao auth server 에 존재하는 내정보를 이용해서 회원 엔티티 생성
      **/
-    private User saveUserWithKakaoUserInfo(KakaoToken kakaoToken,
-                                           ClientRegistration kakaoClientRegistration) throws IOException {
-        Map<String, Object> attributes = getUserAttributes(kakaoToken, kakaoClientRegistration);
-        KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes);
+    private Users saveUserWithKakaoUserInfo(KakaoToken kakaoToken,
+                                            ClientRegistration kakaoClientRegistration) throws IOException {
+        Map<String, Object> attributes = this.getUserAttributes(kakaoToken, kakaoClientRegistration);
+        KakaoOauthUserInfo kakaoOauthUserInfo = new KakaoOauthUserInfo(attributes); // attribute 이용해서 kakaoOauthUserInfo 생성
 
         String oauthId = kakaoOauthUserInfo.getOauthId();
         String kakaoEmail = kakaoOauthUserInfo.getKakaoEmail();
-        return this.userRepository.findByOauthId(oauthId).orElseGet(() -> this.userRepository.save(
-                User.builder()
+        return this.usersRepository.findByOauthId(oauthId).orElseGet(() -> this.usersRepository.save(
+                Users.builder()
                         .oauthId(oauthId)
                         .email(kakaoEmail)
                         .roleType(ROLE_USER)
@@ -135,8 +135,8 @@ public class KakaoOauthService {
                 .build());
     }
 
-    private User getUser() {
-        return this.userRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
+    private Users getUser() {
+        return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
     }
 }

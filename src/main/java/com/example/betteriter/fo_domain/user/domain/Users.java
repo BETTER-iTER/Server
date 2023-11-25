@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS")
-public class User extends BaseEntity implements UserDetails {
+public class Users extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usr_id")
@@ -44,6 +44,7 @@ public class User extends BaseEntity implements UserDetails {
 
     private boolean isExpert;
 
+
     /* User 가 관심 등록한 카테고리 리스트 */
     @ElementCollection(targetClass = Category.class)
     @CollectionTable(name = "USERS_CATEGORY",
@@ -57,10 +58,10 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "followee")
     private List<Follow> follower; // 회원을 팔로잉 하는 유저 리스트
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<ReviewScrap> reviewScraps; // 유저가 스크랩한 리뷰
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<ReviewLike> reviewLikes; // 유저가 좋아요한 리뷰
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)

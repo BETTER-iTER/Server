@@ -1,8 +1,8 @@
 package com.example.betteriter.global.filter;
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.dto.ReissueTokenResponseDto;
-import com.example.betteriter.fo_domain.user.repository.UserRepository;
+import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final JwtProperties jwtProperties;
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -174,11 +174,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .orElseThrow(() -> new JwtException("jwtException"));
 
             // accessToken 을 통해 User Payload 가져 오고 회원 조회
-            User user = this.userRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
+            Users users = this.usersRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
                     .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
 
             // SecurityContext 에 인증된 Authentication 저장
-            UserAuthentication authentication = new UserAuthentication(user);
+            UserAuthentication authentication = new UserAuthentication(users);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
             request.setAttribute("exception", exception);

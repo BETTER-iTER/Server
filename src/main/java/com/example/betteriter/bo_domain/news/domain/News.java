@@ -3,7 +3,7 @@ package com.example.betteriter.bo_domain.news.domain;
 
 import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class News extends BaseEntity {
 
     @JoinColumn(name = "writer_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private Users writer;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -47,7 +47,7 @@ public class News extends BaseEntity {
                 .build();
     }
 
-    public void update(UpdateITNewsRequestDto request, User newWriter) {
+    public void update(UpdateITNewsRequestDto request, Users newWriter) {
         this.title = request.getTitle();
         this.content = request.getContent();
         this.imageUrl = request.getImageUrl();

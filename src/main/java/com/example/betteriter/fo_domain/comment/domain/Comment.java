@@ -2,7 +2,7 @@ package com.example.betteriter.fo_domain.comment.domain;
 
 
 import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Status;
 import lombok.*;
@@ -28,7 +28,7 @@ public class Comment extends BaseEntity {
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Users users;
 
     @Column(name = "comment", nullable = false)
     private String comment;

@@ -1,7 +1,7 @@
 package com.example.betteriter.bo_domain.quiz.domain;
 
 
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class QuizAnswer extends BaseEntity {
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Users users;
 
     @JoinColumn(name = "quiz_id")
     @ManyToOne(fetch = FetchType.LAZY)

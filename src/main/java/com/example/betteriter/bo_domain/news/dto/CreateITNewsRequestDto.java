@@ -1,7 +1,7 @@
 package com.example.betteriter.bo_domain.news.dto;
 
 import com.example.betteriter.bo_domain.news.domain.News;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,13 +20,13 @@ public class CreateITNewsRequestDto {
     private String imageUrl;
     private String newsUrl;
 
-    public News toEntity(User user) {
+    public News toEntity(Users users) {
         return News.builder()
                 .title(title)
                 .content(content)
                 .imageUrl(imageUrl)
                 .newsUrl(newsUrl)
-                .writer(user)
+                .writer(users)
                 .build();
     }
 }
