@@ -1,24 +1,22 @@
 package com.example.betteriter.fo_domain.comment.service;
 
-import com.example.betteriter.fo_domain.comment.domain.Comment;
-import com.example.betteriter.fo_domain.comment.converter.CommentResponseConverter;
 import com.example.betteriter.fo_domain.comment.converter.CommentConverter;
+import com.example.betteriter.fo_domain.comment.converter.CommentResponseConverter;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.repository.CommentReadRepository;
 import com.example.betteriter.fo_domain.comment.repository.CommentWriteRepository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
-import com.example.betteriter.fo_domain.user.domain.User;
+import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
-import com.example.betteriter.global.constant.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * - 댓글 관련 로직을 담고 있는 서비스
@@ -41,7 +39,7 @@ public class CommentService {
     @Transactional
     public Long createComment(CommentRequest.CreateCommentDto request) {
         Review review = this.reviewService.findReviewById(request.getReview_id());
-        User writer = this.userService.getCurrentUser();
+        Users writer = this.userService.getCurrentUser();
 
         Comment comment = CommentConverter.toComment(
                 request.getComment(),

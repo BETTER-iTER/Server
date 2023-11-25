@@ -26,9 +26,9 @@ public class CommentResponseConverter {
                     .comment(c.getComment())
                     .createdAt(c.getCreatedAt().toString())
                     .writer(CommentResponse.WriterDto.builder()
-                            .id(c.getUser().getId())
-                            .nickname(c.getUser().getUsersDetail().getNickName())
-                            .profileImage(c.getUser().getUsersDetail().getProfileImage())
+                            .id(c.getUsers().getId())
+                            .nickname(c.getUsers().getUsersDetail().getNickName())
+                            .profileImage(c.getUsers().getUsersDetail().getProfileImage())
                             .build())
                     .build();
 
