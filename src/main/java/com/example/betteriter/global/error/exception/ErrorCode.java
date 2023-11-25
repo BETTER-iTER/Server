@@ -66,6 +66,10 @@ public enum ErrorCode {
     // Manufacturer
     _MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_400", "일치하는 제조사 정보를 찾을 수 없습니다."),
 
+    // Comment
+    COMMENT_NOT_EXIST(HttpStatus.BAD_REQUEST, "COMMENT_400", "일치하는 댓글 정보를 찾을 수 없습니다."),
+    COMMENT_NOT_HAVE(HttpStatus.BAD_REQUEST, "COMMENT_400", "해당 댓글을 작성한 유저가 아닙니다."),
+
     ;
 
 

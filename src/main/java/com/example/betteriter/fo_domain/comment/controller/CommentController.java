@@ -4,22 +4,18 @@ package com.example.betteriter.fo_domain.comment.controller;
 import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.service.CommentService;
-import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
 import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static com.example.betteriter.global.error.exception.ErrorCode._METHOD_ARGUMENT_ERROR;
 
 
-@Tag(name = "CommentController", description = "Comment API")
+@Tag(name = "CommentControllers", description = "Comment API")
 @Slf4j
 @RequestMapping("/comment")
 @RequiredArgsConstructor
@@ -34,10 +30,8 @@ public class CommentController {
      */
     @PostMapping("/create")
     public ResponseDto<Long> createComment(
-            @Valid @RequestBody CommentRequest.CreateCommentRequestDto request,
-            BindingResult bindingResult
+            @Valid @RequestBody CommentRequest.CreateCommentDto request
     ) {
-        this.checkRequestValidation(bindingResult);
         return ResponseDto.onSuccess(this.commentService.createComment(request));
     }
 
@@ -47,11 +41,9 @@ public class CommentController {
      * 1. 댓글 작성자만 수정 가능
      */
     @PostMapping("/delete")
-    public ResponseDto<Long> deleteComment(
-            @Valid @RequestBody CommentRequest.DeleteCommentRequestDto request,
-            BindingResult bindingResult
+    public ResponseDto<CommentResponse.DeleteCommentDto> deleteComment(
+            @Valid @RequestBody CommentRequest.DeleteCommentDto request
     ) {
-        this.checkRequestValidation(bindingResult);
         return ResponseDto.onSuccess(this.commentService.deleteComment(request));
     }
 
@@ -64,14 +56,6 @@ public class CommentController {
             @ExistReview @PathVariable Long review_id
     ) {
         return ResponseDto.onSuccess(this.commentService.readComment(review_id));
-    }
-
-    private void checkRequestValidation(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldErrors().get(0);
-            log.debug("fieldError occurs : {}", fieldError.getDefaultMessage());
-            throw new ReviewHandler(_METHOD_ARGUMENT_ERROR);
-        }
     }
 
 }

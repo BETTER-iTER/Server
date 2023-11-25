@@ -1,9 +1,12 @@
 package com.example.betteriter.fo_domain.comment.service;
 
 import com.example.betteriter.fo_domain.comment.domain.Comment;
+import com.example.betteriter.fo_domain.comment.converter.CommentResponseConverter;
+import com.example.betteriter.fo_domain.comment.converter.CommentConverter;
 import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
-import com.example.betteriter.fo_domain.comment.repository.CommentRepository;
+import com.example.betteriter.fo_domain.comment.repository.CommentReadRepository;
+import com.example.betteriter.fo_domain.comment.repository.CommentWriteRepository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.User;
@@ -23,19 +26,27 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CommentService {
-    private final CommentRepository commentRepository;
+    private final CommentReadRepository commentReadRepository;
+    private final CommentWriteRepository commentWriteRepository;
+
     private final ReviewService reviewService;
     private final UserService userService;
 
     /**
      * [댓글 작성]
+     * TODO: 이후 대댓글 기능 작성시 order_num과 group_id 관련 로직 추가 해야함
      */
     @Transactional
-    public Long createComment(CommentRequest.CreateCommentRequestDto commentCreateDto) {
-        Review review = this.reviewService.findReviewById(commentCreateDto.getReview_id());
+    public Long createComment(CommentRequest.CreateCommentDto request) {
+        Review review = this.reviewService.findReviewById(request.getReview_id());
         User writer = this.userService.getCurrentUser();
-        Comment comment = this.commentRepository.save(commentCreateDto.toEntity(review, writer));
 
+        Comment comment = CommentConverter.toComment(
+                request.getComment(),
+                review, writer
+        );
+
+        comment = this.commentReadRepository.save(comment);
         return comment.getId();
     }
 
@@ -43,18 +54,17 @@ public class CommentService {
      * [댓글 삭제]
      */
     @Transactional
-    public Long deleteComment(CommentRequest.DeleteCommentRequestDto request) {
-        Comment comment = this.commentRepository.findCommentById(request.getReview_id());
-        this.commentRepository.delete(comment);
-
-        return comment.getId();
+    public CommentResponse.DeleteCommentDto deleteComment(CommentRequest.DeleteCommentDto request) {
+        log.info("request: {}", request);
+        int result = this.commentWriteRepository.explicitDeleteById(request.getComment_id());
+        return CommentResponseConverter.toDeleteCommentResponse();
     }
 
     /**
      * [댓글 조회]
      */
     public CommentResponse.ReadCommentDto readComment(Long reviewId) {
-        List<Comment> commentList = this.commentRepository.findAllByReviewId(reviewId);
+        List<Comment> commentList = this.commentReadRepository.findAllByReviewId(reviewId);
 
         return CommentResponse.ReadCommentDto.builder()
                 .reviewId(reviewId)

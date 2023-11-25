@@ -2,11 +2,12 @@ package com.example.betteriter.fo_domain.comment.repository;
 
 import com.example.betteriter.fo_domain.comment.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentReadRepository extends JpaRepository<Comment, Long> {
 
     Comment findCommentById(Long reviewId);
 
@@ -16,4 +17,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "      c.status != 'INACTIAVE'" +
             "order by c.orderNum desc")
     List<Comment> findAllByReviewId(Long reviewId);
+
 }

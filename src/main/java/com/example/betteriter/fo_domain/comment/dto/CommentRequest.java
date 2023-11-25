@@ -1,10 +1,8 @@
 package com.example.betteriter.fo_domain.comment.dto;
 
-import com.example.betteriter.fo_domain.comment.domain.Comment;
-import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.validation.annotation.ActivatedReview;
+import com.example.betteriter.fo_domain.comment.validation.annotation.ExistComment;
+import com.example.betteriter.fo_domain.comment.validation.annotation.UserHaveComment;
 import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
-import com.example.betteriter.fo_domain.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,35 +14,20 @@ public class CommentRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateCommentRequestDto {
+    public static class CreateCommentDto {
 
         @ExistReview
-        @ActivatedReview
         private Long review_id;
         private String comment;
-        private Integer orderNum;
-        private Integer groupId;
-
-        public Comment toEntity(Review review, User writer) {
-            return Comment.builder()
-                    .review(review)
-                    .user(writer)
-                    .comment(this.comment)
-                    .orderNum(this.orderNum)
-                    .groupId(this.groupId)
-                    .build();
-        }
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DeleteCommentRequestDto {
+    public static class DeleteCommentDto {
 
-        @ExistReview
-        @ActivatedReview
-        private Long review_id;
+        private Long comment_id;
 
     }
 }

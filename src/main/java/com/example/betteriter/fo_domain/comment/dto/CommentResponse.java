@@ -18,4 +18,12 @@ public class CommentResponse {
         private Long reviewId;
         private List<Comment> commentList;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteCommentDto {
+        private String message;
+    }
 }
