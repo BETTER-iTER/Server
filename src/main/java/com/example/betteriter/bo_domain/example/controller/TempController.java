@@ -3,7 +3,7 @@ package com.example.betteriter.bo_domain.example.controller;
 import com.example.betteriter.bo_domain.example.dto.TempConverter;
 import com.example.betteriter.bo_domain.example.dto.TempResponse;
 import com.example.betteriter.bo_domain.example.service.TempQueryService;
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +20,13 @@ public class TempController {
     private final TempQueryService tempQueryService;
 
     @GetMapping("/test")
-    public ApiResponse<TempResponse.TempTestDto> test() {
-        return ApiResponse.onSuccess(TempConverter.toTempTestDto());
+    public ResponseDto<TempResponse.TempTestDto> test() {
+        return ResponseDto.onSuccess(TempConverter.toTempTestDto());
     }
 
     @GetMapping("/exception")
-    public ApiResponse<TempResponse.TempExceptionDto> exception(@RequestParam Integer flag) {
+    public ResponseDto<TempResponse.TempExceptionDto> exception(@RequestParam Integer flag) {
         tempQueryService.checkFlag(flag);
-        return ApiResponse.onSuccess(TempConverter.toTempExceptionDto(flag));
+        return ResponseDto.onSuccess(TempConverter.toTempExceptionDto(flag));
     }
 }

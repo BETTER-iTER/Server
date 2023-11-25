@@ -3,7 +3,7 @@ package com.example.betteriter.fo_domain.review.controller;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +27,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ApiResponse<Long> createReview(
+    public ResponseDto<Long> createReview(
             @Valid @RequestBody CreateReviewRequestDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return ApiResponse.onSuccess(this.reviewService.createReview(request));
+        return ResponseDto.onSuccess(this.reviewService.createReview(request));
     }
 
 

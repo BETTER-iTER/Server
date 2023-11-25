@@ -6,7 +6,7 @@ import com.example.betteriter.fo_domain.user.dto.PasswordResetRequestDto;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.service.AuthService;
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,13 +50,13 @@ public class AuthController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH_EMAIL_DUPLICATION_401", description = "이메일 이미 존재"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "METHOD_ARGUMENT_ERROR", description = "올바르지 않은 클라이언트 요청값")}
     )
-    public ApiResponse<Long> join(
+    public ResponseDto<Long> join(
             @Schema(description = "일반 회원가입 요청 객체")
             @RequestBody @Valid JoinDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return ApiResponse.onSuccess(this.authService.join(request));
+        return ResponseDto.onSuccess(this.authService.join(request));
     }
 
 
@@ -69,13 +69,13 @@ public class AuthController {
      * 사용자가 인증 번호 클릭 -> 서버에서 판단 후 승인 or 거부
      */
     @PostMapping("/join/emails")
-    public ApiResponse<Void> requestEmail(
+    public ResponseDto<Void> requestEmail(
             @Valid @RequestBody EmailDto emailDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
         this.authService.requestEmailForJoin(emailDto);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -84,13 +84,13 @@ public class AuthController {
      * - /auth/check/code
      **/
     @PostMapping("/join/emails/verification")
-    public ApiResponse<Void> verifyJoinAuthCode(
+    public ResponseDto<Void> verifyJoinAuthCode(
             @Valid @RequestBody EmailAuthenticationDto emailAuthenticationDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
         this.authService.verifyJoinAuthCode(emailAuthenticationDto);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
 
@@ -113,13 +113,13 @@ public class AuthController {
      * - 비밀번호 재설정을 위한 이메일 요청 이미 해당 회원정보가 있어야 함
      **/
     @PostMapping("/password/emails")
-    public ApiResponse<Void> requestEmailForPassword(
+    public ResponseDto<Void> requestEmailForPassword(
             @Valid @RequestBody EmailDto emailDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
         this.authService.requestEmailForPasswordReset(emailDto);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
 
@@ -128,13 +128,13 @@ public class AuthController {
      * - 사용자가 이메일로 받은 인증 코드 검증하는 컨트롤러
      **/
     @PostMapping("/password/emails/verification")
-    public ApiResponse<Void> verifyPasswordResetAuthCode(
+    public ResponseDto<Void> verifyPasswordResetAuthCode(
             @Valid @RequestBody EmailAuthenticationDto emailAuthenticationDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
         this.authService.verifyPasswordResetAuthCode(emailAuthenticationDto);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -145,13 +145,13 @@ public class AuthController {
      * - 해당 유저가 존재 여부 확인 및 일반 회원가입 유저인지 다시 확인
      **/
     @PatchMapping("/password/reset")
-    public ApiResponse<Void> resetPassword(
+    public ResponseDto<Void> resetPassword(
             @Valid @RequestBody PasswordResetRequestDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
         this.authService.resetPassword(request);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
     /**
@@ -161,10 +161,10 @@ public class AuthController {
      * - 닉네임 중복 되는 경우(사용 불가능) -> false
      **/
     @GetMapping("/nickname/check")
-    public ApiResponse<Boolean> checkNickname(
+    public ResponseDto<Boolean> checkNickname(
             @RequestParam String nickname
     ) {
-        return ApiResponse.onSuccess(this.authService.checkNickname(nickname));
+        return ResponseDto.onSuccess(this.authService.checkNickname(nickname));
     }
 
     /* 컨트롤러에 들어온 요청 DTO 유효성 검증 */

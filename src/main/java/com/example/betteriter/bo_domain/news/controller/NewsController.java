@@ -5,7 +5,7 @@ import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.service.NewsService;
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,33 +27,33 @@ public class NewsController {
     private final NewsService newsService;
 
     @PostMapping
-    public ApiResponse<Long> createITNews(
+    public ResponseDto<Long> createITNews(
             @Valid @RequestBody CreateITNewsRequestDto request,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return ApiResponse.onSuccess(this.newsService.createITNews(request));
+        return ResponseDto.onSuccess(this.newsService.createITNews(request));
     }
 
     @GetMapping
-    public ApiResponse<List<ITNewsResponseDto>> getITNews() {
-        return ApiResponse.onSuccess(this.newsService.getITNews());
+    public ResponseDto<List<ITNewsResponseDto>> getITNews() {
+        return ResponseDto.onSuccess(this.newsService.getITNews());
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> updateITNews(
+    public ResponseDto<Void> updateITNews(
             @Valid @RequestBody UpdateITNewsRequestDto request,
             @PathVariable Long id,
             BindingResult bindingResult) {
         this.checkRequestValidation(bindingResult);
         this.newsService.updateITNews(id, request);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteITNews(@PathVariable Long id) {
+    public ResponseDto<Void> deleteITNews(@PathVariable Long id) {
         this.newsService.deleteITNews(id);
-        return ApiResponse.onSuccess(null);
+        return ResponseDto.onSuccess(null);
     }
 
     private void checkRequestValidation(BindingResult bindingResult) {
