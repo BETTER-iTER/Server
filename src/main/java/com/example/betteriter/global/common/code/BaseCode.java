@@ -1,11 +1,11 @@
 package com.example.betteriter.global.common.code;
 
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 
 public interface BaseCode {
 
-    public ApiResponse.ReasonDto getReason();
+    public ResponseDto.ReasonDto getReason();
 
-    public ApiResponse.ReasonDto getReasonHttpStatus();
+    public ResponseDto.ReasonDto getReasonHttpStatus();
 
 }

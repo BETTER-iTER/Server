@@ -1,8 +1,7 @@
 package com.example.betteriter.global.common.exception;
 
 import com.example.betteriter.global.common.code.BaseErrorCode;
-import com.example.betteriter.global.common.code.status.ErrorStatus;
-import com.example.betteriter.global.common.response.ApiResponse;
+import com.example.betteriter.global.common.response.ResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,11 +11,11 @@ public class GeneralException extends RuntimeException {
 
     private final BaseErrorCode code;
 
-    public ApiResponse.ErrorReasonDto getErrorReason() {
+    public ResponseDto.ErrorReasonDto getErrorReason() {
         return this.code.getReason();
     }
 
-    public ApiResponse.ErrorReasonDto getErrorReasonHttpStatus() {
+    public ResponseDto.ErrorReasonDto getErrorReasonHttpStatus() {
         return this.code.getReasonHttpStatus();
     }
 }

@@ -59,6 +59,6 @@ public class NewsService {
 
     private News getNews(Long id) {
         return this.newsRepository.findById(id)
-                .orElseThrow(() -> new NewsHandler(ErrorStatus._NEWS_NOT_FOUND));
+                .orElseThrow(() -> new NewsHandler(ErrorStatus.NEWS_NOT_FOUND));
     }
 }
