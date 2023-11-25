@@ -2,8 +2,7 @@ package com.example.betteriter.fo_domain.review.validation.validator;
 
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.review.validation.annotation.ActivatedReview;
-import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +26,7 @@ public class ActivateReviewValidator implements ConstraintValidator<ActivatedRev
 
         if(!isExistReview) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorCode.REVIEW_NOT_ACTIVATE.toString())
+            context.buildConstraintViolationWithTemplate(ErrorStatus.REVIEW_NOT_ACTIVATE.toString())
                     .addConstraintViolation();
         }
 

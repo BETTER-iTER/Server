@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.review.exception;
 
-import com.example.betteriter.global.error.exception.ErrorCode;
-import com.example.betteriter.global.error.exception.GeneralException;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.common.exception.GeneralException;
 
 public class ReviewHandler extends GeneralException {
 
-        public ReviewHandler(ErrorCode errorCode) {
-            super(errorCode);
+        public ReviewHandler(ErrorStatus errorStatus) {
+            super(errorStatus);
         }
 }

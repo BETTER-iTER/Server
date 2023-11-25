@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.comment.exception;
 
-import com.example.betteriter.global.error.exception.ErrorCode;
-import com.example.betteriter.global.error.exception.GeneralException;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.common.exception.GeneralException;
 
 public class CommentHandler extends GeneralException {
 
-        public CommentHandler(ErrorCode errorCode) {
-            super(errorCode);
+        public CommentHandler(ErrorStatus errorStatus) {
+            super(errorStatus);
         }
 }

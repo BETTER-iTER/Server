@@ -1,5 +1,8 @@
-package com.example.betteriter.global.error.exception;
+package com.example.betteriter.global.common.code.status;
 
+import com.example.betteriter.global.common.code.BaseErrorCode;
+import com.example.betteriter.global.common.exception.GeneralException;
+import com.example.betteriter.global.common.response.ApiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,7 +13,7 @@ import java.util.function.Predicate;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode {
+public enum ErrorStatus implements BaseErrorCode {
 
     /*
         ErrorCode는 다음과 같은 형식으로 작성합니다.
@@ -29,9 +32,6 @@ public enum ErrorCode {
                     NOT_FOUND -> USER_404_001,
                     ALREADY_EXISTS -> USER_409_001
      */
-
-    // Success
-    _OK(HttpStatus.OK, "SUCCESS_200", "OK"),
 
     // Common Error & Global Error
     _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_400", "잘못된 요청입니다."),
@@ -77,32 +77,22 @@ public enum ErrorCode {
     private final String code;
     private final String message;
 
-    public static ErrorCode valueOf(HttpStatus httpStatus) {
-        if (httpStatus == null) {
-            throw new GeneralException("httpStatus must not be null");
-        }
-
-        return Arrays.stream(values())
-                .filter(errorCode -> errorCode.getHttpStatus() == httpStatus)
-                .findFirst()
-                .orElseGet(() -> {
-                    if (httpStatus.is4xxClientError()) {
-                        return ErrorCode._BAD_REQUEST;
-                    } else if (httpStatus.is5xxServerError()) {
-                        return ErrorCode._INTERNAL_SERVER_ERROR;
-                    } else {
-                        return ErrorCode._OK;
-                    }
-                });
+    @Override
+    public ApiResponse.ErrorReasonDto getReason() {
+        return ApiResponse.ErrorReasonDto.builder()
+                .isSuccess(false)
+                .code(this.code)
+                .message(this.message)
+                .build();
     }
 
-    public String getMessage(Throwable e) {
-        return this.getMessage(this.getMessage() + " - " + e.getMessage());
-    }
-
-    public String getMessage(String message) {
-        return Optional.ofNullable(message)
-                .filter(Predicate.not(String::isBlank))
-                .orElse(this.getMessage());
+    @Override
+    public ApiResponse.ErrorReasonDto getReasonHttpStatus() {
+        return ApiResponse.ErrorReasonDto.builder()
+                .httpStatus(this.httpStatus)
+                .isSuccess(false)
+                .code(this.code)
+                .message(this.message)
+                .build();
     }
 }

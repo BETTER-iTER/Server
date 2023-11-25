@@ -13,7 +13,6 @@ import com.example.betteriter.fo_domain.user.domain.Follow;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
-import com.example.betteriter.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.example.betteriter.global.error.exception.ErrorCode.REVIEW_NOT_FOUND;
+import static com.example.betteriter.global.common.code.status.ErrorStatus.REVIEW_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor

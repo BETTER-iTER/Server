@@ -5,7 +5,7 @@ import com.example.betteriter.fo_domain.user.domain.UsersWithdrawReason;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +68,6 @@ public class UserService {
     /* 현재 로그인한 회원 정보 가져오기 */
     public Users getCurrentUser() {
         return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
-                .orElseThrow(() -> new UserHandler(ErrorCode._USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
 }

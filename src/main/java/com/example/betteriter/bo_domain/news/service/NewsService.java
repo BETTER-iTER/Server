@@ -8,7 +8,7 @@ import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.repository.NewsRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,6 +59,6 @@ public class NewsService {
 
     private News getNews(Long id) {
         return this.newsRepository.findById(id)
-                .orElseThrow(() -> new NewsHandler(ErrorCode._NEWS_NOT_FOUND));
+                .orElseThrow(() -> new NewsHandler(ErrorStatus._NEWS_NOT_FOUND));
     }
 }

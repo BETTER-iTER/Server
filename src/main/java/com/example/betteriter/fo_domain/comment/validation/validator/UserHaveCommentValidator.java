@@ -3,7 +3,7 @@ package com.example.betteriter.fo_domain.comment.validation.validator;
 import com.example.betteriter.fo_domain.comment.repository.CommentValidRepository;
 import com.example.betteriter.fo_domain.comment.validation.annotation.UserHaveComment;
 import com.example.betteriter.fo_domain.user.service.UserService;
-import com.example.betteriter.global.error.exception.ErrorCode;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,11 +24,11 @@ public class UserHaveCommentValidator implements ConstraintValidator<UserHaveCom
     @Override
     public boolean isValid(Long value, ConstraintValidatorContext context) {
         Long userId = this.userService.getCurrentUser().getId();
-        boolean isHas = this.commentValidRepository.existsByIdAndUser_id(value, userId);
+        boolean isHas = this.commentValidRepository.existsByIdAndUsers_id(value, userId);
 
         if (!isHas) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorCode.COMMENT_NOT_HAVE.getMessage())
+            context.buildConstraintViolationWithTemplate(ErrorStatus.COMMENT_NOT_HAVE.getMessage())
                     .addConstraintViolation();
         }
 

@@ -3,7 +3,7 @@ package com.example.betteriter.fo_domain.user.controller;
 import com.example.betteriter.fo_domain.user.dto.UserServiceTokenResponseDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.service.KakaoOauthService;
-import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ public class KakaoOauthController {
      * - /auth/kakao/join
      **/
     @PostMapping("/kakao/join")
-    public ResponseDto<Void> completeKakaoJoin(
+    public ApiResponse<Void> completeKakaoJoin(
             @RequestBody @Valid KakaoJoinDto request) {
         this.kakaoOauthService.completeKakaoJoin(request);
-        return ResponseDto.onSuccess(null);
+        return ApiResponse.onSuccess(null);
     }
 }

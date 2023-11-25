@@ -27,6 +27,7 @@ public class CommentRequest {
     @AllArgsConstructor
     public static class DeleteCommentDto {
 
+        @ExistComment
         private Long comment_id;
 
     }
