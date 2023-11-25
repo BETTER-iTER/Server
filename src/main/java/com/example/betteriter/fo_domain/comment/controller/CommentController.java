@@ -1,9 +1,11 @@
 package com.example.betteriter.fo_domain.comment.controller;
 
 
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.comment.dto.CommentRequest;
 import com.example.betteriter.fo_domain.comment.dto.CommentResponse;
 import com.example.betteriter.fo_domain.comment.service.CommentService;
+import com.example.betteriter.fo_domain.comment.converter.CommentResponseConverter;
 import com.example.betteriter.fo_domain.review.validation.annotation.ExistReview;
 import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
+import java.util.List;
 
 
 @Tag(name = "CommentControllers", description = "Comment API")
@@ -52,10 +54,13 @@ public class CommentController {
      * - /comment/read/{review_id}
      */
     @GetMapping("/read/{review_id}")
-    public ResponseDto<CommentResponse.ReadCommentDto> readComment(
-            @ExistReview @PathVariable Long review_id
+    public ResponseDto<List<CommentResponse.GetCommentDto>> readComment(
+            @PathVariable @ExistReview Long review_id
     ) {
-        return ResponseDto.onSuccess(this.commentService.readComment(review_id));
+        log.info("review_id: {}", review_id);
+        List<Comment> commentList = this.commentService.readComment(review_id);
+        log.info("commentList: {}", commentList.get(0));
+        return ResponseDto.onSuccess(CommentResponseConverter.toGetCommentDto(commentList));
     }
 
 }

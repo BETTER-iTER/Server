@@ -43,4 +43,8 @@ public class Comment extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // 댓글 상태: ACTIVE, INACTIVE, DELETED
+
+    public boolean isDeleted() {
+        return this.status == Status.DELETED;
+    }
 }

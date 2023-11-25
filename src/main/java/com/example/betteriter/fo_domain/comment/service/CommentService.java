@@ -11,12 +11,14 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.User;
 import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.global.constant.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * - 댓글 관련 로직을 담고 있는 서비스
@@ -55,7 +57,6 @@ public class CommentService {
      */
     @Transactional
     public CommentResponse.DeleteCommentDto deleteComment(CommentRequest.DeleteCommentDto request) {
-        log.info("request: {}", request);
         int result = this.commentWriteRepository.explicitDeleteById(request.getComment_id());
         return CommentResponseConverter.toDeleteCommentResponse();
     }
@@ -63,12 +64,7 @@ public class CommentService {
     /**
      * [댓글 조회]
      */
-    public CommentResponse.ReadCommentDto readComment(Long reviewId) {
-        List<Comment> commentList = this.commentReadRepository.findAllByReviewId(reviewId);
-
-        return CommentResponse.ReadCommentDto.builder()
-                .reviewId(reviewId)
-                .commentList(commentList)
-                .build();
+    public List<Comment> readComment(Long reviewId) {
+        return this.commentReadRepository.findAllByReviewIdAndStatusOrderByCreatedAt(reviewId);
     }
 }
