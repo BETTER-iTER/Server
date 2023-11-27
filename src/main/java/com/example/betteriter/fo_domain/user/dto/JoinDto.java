@@ -6,7 +6,6 @@ import com.example.betteriter.global.constant.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.util.Arrays;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 public class JoinDto {
