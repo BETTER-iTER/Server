@@ -2,7 +2,7 @@ name: CI/CD Automation using github actions and Docker
 
 on:
   push:
-    branches: '*'
+    branches: [ 'main' ]
   pull_request:
     branches: [ 'main' ]
 
