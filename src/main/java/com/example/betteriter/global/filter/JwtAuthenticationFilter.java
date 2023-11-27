@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -83,11 +84,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             this.checkAccessTokenAndAuthentication(request, response, filterChain);
         }
 
-        log.info("passed to next filter");
+        log.info("jwtAuthentication filter is finished");
         // Authentication Exception 없이 정상 인증처리 된 경우
         // 기존 필터 체인 호출 !!
         filterChain.doFilter(request, response);
-
     }
 
     // Case 01) Access Token + Refresh Token 재발급 메소드
@@ -167,11 +167,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void checkAccessTokenAndAuthentication(HttpServletRequest request,
                                                    HttpServletResponse response,
                                                    FilterChain filterChain) {
-
-        log.info("checkAccessTokenAndAuthentication() called!");
         try {
+            // jwt header 에 존재하지 않는 경우
             String accessToken = this.jwtUtil.extractAccessToken(request)
-                    .orElseThrow(() -> new JwtException("jwtException"));
+                    .orElseThrow(() -> new InsufficientAuthenticationException("jwtException"));
 
             // accessToken 을 통해 User Payload 가져 오고 회원 조회
             Users users = this.usersRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
@@ -180,8 +179,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // SecurityContext 에 인증된 Authentication 저장
             UserAuthentication authentication = new UserAuthentication(users);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (IllegalArgumentException | JwtException | UsernameNotFoundException exception) {
-            request.setAttribute("exception", exception);
+
+        } catch (InsufficientAuthenticationException | UsernameNotFoundException | JwtException exception) {
+            request.setAttribute("exception", exception.getClass().getSimpleName());
             log.debug("Authentication occurs! - {}", exception.getClass());
         }
     }

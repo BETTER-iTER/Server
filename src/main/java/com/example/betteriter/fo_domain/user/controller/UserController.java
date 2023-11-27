@@ -38,9 +38,9 @@ public class UserController {
      * 1. 프론트에서 가지고 있는 Access Token 삭제
      * 2. User 정보 삭제
      **/
-    @DeleteMapping("/withdraw/{reasons}")
+    @DeleteMapping("/withdraw")
     public ResponseDto<Void> withdraw(
-            @PathVariable String reasons
+            @RequestParam String reasons
     ) {
         this.userService.withdraw(reasons);
         return ResponseDto.onSuccess(null);
