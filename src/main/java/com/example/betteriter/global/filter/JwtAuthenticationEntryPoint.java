@@ -72,8 +72,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             errorStatus = _JWT_IS_NOT_EXIST;
         } else if (exceptionName.equals("JwtException")) {
             errorStatus = _JWT_IS_NOT_VALID;
+        } else if (exceptionName.equals("RefreshTokenIsNotMatchException")) {
+            errorStatus = _JWT_REFRESH_TOKEN_IS_NOT_MATCH;
+        } else if (exceptionName.equals("RefreshTokenIsNotValidException")) {
+            errorStatus = _JWT_REFRESH_TOKEN_IS_NOT_VALID;
+        } else if (exceptionName.equals("AccessTokenIsValidException")) {
+            errorStatus = _JWT_ACCESS_TOKEN_IS_VALID;
         } else {
-            errorStatus = USER_NOT_FOUND;
+            errorStatus = _INTERNAL_SERVER_ERROR;
         }
         return errorStatus;
     }

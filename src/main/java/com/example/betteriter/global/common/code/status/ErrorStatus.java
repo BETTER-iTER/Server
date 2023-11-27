@@ -38,7 +38,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // JWT Error
     _JWT_IS_NOT_EXIST(HttpStatus.UNAUTHORIZED, "JWT_IS_NOT_EXIST", "Authorization 헤더에 JWT 정보가 존재하지 않습니다."),
-    _JWT_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_IS_NOT_VALID", "JWT 가 유효하지 않습니다."),
+    _JWT_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_IS_NOT_VALID", "Access Token 이 유효하지 않습니다."),
+    _JWT_REFRESH_TOKEN_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_VALID", "Refresh Token 이 유효하지 않습니다."),
+    _JWT_ACCESS_TOKEN_IS_VALID(HttpStatus.UNAUTHORIZED, "JWT_ACCESS_TOKEN_IS_VALID", "Access Token 이 유효합니다."),
+    _JWT_REFRESH_TOKEN_IS_NOT_MATCH(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_MATCH", "Refresh Token 이 일치하지 않습니다."),
 
     // Example (For Test)
     TEST_BAD_REQUEST(HttpStatus.BAD_REQUEST, "TEST_400_001", "잘못된 요청 입니다. (For Test)"),
