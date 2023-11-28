@@ -61,9 +61,8 @@ public class JwtUtil {
                     .getBody()
                     .getSubject();
         } catch (Exception exception) {
-            log.error("Access Token is not valid");
+            throw new JwtException("Access Token is not valid");
         }
-        return null;
     }
 
     // kakao oauth 로그인 & 일반 로그인 시 jwt 응답 생성 + redis refresh 저장

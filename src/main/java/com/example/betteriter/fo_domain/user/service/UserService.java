@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -45,16 +44,14 @@ public class UserService {
         Users users = this.getUserAndDeleteRefreshToken();
         SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
         this.saveUsersWithdrawReason(reasons); // 유저 탈퇴 사유 저장 메소드
-        this.usersRepository.delete(users);
+        this.usersRepository.delete(users); // 유저 삭제
     }
 
     /* 회원 탈퇴 사유 저장 */
     private void saveUsersWithdrawReason(String reasons) {
-        List<Integer> reasonToInteger = Arrays.stream(reasons.split(","))
+        Arrays.stream(reasons.split(","))
                 .map(Integer::valueOf)
-                .collect(Collectors.toList());
-        
-        reasonToInteger.stream()
+                .collect(Collectors.toList()).stream()
                 .map(UsersWithdrawReason::new)
                 .forEach(this.usersWithdrawReasonRepository::save);
     }

@@ -15,8 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -99,12 +97,12 @@ public class AuthController {
      * - /auth/login
      **/
     @PostMapping("/login")
-    public ResponseEntity<UserServiceTokenResponseDto> login(
+    public ResponseDto<UserServiceTokenResponseDto> login(
             @Valid @RequestBody LoginDto loginRequestDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return new ResponseEntity<>(this.authService.login(loginRequestDto), HttpStatus.OK);
+        return ResponseDto.onSuccess(this.authService.login(loginRequestDto));
     }
 
     /**
