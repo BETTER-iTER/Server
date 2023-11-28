@@ -4,17 +4,15 @@ import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.global.constant.Category;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class CreateReviewRequestDto {
     @NotBlank(message = "카테고리는 필수 입력 값입니다.")
     private String category; // 카테고리
@@ -54,10 +52,7 @@ public class CreateReviewRequestDto {
     }
 
     @Getter
-    @Setter
-    @Builder
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class CreateReviewImageRequestDto {
         private String imgUrl;
 
