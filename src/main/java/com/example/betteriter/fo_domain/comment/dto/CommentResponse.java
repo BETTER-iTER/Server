@@ -37,6 +37,7 @@ public class CommentResponse {
         private String comment;
         private String createdAt;
         private WriterDto writer;
+        @Builder.Default
         private List<GetCommentDto> child = new ArrayList<>();
     }
 

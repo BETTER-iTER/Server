@@ -2,15 +2,16 @@ package com.example.betteriter.bo_domain.menufacturer.domain;
 
 
 import com.example.betteriter.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "MANUFACTURER")
 public class Manufacturer extends BaseEntity {
@@ -20,4 +21,9 @@ public class Manufacturer extends BaseEntity {
 
     @Column(name = "co_name", nullable = false, unique = true)
     private String coName;
+
+    @Builder
+    private Manufacturer(String coName) {
+        this.coName = coName;
+    }
 }

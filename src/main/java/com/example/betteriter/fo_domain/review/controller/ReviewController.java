@@ -4,15 +4,13 @@ import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
+import com.example.betteriter.global.constant.Category;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -33,6 +31,13 @@ public class ReviewController {
     ) {
         this.checkRequestValidation(bindingResult);
         return ResponseDto.onSuccess(this.reviewService.createReview(request));
+    }
+
+    @GetMapping("/category")
+    public ResponseDto<Void> getReviewsByCategory(
+            @RequestParam Category category
+    ) {
+        return null;
     }
 
 

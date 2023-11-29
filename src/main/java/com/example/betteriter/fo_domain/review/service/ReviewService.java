@@ -1,10 +1,9 @@
 package com.example.betteriter.fo_domain.review.service;
 
-import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
@@ -40,10 +39,9 @@ public class ReviewService {
     /* 리뷰 등록 */
     @Transactional
     public Long createReview(CreateReviewRequestDto request) {
-        Manufacturer manufacturer = this.manufacturerService.findManufacturerById(request.getManufacturerId());
-        Review review = this.reviewRepository.save(request.toEntity(manufacturer));
-        this.saveReviewImagesFromRequest(request, review);
-        return review.getId();
+        return this.reviewRepository.save(request.toEntity(
+                this.manufacturerService.findManufacturerById(request.getManufacturerId()),
+                this.getReviewImages(request))).getId();
     }
 
     /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
@@ -89,11 +87,10 @@ public class ReviewService {
         return this.reviewImageRepository.findFirstImageWithReview(review);
     }
 
-    private void saveReviewImagesFromRequest(CreateReviewRequestDto request, Review review) {
-        List<CreateReviewImageRequestDto> images = request.getImages();
-        for (CreateReviewImageRequestDto image : images) {
-            reviewImageRepository.save(image.toEntity(images.indexOf(image), review));
-        }
+    private List<ReviewImage> getReviewImages(CreateReviewRequestDto request) {
+        return request.getImages().stream()
+                .map(r -> ReviewImage.createReviewImage(r.getImgUrl(), request.getImages().indexOf(r)))
+                .collect(Collectors.toList());
     }
 
     public Review findReviewById(Long reviewId) {
