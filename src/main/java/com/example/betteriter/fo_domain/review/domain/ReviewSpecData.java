@@ -28,4 +28,11 @@ public class ReviewSpecData extends BaseEntity {
         this.review = review;
         this.specData = specData;
     }
+
+    public static ReviewSpecData createReviewSpecData(Review review, SpecData specData) {
+        return ReviewSpecData.builder()
+                .review(review)
+                .specData(specData)
+                .build();
+    }
 }

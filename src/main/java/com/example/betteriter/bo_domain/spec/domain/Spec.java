@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,31 +17,26 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "SPEC")
 public class Spec extends BaseEntity {
+    @OneToMany(mappedBy = "spec", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<SpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Enumerated(EnumType.STRING)
     private Category category; // 어떤 카테고리에 대한 스펙인지
-
     @Column(name = "spec_title")
     private String title;
 
-    @OneToMany(mappedBy = "spec", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpecData> specData;
-
     @Builder
-    private Spec(Category category, String title, List<SpecData> specData) {
+    private Spec(Category category, String title) {
         this.category = category;
         this.title = title;
-        this.specData = specData;
     }
 
-    public static Spec CreateSpec(Category category, String title, List<SpecData> specData) {
+    public static Spec createSpec(Category category, String title) {
         return Spec.builder()
                 .category(category)
                 .title(title)
-                .specData(specData)
                 .build();
     }
 }

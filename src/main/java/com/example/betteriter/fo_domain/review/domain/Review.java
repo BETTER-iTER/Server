@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -54,7 +53,6 @@ public class Review extends BaseEntity {
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
     // --------------- Review 관련 엔티티 ---------------- //
-    @BatchSize(size = 5)
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages;
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)

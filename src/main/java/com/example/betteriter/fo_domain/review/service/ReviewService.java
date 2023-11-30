@@ -1,13 +1,17 @@
 package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
+import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
+import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
 import com.example.betteriter.fo_domain.user.domain.Follow;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
@@ -30,18 +34,39 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus.REVIE
 @Service
 public class ReviewService {
     private final UserService userService;
+    private final SpecService specService;
     private final ManufacturerService manufacturerService;
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewSpecDataRepository reviewSpecDataRepository;
 
 
     /* 리뷰 등록 */
     @Transactional
     public Long createReview(CreateReviewRequestDto request) {
-        return this.reviewRepository.save(request.toEntity(
-                this.manufacturerService.findManufacturerById(request.getManufacturerId()),
-                this.getReviewImages(request))).getId();
+        // 1. 리뷰 저장
+        Review review = this.reviewRepository.save(request.toEntity(
+                this.userService.getCurrentUser(),
+                this.manufacturerService.findManufacturerById(request.getManufacturerId()), this.getReviewImages(request)));
+
+        // 2. 리뷰 스펙 데이터 저장
+        this.reviewSpecDataRepository.saveAll(this.getReviewSpecData(request, review));
+        return review.getId();
+    }
+
+    /* 리뷰 등록시 카테고리에 해당하는 리뷰 스펙 데이터 조회 (입력 용)*/
+    @Transactional(readOnly = true)
+    public GetReviewSpecResponseDto getReviewSpecDataResponse(Category category) {
+        return GetReviewSpecResponseDto.from(this.specService.findAllSpecDataByCategory(category));
+    }
+
+    private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
+        // 요청으로 들어온 specData 조회
+        return this.specService.findAllSpecDataByIds(request.getSpecData())
+                .stream()
+                .map(sd -> ReviewSpecData.createReviewSpecData(review, sd))
+                .collect(Collectors.toList());
     }
 
     /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */

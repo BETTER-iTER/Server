@@ -26,4 +26,10 @@ public class Manufacturer extends BaseEntity {
     private Manufacturer(String coName) {
         this.coName = coName;
     }
+
+    public static Manufacturer createManufacturer(String coName) {
+        return Manufacturer.builder()
+                .coName(coName)
+                .build();
+    }
 }

@@ -18,7 +18,7 @@ public class CategoryResponseDto {
 
     public static List<CategoryResponseDto> of() {
         return Arrays.stream(Category.values())
-                .map(category -> new CategoryResponseDto(category.getName(), category.getImageUrl()))
+                .map(category -> new CategoryResponseDto(category.getName(), category.getImgUrl()))
                 .collect(Collectors.toList());
     }
 }

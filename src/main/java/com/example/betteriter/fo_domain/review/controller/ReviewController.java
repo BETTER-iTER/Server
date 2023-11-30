@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.review.controller;
 
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
@@ -31,6 +32,13 @@ public class ReviewController {
     ) {
         this.checkRequestValidation(bindingResult);
         return ResponseDto.onSuccess(this.reviewService.createReview(request));
+    }
+
+    @GetMapping("/spec/data")
+    public ResponseDto<GetReviewSpecResponseDto> getReviewSpecDataResponse(
+            @RequestParam String category
+    ) {
+        return ResponseDto.onSuccess(this.reviewService.getReviewSpecDataResponse(Category.from(category)));
     }
 
     @GetMapping("/category")
