@@ -8,7 +8,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - 3307:3306
-
   redis:
     image: redis
     container_name: better-iter_redis

@@ -2,15 +2,16 @@ package com.example.betteriter.bo_domain.spec.domain;
 
 
 import com.example.betteriter.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "SPEC_DATA")
 public class SpecData extends BaseEntity {
@@ -24,4 +25,10 @@ public class SpecData extends BaseEntity {
 
     @Column(name = "spec_data")
     private String data;
+
+    @Builder
+    private SpecData(Spec spec, String data) {
+        this.spec = spec;
+        this.data = data;
+    }
 }

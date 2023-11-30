@@ -1,10 +1,13 @@
 package com.example.betteriter.global.constant;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 // 사용자 회원 가입 시 name 을 입력 받아 enum 생성 후 저장
 // 조회 시에도 이름 + url
+
 @Getter
 @RequiredArgsConstructor
 public enum Category {
@@ -22,5 +25,21 @@ public enum Category {
     ETC("기타", "기타 URL");
 
     private final String name;
-    private final String imageUrl;
+    private final String imgUrl;
+
+    /* 요청으로 들어온 문자열이 Enum 타입으로 역직렬화될때 메소드의 매개변수로 들어감 */
+    @JsonCreator
+    public static Category from(String name) {
+        for (Category category : Category.values()) {
+            if (category.getName().equals(name)) {
+                return category;
+            }
+        }
+        throw new IllegalArgumentException("일치하는 Category 정보가 존재하지 않습니다.");
+    }
+
+    @JsonValue
+    public String getCategoryName() {
+        return name;
+    }
 }
