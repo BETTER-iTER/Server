@@ -24,9 +24,9 @@ public class ExistReviewValidator implements ConstraintValidator<ExistReview, Lo
     public boolean isValid(Long value, ConstraintValidatorContext context) {
         boolean isValid = this.reviewRepository.existsById(value);
 
-        if(!isValid) {
+        if (!isValid) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorStatus.REVIEW_NOT_FOUND.toString())
+            context.buildConstraintViolationWithTemplate(ErrorStatus._REVIEW_NOT_FOUND.toString())
                     .addConstraintViolation();
         }
 

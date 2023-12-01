@@ -51,7 +51,8 @@ public class NewsService {
     }
 
 
-    public List<ITNewsResponseDto> getItNewsForHome() {
+    /* 홈 화면에서 최신순 5개 조회 */
+    public List<ITNewsResponseDto> getTop5ITNews() {
         return this.newsRepository.findTop5ByOrderByCreatedAtDesc().stream()
                 .map(News::from)
                 .collect(Collectors.toList());
@@ -59,6 +60,6 @@ public class NewsService {
 
     private News getNews(Long id) {
         return this.newsRepository.findById(id)
-                .orElseThrow(() -> new NewsHandler(ErrorStatus.NEWS_NOT_FOUND));
+                .orElseThrow(() -> new NewsHandler(ErrorStatus._NEWS_NOT_FOUND));
     }
 }

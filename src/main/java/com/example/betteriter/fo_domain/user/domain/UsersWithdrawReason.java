@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.user.domain;
 
 import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,12 @@ public class UsersWithdrawReason extends BaseEntity {
     private Integer reason;
 
     public UsersWithdrawReason(Integer reason) {
+        this.reason = reason;
+    }
+
+    @Builder
+    private UsersWithdrawReason(Long id, Integer reason) {
+        this.id = id;
         this.reason = reason;
     }
 }

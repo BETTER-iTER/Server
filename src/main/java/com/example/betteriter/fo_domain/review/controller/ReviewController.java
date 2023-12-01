@@ -25,6 +25,7 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._METH
 public class ReviewController {
     private final ReviewService reviewService;
 
+    /* 리뷰 등록 API */
     @PostMapping
     public ResponseDto<Long> createReview(
             @Valid @RequestBody CreateReviewRequestDto request,
@@ -34,6 +35,7 @@ public class ReviewController {
         return ResponseDto.onSuccess(this.reviewService.createReview(request));
     }
 
+    /* 리뷰 등록시 스펙 데이터 조회 API */
     @GetMapping("/spec/data")
     public ResponseDto<GetReviewSpecResponseDto> getReviewSpecDataResponse(
             @RequestParam String category

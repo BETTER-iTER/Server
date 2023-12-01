@@ -215,11 +215,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // jwt header 에 존재하지 않는 경우
             String accessToken = this.jwtUtil.extractAccessToken(request)
-                    .orElseThrow(() -> new InsufficientAuthenticationException("jwtException"));
+                    .orElseThrow(() -> new InsufficientAuthenticationException("요청 헤더에 JWT 정보가 존재하지 않습니다."));
 
             // accessToken 을 통해 User Payload 가져 오고 회원 조회
             Users users = this.usersRepository.findById(Long.valueOf(this.jwtUtil.getUserIdFromToken(accessToken)))
-                    .orElseThrow(() -> new UsernameNotFoundException("usernameNotFoundException"));
+                    .orElseThrow(() -> new UsernameNotFoundException("일치하는 회원 정보가 존재하지 않습니다."));
 
             // SecurityContext 에 인증된 Authentication 저장
             UserAuthentication authentication = new UserAuthentication(users);

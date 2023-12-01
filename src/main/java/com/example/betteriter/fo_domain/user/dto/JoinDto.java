@@ -10,12 +10,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 
@@ -35,14 +33,14 @@ public class JoinDto {
             message = "닉네임은 특수문자 없이 1 ~ 10 글자로 설정 해주세요.")
     private String nickName;
 
-    //    @NotNull(message = "직업을 선택해야 합니다.")
+    @NotNull(message = "직업을 선택해야 합니다.")
     private Job job;
 
-    @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
-    private String categories;
+    @NotNull(message = "올바른 관심사 입력 형식이 아닙니다.")
+    private List<Category> categories;
 
     @Builder
-    public JoinDto(String email, String password, String nickName, Job job, String categories) {
+    public JoinDto(String email, String password, String nickName, Job job, List<Category> categories) {
         this.email = email;
         this.password = password;
         this.nickName = nickName;
@@ -54,7 +52,7 @@ public class JoinDto {
         return Users.builder()
                 .email(email)
                 .password(encryptPassword)
-                .categories(this.toCategory())
+                .categories(categories)
                 .roleType(ROLE_USER)
                 .usersDetail(usersDetail)
                 .build();
@@ -68,10 +66,10 @@ public class JoinDto {
     }
 
     /* User 가 입력한 관심 카테고리 이름으로 Category List 생성 메소드 */
-    private List<Category> toCategory() {
-        List<String> userCategories = Arrays.asList(this.categories.split(","));
-        return Arrays.stream(Category.values())
-                .filter(category -> userCategories.contains(category.getCategoryName()))
-                .collect(Collectors.toList());
-    }
+//    private List<Category> toCategory() {
+//        List<String> userCategories = Arrays.asList(this.categories.split(","));
+//        return Arrays.stream(Category.values())
+//                .filter(category -> userCategories.contains(category.getCategoryName()))
+//                .collect(Collectors.toList());
+//    }
 }

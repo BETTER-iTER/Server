@@ -47,30 +47,30 @@ public enum ErrorStatus implements BaseErrorCode {
     TEST_BAD_REQUEST(HttpStatus.BAD_REQUEST, "TEST_400_001", "잘못된 요청 입니다. (For Test)"),
 
     // User & Auth Error
-    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER_NOT_FOUND_400", "일치하는 회원 정보를 찾을 수 없습니다."),
-    PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "AUTH_PASSWORD_NOT_MATCH_401", "비밀번호가 일치하지 않습니다."),
-    EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_DUPLICATION_401", "이미 존재하는 이메일입니다."),
-    EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_NOT_FOUND_401", "이메일이 존재하지 않습니다."),
-    AUTH_CODE_ALREADY_EXIT(HttpStatus.BAD_REQUEST, "AUTH_CODE_ALREADY_EXIST_401", "이미 인증 코드가 존재합니다."),
-    AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST_401", "인증 코드가 존재하지 않습니다."),
-    AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH_401", "인증 코드가 일치하지 않습니다."),
-    AUTH_SHOULD_BE_KAKAO(HttpStatus.BAD_REQUEST, "AUTH_SHOULD_BE_KAKAO_401", "해당 회원은 카카오 로그인 회원입니다."),
+    _USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER_NOT_FOUND_400", "일치하는 회원 정보를 찾을 수 없습니다."),
+    _PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "AUTH_PASSWORD_NOT_MATCH_401", "비밀번호가 일치하지 않습니다."),
+    _EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_DUPLICATION_401", "이미 존재하는 이메일입니다."),
+    _EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "AUTH_EMAIL_NOT_FOUND_401", "이메일이 존재하지 않습니다."),
+    _AUTH_CODE_ALREADY_EXIT(HttpStatus.BAD_REQUEST, "AUTH_CODE_ALREADY_EXIST_401", "이미 인증 코드가 존재합니다."),
+    _AUTH_CODE_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_EXIST_401", "인증 코드가 존재하지 않습니다."),
+    _AUTH_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "AUTH_CODE_NOT_MATCH_401", "인증 코드가 일치하지 않습니다."),
+    _AUTH_SHOULD_BE_KAKAO(HttpStatus.BAD_REQUEST, "AUTH_SHOULD_BE_KAKAO_401", "해당 회원은 카카오 로그인 회원입니다."),
 
     // Review
-    REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_400", "일치하는 리뷰 정보를 찾을 수 없습니다."),
-    REVIEW_NOT_ACTIVATE(HttpStatus.BAD_REQUEST, "REVIEW_400", "삭제되었거나 비공개된 리뷰입니다."),
+    _REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_NOT_FOUND_400", "일치하는 리뷰 정보를 찾을 수 없습니다."),
+    _REVIEW_NOT_ACTIVATE(HttpStatus.BAD_REQUEST, "REVIEW_NOT_ACTIVATE_400", "삭제되었거나 비공개된 리뷰입니다."),
+    _REVIEW_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_IMAGE_NOT_FOUND_400", "일치하는 리뷰 이미지 정보를 찾을 수 없습니다."),
 
     // News
-    NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
+    _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
 
 
     // Manufacturer
-    MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_400", "일치하는 제조사 정보를 찾을 수 없습니다."),
+    _MANUFACTURER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MANUFACTURER_NOT_FOUND_400", "일치하는 제조사 정보를 찾을 수 없습니다."),
 
     // Comment
-    COMMENT_NOT_EXIST(HttpStatus.BAD_REQUEST, "COMMENT_400", "일치하는 댓글 정보를 찾을 수 없습니다."),
-    COMMENT_NOT_HAVE(HttpStatus.BAD_REQUEST, "COMMENT_400", "해당 댓글을 작성한 유저가 아닙니다."),
-
+    _COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "COMMENT_NOT_FOUND", "일치하는 댓글 정보를 찾을 수 없습니다."),
+    _COMMENT_NOT_HAVE(HttpStatus.BAD_REQUEST, "COMMENT_USER_NOT_MATCH", "해당 댓글을 작성한 유저가 아닙니다."),
     ;
 
 

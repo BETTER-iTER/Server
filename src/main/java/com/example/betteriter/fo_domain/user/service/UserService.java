@@ -29,20 +29,21 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final UsersWithdrawReasonRepository usersWithdrawReasonRepository;
     private final RedisUtil redisUtil;
-
+    private final SecurityUtil securityUtil;
 
     /* 로그아웃 */
     @Transactional
     public Long logout() {
         Users users = this.getUserAndDeleteRefreshToken();
-        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
+        securityUtil.clearSecurityContext(); // SecurityContext 초기화
         return users.getId();
     }
 
     /* 회원 정보 가져오기 */
     @Transactional(readOnly = true)
     public GetUserInfoResponseDto getUserInfo() {
-        return GetUserInfoResponseDto.from(this.getCurrentUser(), this.getCurrentUsersDetail());
+        Users currentUser = this.getCurrentUser();
+        return GetUserInfoResponseDto.from(currentUser, currentUser.getUsersDetail());
     }
 
 
@@ -50,7 +51,7 @@ public class UserService {
     @Transactional
     public void withdraw(String reasons) {
         Users users = this.getUserAndDeleteRefreshToken();
-        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
+        securityUtil.clearSecurityContext(); // SecurityContext 초기화
         this.saveUsersWithdrawReason(reasons); // 유저 탈퇴 사유 저장 메소드
         this.usersRepository.delete(users); // 유저 삭제
     }
@@ -64,7 +65,7 @@ public class UserService {
                 .forEach(this.usersWithdrawReasonRepository::save);
     }
 
-    private Users getUserAndDeleteRefreshToken() {
+    protected Users getUserAndDeleteRefreshToken() {
         Users users = this.getCurrentUser();
         this.redisUtil.deleteData(String.valueOf(users.getId()));
         return users;
@@ -72,8 +73,8 @@ public class UserService {
 
     /* 현재 로그인한 회원 정보 가져오기 */
     public Users getCurrentUser() {
-        return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        return this.usersRepository.findByEmail(securityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
 
     /* 현재 로그인한 회원 상세 정보 가져오기 */

@@ -4,8 +4,7 @@ import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.common.exception.GeneralException;
 
 public class ReviewHandler extends GeneralException {
-
-        public ReviewHandler(ErrorStatus errorStatus) {
-            super(errorStatus);
-        }
+    public ReviewHandler(ErrorStatus errorStatus) {
+        super(errorStatus);
+    }
 }

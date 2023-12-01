@@ -2,15 +2,16 @@ package com.example.betteriter.fo_domain.review.domain;
 
 
 import com.example.betteriter.fo_domain.user.domain.Users;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "REVIEW_SCRAP")
 public class ReviewScrap {
@@ -25,4 +26,11 @@ public class ReviewScrap {
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Users users;
+
+    @Builder
+    private ReviewScrap(Long id, Review review, Users users) {
+        this.id = id;
+        this.review = review;
+        this.users = users;
+    }
 }
