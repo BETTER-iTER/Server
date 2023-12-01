@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.user.dto.oauth;
 
+import com.example.betteriter.global.constant.Job;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class KakaoJoinDto {
     private String nickname;
 
     @NotNull(message = "직업을 선택해야 합니다.")
-    private int job;
+    private Job job;
 
     @NotBlank(message = "올바른 관심사 입력 형식이 아닙니다.")
     private String interests;

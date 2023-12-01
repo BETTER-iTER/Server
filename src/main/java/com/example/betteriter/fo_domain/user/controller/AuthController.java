@@ -119,7 +119,7 @@ public class AuthController {
         this.authService.requestEmailForPasswordReset(emailDto);
         return ResponseDto.onSuccess(null);
     }
-
+ 
 
     /**
      * 비밀번호 재설정 인증 코드 검증

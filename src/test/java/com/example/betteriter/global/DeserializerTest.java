@@ -1,7 +1,9 @@
 package com.example.betteriter.global;
 
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.user.dto.JoinDto;
 import com.example.betteriter.global.constant.Category;
+import com.example.betteriter.global.constant.Job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -91,6 +93,37 @@ public class DeserializerTest {
         System.out.println(requestDto);
         // when
 
+        // then
+    }
+
+    @Test
+    @DisplayName("JoinDto Deserializer Test03")
+    void joinDtoDeserializerTest() throws JsonProcessingException {
+        // given
+        String json
+                = "{\"email\":\"danaver12@daum.net\",\"password\":\"1234\",\"nickName\":\"nickName\",\"job\":\"학생\",\"categories\":\"1,2\"}";
+        // when
+        JoinDto joinDto = new ObjectMapper().readValue(json, JoinDto.class);
+        // then
+        System.out.println("joinDto = " + joinDto);
+    }
+
+    @Test
+    @DisplayName("JoinDto Serializer Test03")
+    void joinDtoSerializerTest() throws JsonProcessingException {
+        // given
+        JoinDto joinDto
+                = JoinDto.builder()
+                .email("danaver12@daum.net")
+                .password("1234")
+                .nickName("nickname")
+                .job(Job.DESIGNER)
+                .categories("1")
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(joinDto);
+        // when
+        System.out.println("json = " + json);
         // then
     }
 }

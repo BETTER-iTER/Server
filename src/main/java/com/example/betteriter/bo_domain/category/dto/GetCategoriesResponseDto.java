@@ -19,7 +19,7 @@ public class GetCategoriesResponseDto {
 
     public static GetCategoriesResponseDto from(Category category) {
         return GetCategoriesResponseDto.builder()
-                .name(category.getName())
+                .name(category.getCategoryName())
                 .imageUrl(category.getImgUrl())
                 .build();
     }

@@ -24,14 +24,14 @@ public enum Category {
     ACCESSORY("악세서리", "악세서리 URL"),
     ETC("기타", "기타 URL");
 
-    private final String name;
+    private final String categoryName;
     private final String imgUrl;
 
     /* 요청으로 들어온 문자열이 Enum 타입으로 역직렬화될때 메소드의 매개변수로 들어감 */
     @JsonCreator
     public static Category from(String name) {
         for (Category category : Category.values()) {
-            if (category.getName().equals(name)) {
+            if (category.getCategoryName().equals(name)) {
                 return category;
             }
         }
@@ -40,6 +40,6 @@ public enum Category {
 
     @JsonValue
     public String getCategoryName() {
-        return name;
+        return categoryName;
     }
 }
