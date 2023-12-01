@@ -9,9 +9,9 @@ import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.util.PasswordUtil;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
-import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.infra.EmailAuthenticationDto;
@@ -48,10 +48,10 @@ public class AuthService implements UserDetailsService {
     @Override
     public Users loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         return this.usersRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserHandler(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
     }
 
-    /* 회원 가입 */
+    /* (카카오,일반) 회원 가입 */
     @Transactional
     public Long join(JoinDto joinDto) {
         // 이메일 중복 여부 파악
@@ -118,12 +118,12 @@ public class AuthService implements UserDetailsService {
         String authCode = this.redisUtil.getData(request.getEmail());
         if (authCode == null) {
             log.debug("AuthService.verifyAuthCode() Exception Occurs! - auth code is null");
-            throw new UserHandler(AUTH_CODE_NOT_EXIST);
+            throw new UserHandler(_AUTH_CODE_NOT_EXIST);
         }
         // 요청 auth code 와 redis 저장된 auth code 가 다른지 확인
         if (!request.getCode().equals(authCode)) {
             log.warn("AuthService.verifyAuthCode() Exception Occurs! - auth code not match");
-            throw new UserHandler(AUTH_CODE_NOT_MATCH);
+            throw new UserHandler(_AUTH_CODE_NOT_MATCH);
         }
         // 인증 코드 검증 성공(redis 데이터 삭제)
         this.redisUtil.deleteData(request.getEmail());
@@ -142,7 +142,7 @@ public class AuthService implements UserDetailsService {
         String authCode = this.createAuthCode();
         // 해당 이메일을 키로 가지는 Redis 데이터가 존재하는 경우
         if (this.redisUtil.getData(emailDto.getEmail()) != null) {
-            throw new UserHandler(AUTH_CODE_ALREADY_EXIT);
+            throw new UserHandler(_AUTH_CODE_ALREADY_EXIT);
         }
         this.redisUtil.setDataExpire(emailDto.getEmail(), authCode, 60L * 3); // 3분
         return authCode;
@@ -151,30 +151,30 @@ public class AuthService implements UserDetailsService {
     /* 이메일 중복 여부 체크 및 인증 타입 체크 for 회원가입 */
     private void checkEmailDuplication(String email) {
         if (this.usersRepository.findByEmail(email).isPresent()) {
-            throw new UserHandler(EMAIL_DUPLICATION);
+            throw new UserHandler(_EMAIL_DUPLICATION);
         }
     }
 
     /* 이메일 중복 여부 체크 및 인증 타입 체크 for 비밀번호 재설정 */
     private void checkEmailExistence(String email) {
         if (this.usersRepository.findByEmail(email).isEmpty()) {
-            throw new UserHandler(EMAIL_NOT_FOUND);
+            throw new UserHandler(_EMAIL_NOT_FOUND);
         }
     }
 
     private void checkPassword(LoginDto loginRequestDto, Users users) {
         if (!this.passwordUtil.isEqual(loginRequestDto.getPassword(), users.getPassword())) {
-            throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCH);
+            throw new UserHandler(ErrorStatus._PASSWORD_NOT_MATCH);
         }
     }
 
     private Users checkEmailExistenceAndType(String email) {
         // 해당 유저가 있는지 확인
         Users users = this.usersRepository.findByEmail(email)
-                .orElseThrow(() -> new UserHandler(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
         // 해당 유저의 회원가입 타입이 일반 회원가입인지 확인
         if (null != users.getOauthId()) {
-            throw new UserHandler(AUTH_SHOULD_BE_KAKAO);
+            throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
         }
         return users;
     }
@@ -206,7 +206,7 @@ public class AuthService implements UserDetailsService {
     // 로그인 시도 회원이 카카오 로그인 회원인지 여부 판단
     private void checkUserLoginType(Users users) {
         if (users.getOauthId() != null) {
-            throw new UserHandler(AUTH_SHOULD_BE_KAKAO);
+            throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
         }
     }
 

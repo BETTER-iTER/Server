@@ -5,15 +5,16 @@ import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
 import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "NEWS")
 public class News extends BaseEntity {
@@ -36,6 +37,18 @@ public class News extends BaseEntity {
 
     @Column(name = "news_url")
     private String newsUrl;
+
+    @Builder
+    private News(Long id, Users writer, String title, String content,
+                 String imageUrl, String newsUrl
+    ) {
+        this.id = id;
+        this.writer = writer;
+        this.title = title;
+        this.content = content;
+        this.imageUrl = imageUrl;
+        this.newsUrl = newsUrl;
+    }
 
     public ITNewsResponseDto from() {
         return ITNewsResponseDto.builder()

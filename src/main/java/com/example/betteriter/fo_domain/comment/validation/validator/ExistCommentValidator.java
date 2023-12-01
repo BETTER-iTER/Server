@@ -26,7 +26,7 @@ public class ExistCommentValidator implements ConstraintValidator<ExistComment, 
 
         if (!isExist) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorStatus.COMMENT_NOT_EXIST.getMessage())
+            context.buildConstraintViolationWithTemplate(ErrorStatus._COMMENT_NOT_FOUND.getMessage())
                     .addConstraintViolation();
         }
 

@@ -28,7 +28,7 @@ public class UserHaveCommentValidator implements ConstraintValidator<UserHaveCom
 
         if (!isHas) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ErrorStatus.COMMENT_NOT_HAVE.getMessage())
+            context.buildConstraintViolationWithTemplate(ErrorStatus._COMMENT_NOT_HAVE.getMessage())
                     .addConstraintViolation();
         }
 

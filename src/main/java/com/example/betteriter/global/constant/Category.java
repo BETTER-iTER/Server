@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // 사용자 회원 가입 시 name 을 입력 받아 enum 생성 후 저장
 // 조회 시에도 이름 + url
 
@@ -36,6 +39,17 @@ public enum Category {
             }
         }
         throw new IllegalArgumentException("일치하는 Category 정보가 존재하지 않습니다.");
+    }
+
+    @JsonCreator
+    public static List<Category> of(List<String> categories) {
+        List<Category> categoryList = new ArrayList<>();
+        for (Category category : Category.values()) {
+            if (categories.contains(category.getCategoryName())) {
+                categoryList.add(category);
+            }
+        }
+        return categoryList;
     }
 
     @JsonValue

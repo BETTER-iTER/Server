@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus.REVIEW_NOT_FOUND;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_NOT_FOUND;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,12 +73,17 @@ public class ReviewService {
     /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
     public Map<String, List<ReviewResponseDto>> getUserCategoryReviews() {
         List<Category> categories = this.getCurrentUser().getCategories(); // 유저가 등록한 관심 카테고리
+        return this.getLatest7ReviewsByCategories(categories); // 카테고리에 해당하는 최신 순 리뷰
+    }
+
+    private Map<String, List<ReviewResponseDto>> getLatest7ReviewsByCategories(List<Category> categories
+    ) {
         Map<String, List<ReviewResponseDto>> result = new LinkedHashMap<>();
-        // 카테고리에 해당하는 최신 순 리뷰
         for (Category category : categories) {
-            List<ReviewResponseDto> reviews = this.reviewRepository.findFirst7ByCategoryOrderByCreatedAtDesc(category).stream()
-                    .map(review -> review.of(this.getFirstImageWithReview(review)))
-                    .collect(Collectors.toList());
+            List<ReviewResponseDto> reviews =
+                    this.reviewRepository.findFirst7ByCategoryOrderByCreatedAtDesc(category).stream()
+                            .map(review -> review.of(this.getFirstImageWithReview(review)))
+                            .collect(Collectors.toList());
             result.put(category.getCategoryName(), reviews);
         }
         return result;
@@ -109,7 +115,12 @@ public class ReviewService {
 
     /* Review 에 첫번째 이미지 가져오는 메소드 */
     private String getFirstImageWithReview(Review review) {
-        return this.reviewImageRepository.findFirstImageWithReview(review);
+        List<ReviewImage> reviewImages = review.getReviewImages();
+        return reviewImages.stream()
+                .filter(ri -> ri.getOrderNum() == 0)
+                .findFirst()
+                .orElseThrow(() -> new ReviewHandler(_REVIEW_IMAGE_NOT_FOUND))
+                .getImgUrl();
     }
 
     private List<ReviewImage> getReviewImages(CreateReviewRequestDto request) {
@@ -120,6 +131,6 @@ public class ReviewService {
 
     public Review findReviewById(Long reviewId) {
         return this.reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ReviewHandler(REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new ReviewHandler(_REVIEW_NOT_FOUND));
     }
 }

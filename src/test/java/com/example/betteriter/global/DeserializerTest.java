@@ -118,7 +118,6 @@ public class DeserializerTest {
                 .password("1234")
                 .nickName("nickname")
                 .job(Job.DESIGNER)
-                .categories("1")
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(joinDto);
