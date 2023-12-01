@@ -76,8 +76,7 @@ public class ReviewService {
         return this.getLatest7ReviewsByCategories(categories); // 카테고리에 해당하는 최신 순 리뷰
     }
 
-    private Map<String, List<ReviewResponseDto>> getLatest7ReviewsByCategories(List<Category> categories
-    ) {
+    private Map<String, List<ReviewResponseDto>> getLatest7ReviewsByCategories(List<Category> categories) {
         Map<String, List<ReviewResponseDto>> result = new LinkedHashMap<>();
         for (Category category : categories) {
             List<ReviewResponseDto> reviews =

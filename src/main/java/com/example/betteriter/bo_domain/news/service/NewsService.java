@@ -51,6 +51,7 @@ public class NewsService {
     }
 
 
+    /* 홈 화면에서 최신순 5개 조회 */
     public List<ITNewsResponseDto> getTop5ITNews() {
         return this.newsRepository.findTop5ByOrderByCreatedAtDesc().stream()
                 .map(News::from)

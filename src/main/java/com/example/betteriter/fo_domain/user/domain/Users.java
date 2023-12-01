@@ -55,10 +55,10 @@ public class Users extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private List<Category> categories;
 
-    @OneToMany(mappedBy = "follower")
+    @OneToMany(mappedBy = "followee")
     private List<Follow> following; // 회원이 팔로잉 하는 유저 리스트
 
-    @OneToMany(mappedBy = "followee")
+    @OneToMany(mappedBy = "follower")
     private List<Follow> follower; // 회원을 팔로잉 하는 유저 리스트
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
