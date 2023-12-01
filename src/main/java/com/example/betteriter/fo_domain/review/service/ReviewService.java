@@ -78,7 +78,7 @@ public class ReviewService {
             List<ReviewResponseDto> reviews = this.reviewRepository.findFirst7ByCategoryOrderByCreatedAtDesc(category).stream()
                     .map(review -> review.of(this.getFirstImageWithReview(review)))
                     .collect(Collectors.toList());
-            result.put(category.getName(), reviews);
+            result.put(category.getCategoryName(), reviews);
         }
         return result;
     }

@@ -1,7 +1,9 @@
 package com.example.betteriter.fo_domain.user.service;
 
 import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.domain.UsersWithdrawReason;
+import com.example.betteriter.fo_domain.user.dto.info.GetUserInfoResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
@@ -37,6 +39,12 @@ public class UserService {
         return users.getId();
     }
 
+    /* 회원 정보 가져오기 */
+    @Transactional(readOnly = true)
+    public GetUserInfoResponseDto getUserInfo() {
+        return GetUserInfoResponseDto.from(this.getCurrentUser(), this.getCurrentUsersDetail());
+    }
+
 
     /* 회원 탈퇴 */
     @Transactional
@@ -66,5 +74,10 @@ public class UserService {
     public Users getCurrentUser() {
         return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    /* 현재 로그인한 회원 상세 정보 가져오기 */
+    public UsersDetail getCurrentUsersDetail() {
+        return this.getCurrentUser().getUsersDetail();
     }
 }

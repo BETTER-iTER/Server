@@ -44,7 +44,6 @@ public class Users extends BaseEntity implements UserDetails {
 
     private boolean isExpert;
 
-
     /* User 가 관심 등록한 카테고리 리스트 */
     @ElementCollection(targetClass = Category.class)
     @CollectionTable(name = "USERS_CATEGORY",

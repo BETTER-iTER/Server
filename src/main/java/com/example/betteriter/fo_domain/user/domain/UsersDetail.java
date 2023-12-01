@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.user.domain;
 
 import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Job;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +21,9 @@ public class UsersDetail extends BaseEntity {
     @Column(name = "usr_nickname", unique = true)
     private String nickName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "usr_job")
-    private int job;
+    private Job job;
 
     @Column(name = "usr_profile_img")
     private String profileImage;

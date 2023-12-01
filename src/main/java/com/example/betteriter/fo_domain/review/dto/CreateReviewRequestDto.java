@@ -8,7 +8,6 @@ import com.example.betteriter.global.constant.Category;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
@@ -18,9 +17,8 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@ToString
 public class CreateReviewRequestDto {
-    @NotBlank(message = "카테고리는 필수 입력 값입니다.")
+    @NotNull(message = "카테고리는 필수 입력 값입니다.")
     private Category category; // 카테고리
 
     @NotBlank(message = "상품명은 필수 입력 값입니다.")
