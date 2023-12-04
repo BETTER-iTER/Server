@@ -38,8 +38,8 @@ public class UsersDetail extends BaseEntity {
     private int quizCount; // 맞춘 퀴즈 개수
 
     @Column(name = "usr_review_scraped")
-    private int reviewScraped; // 작성한 리뷰 스크랩 횟수
+    private int reviewScraped; // 작성한 리뷰 스크랩 총 횟수
 
     @Column(name = "usr_review_liked")
-    private int reviewLiked; // 작성한 리뷰 좋아요 횟수
+    private int reviewLiked; // 작성한 리뷰 좋아요 총 횟수
 }
