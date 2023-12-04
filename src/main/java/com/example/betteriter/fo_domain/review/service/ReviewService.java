@@ -5,9 +5,7 @@ import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
@@ -19,6 +17,7 @@ import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +48,8 @@ public class ReviewService {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
                 this.userService.getCurrentUser(),
-                this.manufacturerService.findManufacturerById(request.getManufacturerId()), this.getReviewImages(request)));
+                this.manufacturerService.findManufacturerById(request.getManufacturerId()), this.getReviewImages(request))
+        );
 
         // 2. 리뷰 스펙 데이터 저장
         this.reviewSpecDataRepository.saveAll(this.getReviewSpecData(request, review));
@@ -60,6 +60,16 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public GetReviewSpecResponseDto getReviewSpecDataResponse(Category category) {
         return GetReviewSpecResponseDto.from(this.specService.findAllSpecDataByCategory(category));
+    }
+
+    /* 카테고리에 해당하는 리뷰 조회 */
+    @Transactional(readOnly = true)
+    public GetCategoryReviewResponseDto getReviewByCategory(Category category) {
+        Slice<Review> result = this.reviewRepository.findReviewByCategory(category, PageRequest.of(0, 5));
+        List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
+                .map(GetReviewResponseDto::of)
+                .collect(Collectors.toList());
+        return new GetCategoryReviewResponseDto(reviewResponse, result.hasNext());
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {

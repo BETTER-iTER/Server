@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.review.controller;
 
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.GetCategoryReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -43,11 +44,12 @@ public class ReviewController {
         return ResponseDto.onSuccess(this.reviewService.getReviewSpecDataResponse(Category.from(category)));
     }
 
+    /* 카테고리 별 리뷰 조회 */
     @GetMapping("/category")
-    public ResponseDto<Void> getReviewsByCategory(
-            @RequestParam Category category
+    public ResponseDto<GetCategoryReviewResponseDto> getReviewsByCategory(
+            @RequestParam String category
     ) {
-        return null;
+        return ResponseDto.onSuccess(this.reviewService.getReviewByCategory(Category.from(category)));
     }
 
 

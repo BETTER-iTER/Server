@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,7 +21,7 @@ import java.util.List;
 @Entity(name = "REVIEW")
 public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<ReviewSpecData> specData;
+    public List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +42,7 @@ public class Review extends BaseEntity {
     @Column(name = "bought_at", nullable = false)
     private LocalDate boughtAt;
     @Column(name = "star_point", nullable = false)
-    private int starPoint;
+    private double starPoint;
     @Column(name = "short_review", nullable = false)
     private String shortReview;
     @Lob // 최대 500 자
@@ -52,11 +53,11 @@ public class Review extends BaseEntity {
     private String badPoint;
     // --------------- Review 관련 엔티티 ---------------- //
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewImage> reviewImages;
+    private List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewScrap> reviewScraped;
+    private List<ReviewScrap> reviewScraped = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewLike> reviewLiked;
+    private List<ReviewLike> reviewLiked = new ArrayList<>();
 
     @Builder
     private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
@@ -94,5 +95,9 @@ public class Review extends BaseEntity {
 
     public void setReviewImages(List<ReviewImage> reviewImages) {
         this.reviewImages = reviewImages;
+    }
+
+    public void setReviewLiked(List<ReviewLike> reviewLiked) {
+        this.reviewLiked = reviewLiked;
     }
 }
