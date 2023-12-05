@@ -1,8 +1,8 @@
 package com.example.betteriter.fo_domain.review.controller;
 
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetCategoryReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
+import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
@@ -46,10 +46,18 @@ public class ReviewController {
 
     /* 카테고리 별 리뷰 조회 */
     @GetMapping("/category")
-    public ResponseDto<GetCategoryReviewResponseDto> getReviewsByCategory(
+    public ResponseDto<ReviewResponse> getReviewsByCategory(
             @RequestParam String category
     ) {
         return ResponseDto.onSuccess(this.reviewService.getReviewByCategory(Category.from(category)));
+    }
+
+    /* 이름으로 리뷰 조회 */
+    @GetMapping("/search")
+    public ResponseDto<ReviewResponse> getReviewsBySearch(
+            @RequestParam String name
+    ) {
+        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name));
     }
 
 

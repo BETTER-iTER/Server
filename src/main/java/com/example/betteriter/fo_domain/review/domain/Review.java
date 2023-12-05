@@ -8,6 +8,7 @@ import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -45,6 +46,8 @@ public class Review extends BaseEntity {
     private double starPoint;
     @Column(name = "short_review", nullable = false)
     private String shortReview;
+    @Column(name = "click_cnt")
+    private Long clickCount; // 클릭 수
     @Lob // 최대 500 자
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
@@ -99,5 +102,16 @@ public class Review extends BaseEntity {
 
     public void setReviewLiked(List<ReviewLike> reviewLiked) {
         this.reviewLiked = reviewLiked;
+    }
+
+    // review 클릭 수를 초기화하는 메소드
+    public void resetClickCounts() {
+        this.clickCount = 0L;
+    }
+
+    // 매주 월요일 자정 실행
+    @Scheduled(cron = "0 0 0 ? * MON")
+    public void resetClickCountsScheduler() {
+        this.resetClickCounts();
     }
 }

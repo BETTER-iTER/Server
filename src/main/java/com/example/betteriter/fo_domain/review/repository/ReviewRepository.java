@@ -29,10 +29,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("select r from REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "LEFT JOIN r.specData sd " +
             "WHERE r.category = :category " +
             "GROUP BY r.id " +
             "ORDER BY (COALESCE(COUNT(rl),0) + COALESCE(COUNT(rs),0)) DESC, " +
             "r.createdAt DESC")
     Slice<Review> findReviewByCategory(Category category, Pageable pageable);
+
+    Slice<Review> findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(String productName, Pageable pageable);
 }

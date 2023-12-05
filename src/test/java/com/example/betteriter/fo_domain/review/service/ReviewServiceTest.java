@@ -8,9 +8,9 @@ import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetCategoryReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
+import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
@@ -230,7 +230,7 @@ public class ReviewServiceTest {
                 .willReturn(new SliceImpl<>(List.of(review01, review02, review03, review04)));
 
         // when
-        GetCategoryReviewResponseDto result = this.reviewService.getReviewByCategory(PC);
+        ReviewResponse result = this.reviewService.getReviewByCategory(PC);
         // then
         for (GetReviewResponseDto getReviewResponseDto : result.getGetReviewResponseDtoList()) {
             System.out.println("getReviewResponseDto = " + getReviewResponseDto);
