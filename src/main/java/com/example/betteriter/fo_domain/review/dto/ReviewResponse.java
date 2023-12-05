@@ -9,14 +9,14 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class GetCategoryReviewResponseDto {
+public class ReviewResponse {
     @JsonProperty("reviews")
     private List<GetReviewResponseDto> getReviewResponseDtoList;
     private boolean hasNext;
 
     @Builder
-    public GetCategoryReviewResponseDto(List<GetReviewResponseDto> getReviewResponseDtoList,
-                                        boolean hasNext
+    public ReviewResponse(List<GetReviewResponseDto> getReviewResponseDtoList,
+                          boolean hasNext
     ) {
         this.getReviewResponseDtoList = getReviewResponseDtoList;
         this.hasNext = hasNext;

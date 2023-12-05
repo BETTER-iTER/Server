@@ -64,12 +64,23 @@ public class ReviewService {
 
     /* 카테고리에 해당하는 리뷰 조회 */
     @Transactional(readOnly = true)
-    public GetCategoryReviewResponseDto getReviewByCategory(Category category) {
+    public ReviewResponse getReviewByCategory(Category category) {
         Slice<Review> result = this.reviewRepository.findReviewByCategory(category, PageRequest.of(0, 5));
         List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
-        return new GetCategoryReviewResponseDto(reviewResponse, result.hasNext());
+        return new ReviewResponse(reviewResponse, result.hasNext());
+    }
+
+    /* 이름에 해당하는 리뷰 조회 */
+    @Transactional(readOnly = true)
+    public ReviewResponse getReviewBySearch(String name) {
+        Slice<Review> result
+                = this.reviewRepository.findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(name, PageRequest.of(0, 5));
+        List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
+                .map(GetReviewResponseDto::of)
+                .collect(Collectors.toUnmodifiableList());
+        return new ReviewResponse(reviewResponse, result.hasNext());
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
