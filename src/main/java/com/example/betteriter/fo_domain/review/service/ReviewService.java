@@ -48,7 +48,7 @@ public class ReviewService {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
                 this.userService.getCurrentUser(),
-                this.manufacturerService.findManufacturerByName(request.getProductName()), this.getReviewImages(request))
+                this.manufacturerService.findManufacturerByName(request.getManufacturer()), this.getReviewImages(request))
         );
 
         // 2. 리뷰 스펙 데이터 저장
