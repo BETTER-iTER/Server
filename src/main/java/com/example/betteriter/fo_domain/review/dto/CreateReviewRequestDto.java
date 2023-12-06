@@ -28,7 +28,7 @@ public class CreateReviewRequestDto {
     private LocalDate boughtAt; // 구매 일자
 
     @NotNull(message = "제조사 정보는 필수 입력 값입니다.")
-    private Long manufacturerId; // 제조사 아이디
+    private String manufacturer; // 제조사 이름
 
     @NotNull(message = "가격은 필수 입력 값입니다.")
     private int amount; // 가격
@@ -53,13 +53,13 @@ public class CreateReviewRequestDto {
 
     @Builder
     private CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                   Long manufacturerId, int amount, int storeName, String shortReview,
+                                   String manufacturerName, int amount, int storeName, String shortReview,
                                    int starPoint, String goodPoint, String badPoint, List<Long> specData,
                                    List<CreateReviewImageRequestDto> images) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
-        this.manufacturerId = manufacturerId;
+        this.manufacturer = manufacturerName;
         this.amount = amount;
         this.storeName = storeName;
         this.shortReview = shortReview;

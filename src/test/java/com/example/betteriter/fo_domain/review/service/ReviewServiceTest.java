@@ -74,7 +74,7 @@ public class ReviewServiceTest {
                         .category(LAPTOP)
                         .productName("맥북1")
                         .boughtAt(LocalDate.now())
-                        .manufacturerId(1L)
+                        .manufacturerName("기타")
                         .amount(100000)
                         .storeName(1)
                         .shortReview("한줄 평")
@@ -86,7 +86,7 @@ public class ReviewServiceTest {
                                 CreateReviewImageRequestDto.builder().imgUrl("imgUrl2").build())
                         ).build();
 
-        given(this.manufacturerService.findManufacturerById(anyLong()))
+        given(this.manufacturerService.findManufacturerByName(anyString()))
                 .willReturn(Manufacturer.createManufacturer("삼성")); // 삼성
 
         given(this.specService.findAllSpecDataByIds(anyList()))
@@ -129,7 +129,7 @@ public class ReviewServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(manufacturerService, times(1)).findManufacturerById(anyLong());
+        verify(manufacturerService, times(1)).findManufacturerByName(anyString());
         verify(reviewRepository, times(1)).save(any());
         verify(reviewSpecDataRepository, times(1)).saveAll(anyList());
     }
