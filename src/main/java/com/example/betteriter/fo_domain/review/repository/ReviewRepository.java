@@ -24,4 +24,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "left join r.reviewLiked rl group by r " +
             "ORDER BY COALESCE(SUM(rs.id), 0) + COALESCE(SUM(rl.id), 0) DESC")
     List<Review> findTop7ReviewHavingMostScrapedAndLiked(Pageable pageable);
+
+    @Query("select r " +
+            "from REVIEW r " +
+            "left join r.reviewScraped rs " +
+            "left join r.reviewLiked rl " +
+            "where r.status != 'DELETED' " +
+            "group by r " +
+            "order by r.createdAt desc ")
+    List<Review> findAllByWriterId(Long id);
 }

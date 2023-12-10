@@ -100,4 +100,8 @@ public class ReviewService {
         return this.reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewHandler(REVIEW_NOT_FOUND));
     }
+
+    public List<Review> getReviewList(Long id) {
+        return this.reviewRepository.findAllByWriterId(id);
+    }
 }

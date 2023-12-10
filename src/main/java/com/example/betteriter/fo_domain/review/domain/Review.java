@@ -6,6 +6,7 @@ import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
+import com.example.betteriter.global.constant.Status;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +54,6 @@ public class Review extends BaseEntity {
     @Column(name = "short_review", nullable = false)
     private String shortReview;
 
-
     @Lob // 최대 500 자
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
@@ -61,6 +61,10 @@ public class Review extends BaseEntity {
     @Lob // 최대 500 자
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status; // ACTIVE, DELETED
 
     // --------------- Review 관련 엔티티 ---------------- //
     @OneToMany(mappedBy = "review")
