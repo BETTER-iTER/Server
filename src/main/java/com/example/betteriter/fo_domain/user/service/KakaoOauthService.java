@@ -8,12 +8,10 @@ import com.example.betteriter.fo_domain.user.dto.oauth.KakaoJoinDto;
 import com.example.betteriter.fo_domain.user.dto.oauth.KakaoToken;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.global.util.JwtUtil;
-import com.example.betteriter.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
@@ -37,6 +35,7 @@ public class KakaoOauthService {
     private final UsersRepository usersRepository;
     private final InMemoryClientRegistrationRepository inMemoryClientRegistrationRepository;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     /**
      * - findUser : 회원 저장 및 리턴
@@ -129,14 +128,11 @@ public class KakaoOauthService {
     /* 카카오 회원가입 마무리 */
     @Transactional
     public void completeKakaoJoin(KakaoJoinDto request) {
-        getUser().setUsersDetail(UsersDetail.builder()
+        Users currentUser = this.userService.getCurrentUser();
+        currentUser.setUsersDetail(UsersDetail.builder()
                 .nickName(request.getNickname())
                 .job(request.getJob())
                 .build());
-    }
-
-    private Users getUser() {
-        return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저 정보를 찾을 수 없습니다."));
+        currentUser.setUsersCategory(request.getCategories());
     }
 }

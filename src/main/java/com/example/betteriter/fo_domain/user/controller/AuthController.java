@@ -11,12 +11,11 @@ import com.example.betteriter.infra.EmailAuthenticationDto;
 import com.example.betteriter.infra.EmailDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +45,9 @@ public class AuthController {
     @PostMapping("/join")
     @Operation(summary = "일반 회원가입")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SUCCESS_200", description = "일반 회원가입 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH_EMAIL_DUPLICATION_401", description = "이메일 이미 존재"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "METHOD_ARGUMENT_ERROR", description = "올바르지 않은 클라이언트 요청값")}
+            @ApiResponse(responseCode = "SUCCESS_200", description = "일반 회원가입 성공"),
+            @ApiResponse(responseCode = "AUTH_EMAIL_DUPLICATION_401", description = "이메일 이미 존재"),
+            @ApiResponse(responseCode = "METHOD_ARGUMENT_ERROR", description = "올바르지 않은 클라이언트 요청값")}
     )
     public ResponseDto<Long> join(
             @Schema(description = "일반 회원가입 요청 객체")
@@ -99,12 +98,12 @@ public class AuthController {
      * - /auth/login
      **/
     @PostMapping("/login")
-    public ResponseEntity<UserServiceTokenResponseDto> login(
+    public ResponseDto<UserServiceTokenResponseDto> login(
             @Valid @RequestBody LoginDto loginRequestDto,
             BindingResult bindingResult
     ) {
         this.checkRequestValidation(bindingResult);
-        return new ResponseEntity<>(this.authService.login(loginRequestDto), HttpStatus.OK);
+        return ResponseDto.onSuccess(this.authService.login(loginRequestDto));
     }
 
     /**

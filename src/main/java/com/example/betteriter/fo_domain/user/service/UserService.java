@@ -1,7 +1,9 @@
 package com.example.betteriter.fo_domain.user.service;
 
 import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.domain.UsersWithdrawReason;
+import com.example.betteriter.fo_domain.user.dto.info.GetUserInfoResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -28,14 +29,21 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final UsersWithdrawReasonRepository usersWithdrawReasonRepository;
     private final RedisUtil redisUtil;
-
+    private final SecurityUtil securityUtil;
 
     /* 로그아웃 */
     @Transactional
     public Long logout() {
         Users users = this.getUserAndDeleteRefreshToken();
-        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
+        securityUtil.clearSecurityContext(); // SecurityContext 초기화
         return users.getId();
+    }
+
+    /* 회원 정보 가져오기 */
+    @Transactional(readOnly = true)
+    public GetUserInfoResponseDto getUserInfo() {
+        Users currentUser = this.getCurrentUser();
+        return GetUserInfoResponseDto.from(currentUser, currentUser.getUsersDetail());
     }
 
 
@@ -43,23 +51,21 @@ public class UserService {
     @Transactional
     public void withdraw(String reasons) {
         Users users = this.getUserAndDeleteRefreshToken();
-        SecurityUtil.clearSecurityContext(); // SecurityContext 초기화
+        securityUtil.clearSecurityContext(); // SecurityContext 초기화
         this.saveUsersWithdrawReason(reasons); // 유저 탈퇴 사유 저장 메소드
-        this.usersRepository.delete(users);
+        this.usersRepository.delete(users); // 유저 삭제
     }
 
     /* 회원 탈퇴 사유 저장 */
     private void saveUsersWithdrawReason(String reasons) {
-        List<Integer> reasonToInteger = Arrays.stream(reasons.split(","))
+        Arrays.stream(reasons.split(","))
                 .map(Integer::valueOf)
-                .collect(Collectors.toList());
-        
-        reasonToInteger.stream()
+                .collect(Collectors.toList()).stream()
                 .map(UsersWithdrawReason::new)
                 .forEach(this.usersWithdrawReasonRepository::save);
     }
 
-    private Users getUserAndDeleteRefreshToken() {
+    protected Users getUserAndDeleteRefreshToken() {
         Users users = this.getCurrentUser();
         this.redisUtil.deleteData(String.valueOf(users.getId()));
         return users;
@@ -67,7 +73,12 @@ public class UserService {
 
     /* 현재 로그인한 회원 정보 가져오기 */
     public Users getCurrentUser() {
-        return this.usersRepository.findByEmail(SecurityUtil.getCurrentUserEmail())
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        return this.usersRepository.findByEmail(securityUtil.getCurrentUserEmail())
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
+    }
+
+    /* 현재 로그인한 회원 상세 정보 가져오기 */
+    public UsersDetail getCurrentUsersDetail() {
+        return this.getCurrentUser().getUsersDetail();
     }
 }

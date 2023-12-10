@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.user.domain;
 
 import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Job;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +21,9 @@ public class UsersDetail extends BaseEntity {
     @Column(name = "usr_nickname", unique = true)
     private String nickName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "usr_job")
-    private int job;
+    private Job job;
 
     @Column(name = "usr_profile_img")
     private String profileImage;
@@ -36,8 +38,8 @@ public class UsersDetail extends BaseEntity {
     private int quizCount; // 맞춘 퀴즈 개수
 
     @Column(name = "usr_review_scraped")
-    private int reviewScraped; // 작성한 리뷰 스크랩 횟수
+    private int reviewScraped; // 작성한 리뷰 스크랩 총 횟수
 
     @Column(name = "usr_review_liked")
-    private int reviewLiked; // 작성한 리뷰 좋아요 횟수
+    private int reviewLiked; // 작성한 리뷰 좋아요 총 횟수
 }

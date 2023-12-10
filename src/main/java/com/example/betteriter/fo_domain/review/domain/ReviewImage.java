@@ -1,15 +1,16 @@
 package com.example.betteriter.fo_domain.review.domain;
 
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "REVIEW_IMAGE")
 public class ReviewImage {
@@ -26,4 +27,17 @@ public class ReviewImage {
 
     @Column(name = "order_num", nullable = false)
     private int orderNum;
+
+    @Builder
+    private ReviewImage(String imgUrl, int orderNum) {
+        this.imgUrl = imgUrl;
+        this.orderNum = orderNum;
+    }
+
+    public static ReviewImage createReviewImage(String imgUrl, int orderNum) {
+        return ReviewImage.builder()
+                .imgUrl(imgUrl)
+                .orderNum(orderNum)
+                .build();
+    }
 }

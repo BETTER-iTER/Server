@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.user.controller;
 
 
+import com.example.betteriter.fo_domain.user.dto.info.GetUserInfoResponseDto;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,11 +39,20 @@ public class UserController {
      * 1. 프론트에서 가지고 있는 Access Token 삭제
      * 2. User 정보 삭제
      **/
-    @DeleteMapping("/withdraw/{reasons}")
+    @DeleteMapping("/withdraw")
     public ResponseDto<Void> withdraw(
-            @PathVariable String reasons
+            @RequestParam String reasons
     ) {
         this.userService.withdraw(reasons);
         return ResponseDto.onSuccess(null);
+    }
+
+    /**
+     * 3. 회원 정보 가져오기
+     * - /user/info
+     **/
+    @GetMapping("/info")
+    public ResponseDto<GetUserInfoResponseDto> getUserInfo() {
+        return ResponseDto.onSuccess(this.userService.getUserInfo());
     }
 }
