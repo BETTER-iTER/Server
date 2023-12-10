@@ -18,8 +18,28 @@ public class MypageService {
     private final UserService userService;
     private final ReviewService reviewService;
 
-    public List<Review> getMyReviewList(Long user_id) {
-        Users user = userService.getUserById(user_id);
+    public List<Review> getMyReviewList() {
+        Users user = userService.getCurrentUser();
         return reviewService.getReviewList(user.getId());
+    }
+
+    public List<Review> getScrapReviewList(Long userId) {
+        Users user = userService.getUserById(userId);
+        return reviewService.getScrapReviewList(user);
+    }
+
+    public List<Review> getLikeReviewList(Long userId) {
+        Users user = userService.getUserById(userId);
+        return reviewService.getLikeReviewList(user);
+    }
+
+    public List<Review> getTargetReviewList(Long userId) {
+        Users user = userService.getUserById(userId);
+        return reviewService.getTargetReviewList(user.getId());
+    }
+
+    public boolean checkUserSelf(Long userId) {
+        Users user = userService.getCurrentUser();
+        return user.getId().equals(userId);
     }
 }

@@ -155,6 +155,18 @@ public class ReviewService {
     }
 
     public List<Review> getReviewList(Long id) {
-        return this.reviewRepository.findAllByWriterId(id);
+        return this.reviewRepository.findAllByUser(id);
+    }
+
+    public List<Review> getScrapReviewList(Users user) {
+        return this.reviewRepository.findAllByReviewScrapedUser(user);
+    }
+
+    public List<Review> getLikeReviewList(Users user) {
+        return this.reviewRepository.findAllByReviewLikedUser(user);
+    }
+
+    public List<Review> getTargetReviewList(Long id) {
+        return this.reviewRepository.findAllByTargetId(id);
     }
 }
