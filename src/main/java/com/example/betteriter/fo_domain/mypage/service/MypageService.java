@@ -18,8 +18,8 @@ public class MypageService {
     private final UserService userService;
     private final ReviewService reviewService;
 
-    public List<Review> getMyReviewList() {
-        Users user = userService.getCurrentUser();
+    public List<Review> getMyReviewList(Long user_id) {
+        Users user = userService.getUserById(user_id);
         return reviewService.getReviewList(user.getId());
     }
 }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,9 +26,11 @@ public class MypageController {
 
     private final MypageService mypageService;
 
-    @GetMapping("/review/mine")
-    public ResponseDto<List<MypageResponse.MyReviewDto>> getMyReview() {
-        List<Review> reviewList = mypageService.getMyReviewList();
+    @GetMapping("/review?user_id={user_id}")
+    public ResponseDto<List<MypageResponse.MyReviewDto>> getMyReview(
+            @RequestParam(value = "user_id", required = false) Long user_id
+    ) {
+        List<Review> reviewList = mypageService.getMyReviewList(user_id);
         return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
     }
 }
