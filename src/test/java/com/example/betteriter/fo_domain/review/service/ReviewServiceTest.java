@@ -6,6 +6,7 @@ import com.example.betteriter.bo_domain.spec.domain.Spec;
 import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
@@ -80,6 +81,10 @@ public class ReviewServiceTest {
                 .writer(users)
                 .category(PC)
                 .productName("productName")
+                .reviewImages(List.of(ReviewImage.builder()
+                        .imgUrl("img")
+                        .orderNum(0)
+                        .build()))
                 .amount(10)
                 .storeName(1)
                 .boughtAt(LocalDate.now())
@@ -282,6 +287,7 @@ public class ReviewServiceTest {
         // then
         assertThat(result.isHasNext()).isFalse();
         assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
+        assertThat(result.isExisted()).isFalse();
         verify(reviewRepository, times(1)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
         verify(reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any(PageRequest.class));
     }
@@ -303,6 +309,7 @@ public class ReviewServiceTest {
         // then
         assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
         assertThat(result.isHasNext()).isFalse();
+        assertThat(result.isExisted()).isTrue();
         verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
     }
 }
