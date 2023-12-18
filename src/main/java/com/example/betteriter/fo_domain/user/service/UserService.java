@@ -81,4 +81,15 @@ public class UserService {
     public UsersDetail getCurrentUsersDetail() {
         return this.getCurrentUser().getUsersDetail();
     }
+
+    /* 회원 정보 가져오기 */
+    public Users getUserById(Long userId) {
+        return this.usersRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
+    }
+
+    public Users getUserByEmail(String email) {
+        return this.usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
+    }
 }

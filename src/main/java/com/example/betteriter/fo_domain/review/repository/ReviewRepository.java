@@ -25,7 +25,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY (COALESCE(COUNT(rs), 0) + COALESCE(COUNT(rl), 0)) DESC")
     List<Review> findTop7ReviewHavingMostScrapedAndLiked(Pageable pageable);
 
-
     @Query("select r from REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
@@ -36,4 +35,40 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Slice<Review> findReviewByCategory(Category category, Pageable pageable);
 
     Slice<Review> findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(String productName, Pageable pageable);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "LEFT JOIN r.reviewLiked rl " +
+            "LEFT JOIN r.reviewScraped rs " +
+            "WHERE rs.users = :user AND " +
+            "   r.status = 'ACTIVE'" +
+            "GROUP BY r.id " +
+            "ORDER BY r.createdAt DESC")
+    List<Review> findAllByTargetId(Long id);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "LEFT JOIN r.reviewLiked rl " +
+            "LEFT JOIN r.reviewScraped rs " +
+            "WHERE rs.users = :user AND " +
+            "   r.status != 'DELETED'" +
+            "GROUP BY r.id " +
+            "ORDER BY r.createdAt DESC")
+    List<Review> findAllByUser(Long id);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "LEFT JOIN r.reviewLiked rl " +
+            "LEFT JOIN r.reviewScraped rs " +
+            "WHERE rs.users = :user AND " +
+            "   r.status = 'ACTIVE'" +
+            "GROUP BY r.id " +
+            "ORDER BY r.createdAt DESC")
+    List<Review> findAllByReviewScrapedUser(Users user);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "LEFT JOIN r.reviewLiked rl " +
+            "LEFT JOIN r.reviewScraped rs " +
+            "WHERE rl.users = :user AND " +
+            "   r.status = 'ACTIVE'" +
+            "GROUP BY r.id " +
+            "ORDER BY r.createdAt DESC")
+    List<Review> findAllByReviewLikedUser(Users user);
 }
