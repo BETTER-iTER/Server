@@ -2,7 +2,6 @@ package com.example.betteriter.fo_domain.review.dto;
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 import lombok.Builder;
@@ -70,7 +69,7 @@ public class CreateReviewRequestDto {
         this.images = images;
     }
 
-    public Review toEntity(Users users, Manufacturer manufacturer, List<ReviewImage> reviewImages) {
+    public Review toEntity(Users users, Manufacturer manufacturer) {
         return Review.builder()
                 .writer(users)
                 .category(category)
@@ -83,7 +82,6 @@ public class CreateReviewRequestDto {
                 .starPoint(starPoint)
                 .goodPoint(goodPoint)
                 .badPoint(badPoint)
-                .reviewImages(reviewImages)
                 .build();
     }
 

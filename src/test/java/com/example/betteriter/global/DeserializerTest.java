@@ -57,7 +57,6 @@ public class DeserializerTest {
                         .category(LAPTOP)
                         .productName("맥북1")
                         .boughtAt(LocalDate.now())
-                        .manufacturerId(1L)
                         .amount(10000)
                         .storeName(1)
                         .shortReview("한줄 평")

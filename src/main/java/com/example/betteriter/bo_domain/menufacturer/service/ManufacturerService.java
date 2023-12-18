@@ -16,9 +16,6 @@ public class ManufacturerService {
 
     public Manufacturer findManufacturerByName(String name) {
         Optional<Manufacturer> optionalManufacturer = this.manufacturerRepository.findByCoName(name);
-        if (optionalManufacturer.isEmpty()) {
-            return this.manufacturerRepository.save(Manufacturer.createManufacturer(name));
-        }
-        return optionalManufacturer.get();
+        return optionalManufacturer.orElseGet(() -> this.manufacturerRepository.save(Manufacturer.createManufacturer(name)));
     }
 }
