@@ -43,6 +43,22 @@ public class ReviewRepositoryTest {
     @Autowired
     private UsersRepository usersRepository;
 
+    private static Review createReview(long count) {
+        return Review.builder()
+                .category(PC)
+                .productName("productName")
+                .amount(10)
+                .storeName(1)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .clickCount(count)
+                .shortReview("short")
+                .build();
+
+    }
+
     @Test
     @DisplayName("사용자 카테고리에 해당하는 최신순 7개의 리뷰를 조회한다.")
     void findFirst7ByCategoryOrderByCreatedAtDesc() {
@@ -440,6 +456,40 @@ public class ReviewRepositoryTest {
         for (ReviewLike reviewLike : reviewLiked) {
             System.out.println(reviewLike.getReview());
             System.out.println(reviewLike.getUsers().getId());
+        }
+    }
+
+    @Test
+    @DisplayName("최근 7일 유저들이 많이 클릭한 리뷰 top 20 개를 보여준다.")
+    void test() {
+        // given
+        Review review01 = createReview(1L);
+        Review review02 = createReview(2L);
+        Review review03 = createReview(3L);
+        Review review04 = createReview(4L);
+        Review review05 = createReview(5L);
+        Review review06 = createReview(6L);
+        Review review07 = createReview(7L);
+        Review review08 = createReview(8L);
+        Review review09 = createReview(9L);
+        Review review10 = createReview(10L);
+        Review review11 = createReview(11L);
+        Review review12 = createReview(12L);
+        Review review13 = createReview(13L);
+        Review review14 = createReview(14L);
+        Review review15 = createReview(15L);
+        Review review16 = createReview(16L);
+
+        this.reviewRepository.saveAll(List.of(review01, review02, review03, review04, review05,
+                review06, review07, review08, review09, review10, review11, review12, review13, review14, review15, review16));
+
+
+        // when
+        List<Review> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc();
+
+        // then
+        for (Review review : result) {
+            System.out.println(result);
         }
     }
 }

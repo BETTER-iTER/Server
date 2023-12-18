@@ -49,7 +49,12 @@ public class Review extends BaseEntity {
     private String shortReview;
 
     @Column(name = "click_cnt")
-    private Long clickCount; // 클릭 수
+    private long clickCount; // 클릭 수
+    @Column(name = "liked_cnt")
+    private long likedCount; // 좋아요 수
+    @Column(name = "scraped_cnt")
+    private long scrapedCount; // 스크랩 수
+
 
     @Lob // 최대 500 자
     @Column(name = "good_point", nullable = false)
@@ -65,18 +70,21 @@ public class Review extends BaseEntity {
 
 
     // --------------- Review 관련 엔티티 ---------------- //
+    @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewScrap> reviewScraped = new ArrayList<>();
+    @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();
 
     @Builder
     private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
                    String productName, int amount, int storeName, LocalDate boughtAt,
-                   int starPoint, String shortReview, String goodPoint, String badPoint,
-                   List<ReviewImage> reviewImages, List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked
+                   double starPoint, String shortReview, String goodPoint,
+                   String badPoint, long clickCount, List<ReviewImage> reviewImages,
+                   List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked, long likedCount, long scrapedCount
     ) {
         this.id = id;
         this.writer = writer;
@@ -92,26 +100,14 @@ public class Review extends BaseEntity {
         this.badPoint = badPoint;
         this.reviewImages = reviewImages;
         this.reviewScraped = reviewScraped;
+        this.clickCount = clickCount;
         this.reviewLiked = reviewLiked;
+        this.likedCount = likedCount;
+        this.scrapedCount = scrapedCount;
     }
 
     public ReviewResponseDto of(String firstImageUrl) {
-        return ReviewResponseDto.builder()
-                .id(id)
-                .imageUrl(firstImageUrl)
-                .productName(productName)
-                .nickname(writer.getUsersDetail().getNickName())
-                .profileImageUrl(writer.getUsersDetail().getProfileImage())
-                .isExpert(writer.isExpert())
-                .build();
-    }
-
-    public void setReviewImages(List<ReviewImage> reviewImages) {
-        this.reviewImages = reviewImages;
-    }
-
-    public void setReviewLiked(List<ReviewLike> reviewLiked) {
-        this.reviewLiked = reviewLiked;
+        return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName).nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage()).isExpert(writer.isExpert()).build();
     }
 
     // review 클릭 수를 초기화하는 메소드

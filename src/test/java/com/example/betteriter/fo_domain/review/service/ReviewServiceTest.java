@@ -26,10 +26,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.LAPTOP;
@@ -64,6 +66,31 @@ public class ReviewServiceTest {
 
     @Mock
     private ReviewSpecDataRepository reviewSpecDataRepository;
+
+    private static Review createReview(long count) {
+
+        Users users = Users.builder()
+                .usersDetail(UsersDetail.builder()
+                        .nickName("nickName")
+                        .job(Job.DEVELOPER)
+                        .profileImage("profileImage")
+                        .build())
+                .build();
+        return Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .amount(10)
+                .storeName(1)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .clickCount(count)
+                .shortReview("short")
+                .build();
+
+    }
 
     @Test
     @DisplayName("리뷰을 리뷰 이미지와 함께 정상적으로 등록한다.")
@@ -235,5 +262,47 @@ public class ReviewServiceTest {
         for (GetReviewResponseDto getReviewResponseDto : result.getGetReviewResponseDtoList()) {
             System.out.println("getReviewResponseDto = " + getReviewResponseDto);
         }
+    }
+
+    @Test
+    @DisplayName("리뷰 이름 조회 테스트를 진행한다.(비어있는 경우)")
+    void getReviewBySearchTest() {
+        // given
+        List<Review> reviewResult =
+                List.of(createReview(1L), createReview(2L), createReview(3L));
+
+        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
+                .willReturn(new SliceImpl<>(Collections.emptyList()));
+
+        given(this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc())
+                .willReturn(reviewResult);
+        // when
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName");
+
+        // then
+        assertThat(result.isHasNext()).isFalse();
+        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
+        verify(reviewRepository, times(1)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
+        verify(reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any(PageRequest.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 이름 조회 테스트를 진행한다.(비어있지 않은 경우)")
+    void getReviewBySearchTest02() {
+        // given
+        List<Review> reviewResult =
+                List.of(createReview(1L), createReview(2L), createReview(3L));
+
+        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
+                .willReturn(new SliceImpl<>(reviewResult));
+
+
+        // when
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName");
+
+        // then
+        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
+        assertThat(result.isHasNext()).isFalse();
+        verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
     }
 }

@@ -34,6 +34,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "r.createdAt DESC")
     Slice<Review> findReviewByCategory(Category category, Pageable pageable);
 
+
+    List<Review> findFirst20ByOrderByClickCountDescCreatedAtDesc();
+
+    Slice<Review> findByProductNameOrderByCreatedAtDesc(String name, Pageable pageable);
+
     Slice<Review> findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(String productName, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +

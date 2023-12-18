@@ -48,10 +48,12 @@ public class ReviewService {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
                 this.userService.getCurrentUser(),
-                this.manufacturerService.findManufacturerByName(request.getManufacturer()), this.getReviewImages(request))
-        );
+                this.manufacturerService.findManufacturerByName(request.getManufacturer())));
 
-        // 2. 리뷰 스펙 데이터 저장
+        // 2. 리뷰 이미지 저장
+        this.reviewImageRepository.saveAll(this.getReviewImages(review, request));
+
+        // 3. 리뷰 스펙 데이터 저장
         this.reviewSpecDataRepository.saveAll(this.getReviewSpecData(request, review));
         return review.getId();
     }
@@ -72,15 +74,33 @@ public class ReviewService {
         return new ReviewResponse(reviewResponse, result.hasNext());
     }
 
-    /* 이름에 해당하는 리뷰 조회 */
+    /**
+     * - 이름에 해당하는 리뷰 조회
+     * case 01 : 없다면 7일 동안 유저들이 많이 클릭한 리뷰 20개 리턴
+     * case 02 : 있다면 최신순 리뷰 리스트 응답
+     **/
     @Transactional(readOnly = true)
     public ReviewResponse getReviewBySearch(String name) {
-        Slice<Review> result
-                = this.reviewRepository.findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(name, PageRequest.of(0, 5));
-        List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
+
+        // 1. 이름에 해당하는 최신순 리뷰 조회
+        Slice<Review> latestReview
+                = this.reviewRepository.findByProductNameOrderByCreatedAtDesc(name, PageRequest.of(0, 5));
+
+        // 2. 데이터 갯수 null 인 경우
+        if (latestReview.isEmpty()) {
+            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
+                    .stream()
+                    .map(GetReviewResponseDto::of)
+                    .collect(Collectors.toList());
+            return new ReviewResponse(result, false);
+        }
+
+        // 3. 데이터 갯수 null 아닌 경우
+        List<GetReviewResponseDto> getReviewResponseDtos = latestReview.getContent().stream()
                 .map(GetReviewResponseDto::of)
-                .collect(Collectors.toUnmodifiableList());
-        return new ReviewResponse(reviewResponse, result.hasNext());
+                .collect(Collectors.toList());
+
+        return new ReviewResponse(getReviewResponseDtos, latestReview.hasNext());
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
@@ -143,9 +163,9 @@ public class ReviewService {
                 .getImgUrl();
     }
 
-    private List<ReviewImage> getReviewImages(CreateReviewRequestDto request) {
+    private List<ReviewImage> getReviewImages(Review review, CreateReviewRequestDto request) {
         return request.getImages().stream()
-                .map(r -> ReviewImage.createReviewImage(r.getImgUrl(), request.getImages().indexOf(r)))
+                .map(r -> ReviewImage.createReviewImage(review, r.getImgUrl(), request.getImages().indexOf(r)))
                 .collect(Collectors.toList());
     }
 
