@@ -173,4 +173,20 @@ public class ReviewService {
         return this.reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewHandler(_REVIEW_NOT_FOUND));
     }
+
+    public List<Review> getReviewList(Long id) {
+        return this.reviewRepository.findAllByUser(id);
+    }
+
+    public List<Review> getScrapReviewList(Users user) {
+        return this.reviewRepository.findAllByReviewScrapedUser(user);
+    }
+
+    public List<Review> getLikeReviewList(Users user) {
+        return this.reviewRepository.findAllByReviewLikedUser(user);
+    }
+
+    public List<Review> getTargetReviewList(Long id) {
+        return this.reviewRepository.findAllByTargetId(id);
+    }
 }
