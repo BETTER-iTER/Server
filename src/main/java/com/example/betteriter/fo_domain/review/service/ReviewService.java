@@ -88,7 +88,7 @@ public class ReviewService {
 
         // 2. 데이터 갯수 null 인 경우
         if (latestReview.isEmpty()) {
-            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc(name)
+            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
                     .stream()
                     .map(GetReviewResponseDto::of)
                     .collect(Collectors.toList());

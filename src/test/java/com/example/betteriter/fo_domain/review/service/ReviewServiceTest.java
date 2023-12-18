@@ -274,7 +274,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
                 .willReturn(new SliceImpl<>(Collections.emptyList()));
 
-        given(this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc(anyString()))
+        given(this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc())
                 .willReturn(reviewResult);
         // when
         ReviewResponse result = this.reviewService.getReviewBySearch("productName");
@@ -282,13 +282,13 @@ public class ReviewServiceTest {
         // then
         assertThat(result.isHasNext()).isFalse();
         assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
-        verify(reviewRepository, times(1)).findFirst20ByOrderByClickCountDescCreatedAtDesc(anyString());
+        verify(reviewRepository, times(1)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
         verify(reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any(PageRequest.class));
     }
 
     @Test
     @DisplayName("리뷰 이름 조회 테스트를 진행한다.(비어있지 않은 경우)")
-    void test() {
+    void getReviewBySearchTest02() {
         // given
         List<Review> reviewResult =
                 List.of(createReview(1L), createReview(2L), createReview(3L));
@@ -303,6 +303,6 @@ public class ReviewServiceTest {
         // then
         assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
         assertThat(result.isHasNext()).isFalse();
-        verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc(anyString());
+        verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
     }
 }

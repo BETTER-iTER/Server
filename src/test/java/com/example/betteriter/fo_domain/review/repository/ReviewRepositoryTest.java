@@ -485,7 +485,7 @@ public class ReviewRepositoryTest {
 
 
         // when
-        List<Review> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc("productName");
+        List<Review> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc();
 
         // then
         for (Review review : result) {
