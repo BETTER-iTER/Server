@@ -23,23 +23,23 @@ public class MypageService {
         return reviewService.getReviewList(user.getId());
     }
 
-    public List<Review> getScrapReviewList(Long userId) {
-        Users user = userService.getUserById(userId);
+    public List<Review> getScrapReviewList(String email) {
+        Users user = userService.getUserByEmail(email);
         return reviewService.getScrapReviewList(user);
     }
 
-    public List<Review> getLikeReviewList(Long userId) {
-        Users user = userService.getUserById(userId);
+    public List<Review> getLikeReviewList(String email) {
+        Users user = userService.getUserByEmail(email);
         return reviewService.getLikeReviewList(user);
     }
 
-    public List<Review> getTargetReviewList(Long userId) {
-        Users user = userService.getUserById(userId);
+    public List<Review> getTargetReviewList(String email) {
+        Users user = userService.getUserByEmail(email);
         return reviewService.getTargetReviewList(user.getId());
     }
 
-    public boolean checkUserSelf(Long userId) {
+    public boolean checkUserSelf(String email) {
         Users user = userService.getCurrentUser();
-        return user.getId().equals(userId);
+        return user.getEmail().equals(email);
     }
 }

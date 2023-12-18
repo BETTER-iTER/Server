@@ -87,4 +87,9 @@ public class UserService {
         return this.usersRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
+
+    public Users getUserByEmail(String email) {
+        return this.usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
+    }
 }

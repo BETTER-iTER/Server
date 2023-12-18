@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,30 +28,30 @@ public class MypageController {
 
     private final MypageService mypageService;
 
-    @GetMapping("/review?user_id={user_id}")
+    @GetMapping("/review?email={email}")
     public ResponseDto<List<MypageResponse.MyReviewDto>> getReview(
-            @RequestParam(value = "user_id", required = false) Long user_id
+            @RequestParam(value = "email", required = false) @Email String email
     ) {
         List<Review> reviewList;
-        if (mypageService.checkUserSelf(user_id)) reviewList = mypageService.getMyReviewList();
-        else reviewList = mypageService.getTargetReviewList(user_id);
+        if (mypageService.checkUserSelf(email)) reviewList = mypageService.getMyReviewList();
+        else reviewList = mypageService.getTargetReviewList(email);
 
         return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
     }
 
-    @GetMapping("/review/scrap/user_id={user_id}")
+    @GetMapping("/review/scrap?user_id={user_id}")
     public ResponseDto<List<MypageResponse.MyReviewDto>> getScrapReview(
-            @RequestParam(value = "user_id", required = false) Long user_id
+            @RequestParam(value = "email", required = false) @Email String email
     ) {
-        List<Review> reviewList = mypageService.getScrapReviewList(user_id);
+        List<Review> reviewList = mypageService.getScrapReviewList(email);
         return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
     }
 
-    @GetMapping("/review/like/user_id={user_id}")
+    @GetMapping("/review/like?email={email}")
     public ResponseDto<List<MypageResponse.MyReviewDto>> getLikeReview(
-            @RequestParam(value = "user_id", required = false) Long user_id
+            @RequestParam(value = "email", required = false) @Email String email
     ) {
-        List<Review> reviewList = mypageService.getLikeReviewList(user_id);
+        List<Review> reviewList = mypageService.getLikeReviewList(email);
         return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
     }
 }
