@@ -101,7 +101,7 @@ public class ReviewServiceTest {
                         .category(LAPTOP)
                         .productName("맥북1")
                         .boughtAt(LocalDate.now())
-                        .manufacturerName("기타")
+                        .manufacturer("기타")
                         .amount(100000)
                         .storeName(1)
                         .shortReview("한줄 평")

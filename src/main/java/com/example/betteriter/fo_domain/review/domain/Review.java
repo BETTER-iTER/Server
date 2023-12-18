@@ -82,7 +82,7 @@ public class Review extends BaseEntity {
     @Builder
     private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
                    String productName, int amount, int storeName, LocalDate boughtAt,
-                   double starPoint, String shortReview, String goodPoint,
+                   double starPoint, String shortReview, String goodPoint, Status status,
                    String badPoint, long clickCount, List<ReviewImage> reviewImages,
                    List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked, long likedCount, long scrapedCount
     ) {
@@ -104,6 +104,7 @@ public class Review extends BaseEntity {
         this.reviewLiked = reviewLiked;
         this.likedCount = likedCount;
         this.scrapedCount = scrapedCount;
+        this.status = status;
     }
 
     public ReviewResponseDto of(String firstImageUrl) {

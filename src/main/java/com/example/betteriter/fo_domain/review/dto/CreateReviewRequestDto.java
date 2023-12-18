@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.betteriter.global.constant.Status.ACTIVE;
+
 @Getter
 @NoArgsConstructor
 public class CreateReviewRequestDto {
@@ -52,13 +54,13 @@ public class CreateReviewRequestDto {
 
     @Builder
     private CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                   String manufacturerName, int amount, int storeName, String shortReview,
+                                   String manufacturer, int amount, int storeName, String shortReview,
                                    int starPoint, String goodPoint, String badPoint, List<Long> specData,
                                    List<CreateReviewImageRequestDto> images) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
-        this.manufacturer = manufacturerName;
+        this.manufacturer = manufacturer;
         this.amount = amount;
         this.storeName = storeName;
         this.shortReview = shortReview;
@@ -82,6 +84,7 @@ public class CreateReviewRequestDto {
                 .starPoint(starPoint)
                 .goodPoint(goodPoint)
                 .badPoint(badPoint)
+                .status(ACTIVE)
                 .build();
     }
 

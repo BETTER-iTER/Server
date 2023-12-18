@@ -71,12 +71,15 @@ public class GetReviewResponseDto {
         private String nickName;
         private Job job;
         private String profileImage;
+        private boolean isExpert;
 
         @Builder
-        public GetUserResponseDto(String nickName, Job job, String profileImage) {
+        public GetUserResponseDto(String nickName, Job job,
+                                  String profileImage, boolean isExpert) {
             this.nickName = nickName;
             this.job = job;
             this.profileImage = profileImage;
+            this.isExpert = isExpert;
         }
 
         public static GetUserResponseDto from(Review review) {
@@ -84,6 +87,7 @@ public class GetReviewResponseDto {
             return GetUserResponseDto.builder()
                     .nickName(user.getUsersDetail().getNickName())
                     .job(user.getUsersDetail().getJob())
+                    .isExpert(user.isExpert())
                     .profileImage(user.getUsersDetail().getProfileImage())
                     .build();
         }

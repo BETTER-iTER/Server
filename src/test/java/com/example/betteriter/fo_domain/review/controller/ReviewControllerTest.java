@@ -1,6 +1,8 @@
 package com.example.betteriter.fo_domain.review.controller;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -19,15 +21,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.PC;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,7 +92,7 @@ class ReviewControllerTest {
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
 
-        ReviewResponse reviewResponse = new ReviewResponse(List.of(getReviewResponseDto), true);
+        ReviewResponse reviewResponse = new ReviewResponse(List.of(getReviewResponseDto), true, true);
         // when && then
         mockMvc.perform(get("/review/search")
                         .param("name", "productName"))
@@ -93,6 +100,7 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.code").value("SUCCESS_200"))
                 .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data.isExited").value(true))
                 .andDo(print());
     }
 
@@ -131,11 +139,48 @@ class ReviewControllerTest {
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
 
-        ReviewResponse reviewResponse = new ReviewResponse(List.of(getReviewResponseDto), true);
+        ReviewResponse reviewResponse = new ReviewResponse(List.of(getReviewResponseDto), true, true);
         // when && then
         mockMvc.perform(get("/review/search")
                         .param("name", (String) null))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "choi", roles = "USER")
+    @DisplayName("리뷰를 성공적으로 등록한다.")
+    void createReviewSuccessfully() throws Exception {
+        // given
+        CreateReviewRequestDto requestDto
+                = CreateReviewRequestDto.builder()
+                .category(PC)
+                .productName("productName")
+                .boughtAt(LocalDate.now())
+                .manufacturer("삼성")
+                .amount(1000)
+                .storeName(1)
+                .shortReview("shortReview")
+                .starPoint(2)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .specData(List.of(1L, 2L))
+                .images(List.of(CreateReviewImageRequestDto.builder().imgUrl("imgUrl").build()))
+                .build();
+
+        given(this.reviewService.createReview(any(CreateReviewRequestDto.class)))
+                .willReturn(1L); // 생성된 리뷰 id
+
+
+        // when & then
+        mockMvc.perform(post("/review")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.result").value(1L));
     }
 }

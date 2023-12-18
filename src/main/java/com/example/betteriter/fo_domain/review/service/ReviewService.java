@@ -71,7 +71,7 @@ public class ReviewService {
         List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
-        return new ReviewResponse(reviewResponse, result.hasNext());
+        return new ReviewResponse(reviewResponse, result.hasNext(), true);
     }
 
     /**
@@ -92,7 +92,7 @@ public class ReviewService {
                     .stream()
                     .map(GetReviewResponseDto::of)
                     .collect(Collectors.toList());
-            return new ReviewResponse(result, false);
+            return new ReviewResponse(result, false, false);
         }
 
         // 3. 데이터 갯수 null 아닌 경우
@@ -100,7 +100,7 @@ public class ReviewService {
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
 
-        return new ReviewResponse(getReviewResponseDtos, latestReview.hasNext());
+        return new ReviewResponse(getReviewResponseDtos, latestReview.hasNext(), true);
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {

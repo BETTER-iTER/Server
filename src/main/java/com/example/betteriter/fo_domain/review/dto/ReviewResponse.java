@@ -13,12 +13,14 @@ public class ReviewResponse {
     @JsonProperty("reviews")
     private List<GetReviewResponseDto> getReviewResponseDtoList;
     private boolean hasNext;
+    private boolean isExisted;
 
     @Builder
     public ReviewResponse(List<GetReviewResponseDto> getReviewResponseDtoList,
-                          boolean hasNext
+                          boolean hasNext, boolean isExisted
     ) {
         this.getReviewResponseDtoList = getReviewResponseDtoList;
         this.hasNext = hasNext;
+        this.isExisted = isExisted;
     }
 }

@@ -6,10 +6,7 @@ import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.RoleType;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,6 +35,7 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(name = "usr_email", nullable = false, unique = true)
     private String email;
 
+    @Setter
     @Column(name = "usr_pwd", unique = true)
     private String password;
 
@@ -70,6 +68,7 @@ public class Users extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Review> reviews; // 유저가 작성한 리뷰
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UsersDetail usersDetail; // 유저 상세 정보
 
@@ -128,14 +127,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setUsersDetail(UsersDetail usersDetail) {
-        this.usersDetail = usersDetail;
     }
 
     public void setUsersCategory(List<Category> categories) {
