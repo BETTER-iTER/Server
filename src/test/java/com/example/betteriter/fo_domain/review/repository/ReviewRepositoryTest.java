@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.betteriter.global.constant.Category.PC;
+import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
@@ -49,8 +51,10 @@ public class ReviewRepositoryTest {
                 .productName("productName")
                 .amount(10)
                 .storeName(1)
+                .status(ACTIVE)
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
+                .likedCount(count)
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
                 .clickCount(count)
@@ -491,5 +495,35 @@ public class ReviewRepositoryTest {
         for (Review review : result) {
             System.out.println(result);
         }
+    }
+
+    @Test
+    @DisplayName("상품명에 해당하는 리뷰를 좋아요 수가 많은 순으로 조회한다.")
+    void findByProductNameOrderByLikedCountDescAndCreatedAtDesc() {
+        // given
+        Review review01 = createReview(1L);
+        Review review02 = createReview(2L);
+        Review review03 = createReview(3L);
+        Review review04 = createReview(4L);
+        Review review05 = createReview(5L);
+        Review review06 = createReview(6L);
+        Review review07 = createReview(7L);
+        Review review08 = createReview(8L);
+        Review review09 = createReview(9L);
+        Review review10 = createReview(10L);
+        Review review11 = createReview(11L);
+        Review review12 = createReview(12L);
+        Review review13 = createReview(13L);
+        Review review14 = createReview(14L);
+        Review review15 = createReview(15L);
+        Review review16 = createReview(16L);
+
+        this.reviewRepository.saveAll(List.of(review01, review02, review03, review04, review05,
+                review06, review07, review08, review09, review10, review11, review12, review13, review14, review15, review16));
+        // when
+
+        Slice<Review> result = this.reviewRepository.findByProductNameOrderByLikedCountDescCreatedAtDesc("productName", PageRequest.of(0, 20));
+        // then
+        System.out.println(result.getContent().size());
     }
 }
