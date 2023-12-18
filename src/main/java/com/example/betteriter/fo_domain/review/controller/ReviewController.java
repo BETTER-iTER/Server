@@ -55,9 +55,10 @@ public class ReviewController {
     /* 이름으로 리뷰 조회 */
     @GetMapping("/search")
     public ResponseDto<ReviewResponse> getReviewsBySearch(
-            @RequestParam String name
+            @RequestParam String name,
+            @RequestParam String sort
     ) {
-        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name));
+        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name, sort));
     }
 
 
