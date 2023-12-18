@@ -70,7 +70,12 @@ public class Review extends BaseEntity {
     private List<ReviewLike> reviewLiked = new ArrayList<>();
 
     @Builder
-    private Review(Long id, Users writer, Manufacturer manufacturer, Category category, String productName, int amount, int storeName, LocalDate boughtAt, int starPoint, String shortReview, String goodPoint, String badPoint, long clickCount, List<ReviewImage> reviewImages, List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked) {
+    private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
+                   String productName, int amount, int storeName, LocalDate boughtAt,
+                   int starPoint, String shortReview, String goodPoint,
+                   String badPoint, long clickCount, List<ReviewImage> reviewImages,
+                   List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked
+    ) {
         this.id = id;
         this.writer = writer;
         this.manufacturer = manufacturer;
