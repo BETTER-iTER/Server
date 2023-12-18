@@ -17,6 +17,7 @@ import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
@@ -33,6 +35,7 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._REVI
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
+    private final static Pageable pageble = PageRequest.of(0, 5);
     private final UserService userService;
     private final SpecService specService;
     private final ManufacturerService manufacturerService;
@@ -67,7 +70,7 @@ public class ReviewService {
     /* 카테고리에 해당하는 리뷰 조회 */
     @Transactional(readOnly = true)
     public ReviewResponse getReviewByCategory(Category category) {
-        Slice<Review> result = this.reviewRepository.findReviewByCategory(category, PageRequest.of(0, 5));
+        Slice<Review> result = this.reviewRepository.findReviewByCategory(category, pageble);
         List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
@@ -80,14 +83,12 @@ public class ReviewService {
      * case 02 : 있다면 최신순 리뷰 리스트 응답
      **/
     @Transactional(readOnly = true)
-    public ReviewResponse getReviewBySearch(String name) {
-
-        // 1. 이름에 해당하는 최신순 리뷰 조회
-        Slice<Review> latestReview
-                = this.reviewRepository.findByProductNameOrderByCreatedAtDesc(name, PageRequest.of(0, 5));
+    public ReviewResponse getReviewBySearch(String name, String sort) {
+        // 1. 필터링 따른 상품 이름에 해당하는 리뷰 조회
+        Slice<Review> reviews = getReviews(name, sort);
 
         // 2. 데이터 갯수 null 인 경우
-        if (latestReview.isEmpty()) {
+        if (Objects.requireNonNull(reviews).isEmpty()) {
             List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
                     .stream()
                     .map(GetReviewResponseDto::of)
@@ -96,11 +97,33 @@ public class ReviewService {
         }
 
         // 3. 데이터 갯수 null 아닌 경우
-        List<GetReviewResponseDto> getReviewResponseDtos = latestReview.getContent().stream()
+        List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent().stream()
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
 
-        return new ReviewResponse(getReviewResponseDtos, latestReview.hasNext(), true);
+        return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
+    }
+
+    private Slice<Review> getReviews(String name, String sort) {
+        Slice<Review> reviews = null;
+        switch (sort) {
+            // 최신순
+            case "latest":
+                reviews
+                        = this.reviewRepository.findByProductNameOrderByCreatedAtDesc(name, pageble);
+                break;
+            // 좋아요 많은 순
+            case "mostLiked":
+                reviews
+                        = this.reviewRepository.findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageble);
+                break;
+            // 스크랩 많은 순
+            case "mostScraped":
+                reviews
+                        = this.reviewRepository.findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageble);
+                break;
+        }
+        return reviews;
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {

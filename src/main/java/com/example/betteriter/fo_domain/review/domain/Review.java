@@ -62,7 +62,6 @@ public class Review extends BaseEntity {
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
 
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED

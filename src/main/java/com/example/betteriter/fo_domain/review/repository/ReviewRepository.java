@@ -13,8 +13,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findFirst7ByCategoryOrderByCreatedAtDesc(Category category);
 
-    List<Review> findReviewByWriter(Users users);
-
     List<Review> findFirst7ByWriterInOrderByCreatedAtDesc(List<Users> writers);
 
     // sum(count (r.reviewLiked),count(r.reviewScraped))
@@ -39,7 +37,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Slice<Review> findByProductNameOrderByCreatedAtDesc(String name, Pageable pageable);
 
-    Slice<Review> findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(String productName, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
@@ -76,4 +73,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "GROUP BY r.id " +
             "ORDER BY r.createdAt DESC")
     List<Review> findAllByReviewLikedUser(Users user);
+
+
+    /* 좋아요 수 많은 리뷰 조회 */
+    Slice<Review> findByProductNameOrderByLikedCountDescCreatedAtDesc(String name, Pageable pageable);
+
+    /* 스크랩 수 많은 리뷰 조회 */
+    Slice<Review> findByProductNameOrderByScrapedCountDescCreatedAtDesc(String name, Pageable pageable);
+
 }

@@ -282,7 +282,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc())
                 .willReturn(reviewResult);
         // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName");
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "likeCount");
 
         // then
         assertThat(result.isHasNext()).isFalse();
@@ -304,12 +304,33 @@ public class ReviewServiceTest {
 
 
         // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName");
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "likeCount");
 
         // then
         assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
         assertThat(result.isHasNext()).isFalse();
         assertThat(result.isExisted()).isTrue();
         verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
+    }
+
+    @Test
+    @DisplayName("변경된 리뷰 이름 조회 테스트를 진행한다.")
+    void getReviewBySearchTest03() {
+        // given
+        List<Review> reviewResult =
+                List.of(createReview(1L), createReview(2L), createReview(3L));
+
+        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
+                .willReturn(new SliceImpl<>(reviewResult));
+        // when
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "latest");
+
+        // then
+        verify(this.reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any());
+        verify(this.reviewRepository, times(0)).findByProductNameOrderByScrapedCountDescCreatedAtDesc(anyString(), any());
+        verify(this.reviewRepository, times(0)).findByProductNameOrderByLikedCountDescCreatedAtDesc(anyString(), any());
+
+        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
+        assertThat(result.isExisted()).isTrue();
     }
 }

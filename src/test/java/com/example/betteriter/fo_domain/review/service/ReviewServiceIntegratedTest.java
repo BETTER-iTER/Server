@@ -70,7 +70,7 @@ public class ReviewServiceIntegratedTest {
                 .willReturn(new SliceImpl<>(reviews));
 
         // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName");
+        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "likeCount");
 
         // then
         assertThat(result).isNotNull();

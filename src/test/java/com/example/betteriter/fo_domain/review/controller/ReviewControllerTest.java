@@ -87,7 +87,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString()))
+        given(reviewService.getReviewBySearch(anyString(), anyString()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
@@ -134,7 +134,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString()))
+        given(reviewService.getReviewBySearch(anyString(), anyString()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
