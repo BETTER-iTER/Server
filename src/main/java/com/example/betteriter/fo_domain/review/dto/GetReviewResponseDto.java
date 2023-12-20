@@ -26,7 +26,7 @@ public class GetReviewResponseDto {
     private List<String> reviewSpecData; // 리뷰 스펙 데이터
     private double starPoint; // 별점
     private String shortReview; // 한줄 평
-    private GetUserResponseDto userInfo; // 리뷰 작성자 정보
+    private GetUserResponseDto writerInfo; // 리뷰 작성자 정보
     private long scrapedCount; // 스크랩 갯수
     private long likedCount; // 좋아요 갯수
 
@@ -38,7 +38,7 @@ public class GetReviewResponseDto {
         this.reviewSpecData = reviewSpecData;
         this.starPoint = review.getStarPoint();
         this.shortReview = review.getShortReview();
-        this.userInfo = GetUserResponseDto.from(review);
+        this.writerInfo = GetUserResponseDto.from(review);
         this.scrapedCount = review.getScrapedCount();
         this.likedCount = review.getLikedCount();
     }

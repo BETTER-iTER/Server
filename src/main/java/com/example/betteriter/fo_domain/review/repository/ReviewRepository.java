@@ -95,4 +95,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ON f.followee = w WHERE r.productName = :productName " +
             "GROUP BY r ORDER BY COUNT(f.id) DESC ,r.createdAt DESC")
     Slice<Review> findByProductNameOrderByMostWriterFollower(@Param("productName") String productName, Pageable pageable);
+
+    /* 동일 카테고리 중 좋아요 + 스크랩 많은 순 리뷰 조회 */
+    @Query(value = "SELECT * FROM review " +
+            "WHERE category = :category " +
+            "ORDER BY (scraped_cnt + liked_cnt) DESC, created_at DESC", nativeQuery = true)
+    List<Review> findByProductNameOrderByScrapedCountAndLikedCountDescCreatedAtDesc(@Param("category") Category category);
 }

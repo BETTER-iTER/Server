@@ -9,6 +9,7 @@ import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.global.config.security.SecurityConfig;
+import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
 import com.example.betteriter.global.filter.JwtAuthenticationFilter;
 import com.example.betteriter.global.util.JwtUtil;
@@ -21,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,9 +29,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.PC;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
+import static com.example.betteriter.global.constant.Status.ACTIVE;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -87,7 +91,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString(), anyString()))
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
@@ -100,7 +104,7 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.code").value("SUCCESS_200"))
                 .andExpect(jsonPath("$.message").value("OK"))
-                .andExpect(jsonPath("$.data.isExited").value(true))
+                .andExpect(jsonPath("$.data.existed").value(true))
                 .andDo(print());
     }
 
@@ -134,7 +138,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString(), anyString()))
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
@@ -176,11 +180,165 @@ class ReviewControllerTest {
         mockMvc.perform(post("/review")
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("SUCCESS_200"))
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.result").value(1L));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("변경된 상품명 리뷰 조회 테스트를 진행한다.")
+    void getReviewByProductNameSuccessfully() throws Exception {
+        // given
+        Users user = Users.builder()
+                .usersDetail(UsersDetail.builder()
+                        .nickName("nickName")
+                        .profileImage("profileImage")
+                        .job(Job.DEVELOPER)
+                        .build())
+                .build();
+
+        Review review = Review.builder()
+                .writer(user)
+                .id(1L)
+                .category(PC)
+                .productName("productName")
+                .amount(10000)
+                .storeName(1)
+                .starPoint(1.0)
+                .badPoint("badPoint")
+                .build();
+
+        GetReviewResponseDto getReviewResponseDto = GetReviewResponseDto.builder()
+                .review(review)
+                .reviewSpecData(List.of("string", "string02"))
+                .firstImage("firstImage")
+                .build();
+
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+                .willReturn(ReviewResponse.builder()
+                        .getReviewResponseDtoList(List.of(getReviewResponseDto))
+                        .hasNext(false)
+                        .isExisted(true)
+                        .build());
+        // when
+        mockMvc.perform(get("/review/search")
+                        .param("name", "productName")
+                        .param("sort", "mostLiked")
+                        .contentType(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.result.existed").value(true));
+        // then
+        verify(this.reviewService, times(1)).getReviewBySearch(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("카테고리별 좋아요 + 스크랩 수로 리뷰 조회 컨트롤러 테스트")
+    void getReviewByCategoryControllerTest() throws Exception {
+        // given
+        Users users = Users.builder()
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .build();
+
+        Review review = Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .amount(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("short")
+                .build();
+
+        List<GetReviewResponseDto> getReviewResponseList =
+                List.of(GetReviewResponseDto.builder()
+                        .review(review)
+                        .reviewSpecData(List.of("s", "2"))
+                        .firstImage("firstImage")
+                        .build());
+
+        ReviewResponse reviewResponse = ReviewResponse.builder()
+                .getReviewResponseDtoList(getReviewResponseList)
+                .hasNext(false)
+                .isExisted(true)
+                .build();
+
+        given(this.reviewService.getReviewByCategory(any(Category.class), anyInt()))
+                .willReturn(reviewResponse);
+        // when & then
+        mockMvc.perform(get("/review/category")
+                        .param("category", "PC")
+                        .param("page", "2"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.result.hasNext").value(false));
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("상품 명 + 필터링 리뷰 조회 컨트롤러 API 변동으로 인한 테스트을 진행한다.")
+    void getReviewsBySearchTest() throws Exception {
+        // given
+        Users users = Users.builder()
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .build();
+
+        Review review = Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .amount(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("short")
+                .build();
+
+        List<GetReviewResponseDto> getReviewResponseList =
+                List.of(GetReviewResponseDto.builder()
+                        .review(review)
+                        .reviewSpecData(List.of("s", "2"))
+                        .firstImage("firstImage")
+                        .build());
+
+        ReviewResponse reviewResponse = ReviewResponse.builder()
+                .getReviewResponseDtoList(getReviewResponseList)
+                .hasNext(false)
+                .isExisted(true)
+                .build();
+
+        given(this.reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+                .willReturn(reviewResponse);
+        // when & then
+        mockMvc.perform(get("/review/search")
+                        .param("name", "name")
+                        .param("sort", "mostScraped")
+                        .param("page", "2"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }

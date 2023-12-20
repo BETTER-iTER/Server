@@ -7,11 +7,8 @@ import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
@@ -33,6 +30,7 @@ import org.springframework.data.domain.SliceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.betteriter.global.constant.Category.LAPTOP;
 import static com.example.betteriter.global.constant.Category.PC;
@@ -77,6 +75,7 @@ public class ReviewServiceTest {
 
 
         Review review = Review.builder()
+                .id(count)
                 .writer(users)
                 .category(PC)
                 .productName("productName")
@@ -84,6 +83,7 @@ public class ReviewServiceTest {
                 .amount(10)
                 .storeName(1)
                 .status(ACTIVE)
+                .manufacturer(Manufacturer.builder().coName("삼성").build())
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
                 .likedCount(count)
@@ -298,5 +298,73 @@ public class ReviewServiceTest {
         assertThat(response.isHasNext()).isFalse();
         assertThat(response.isExisted()).isTrue();
         assertThat(getReviewResponseDtoList).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("카테고리에 해당하는 모든 리뷰를 리뷰의 스크랩 수 + 좋아요 순으로 정렬해서 조회한다.(조회 결과가 없는 경우 isExisted = false")
+    void getReviewByCategoryServiceTest02() {
+        // given
+        Slice<Review> result = new SliceImpl<>(List.of());
+        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
+                .willReturn(result);
+        // when
+        ReviewResponse response = this.reviewService.getReviewByCategory(PC, 2);
+        // then
+        List<GetReviewResponseDto> getReviewResponseDtoList = response.getGetReviewResponseDtoList();
+        assertThat(response.isHasNext()).isFalse();
+        assertThat(response.isExisted()).isFalse();
+        assertThat(getReviewResponseDtoList).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("리뷰 상세조회를 한다.(동일한 제품명 리뷰 조회 4개 조회되는 경우)")
+    void getReviewDetailTest01() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(review.getId()))
+                .willReturn(Optional.of(review));
+
+        /* 동일한 제품명 리뷰 조회 */
+        given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
+                .willReturn(List.of(createReview(2L), createReview(3L), createReview(4L), createReview(5L)));
+        // when
+        ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
+        // then
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getId()).isEqualTo(1L);
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
+        assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
+        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
+        verify(reviewRepository, times(1)).findById(anyLong());
+        verify(reviewRepository, times(0)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세조회를 한다.(동일한 제품명 리뷰 조회 2개 + 같은 카테고리 리뷰 2개 조회되는 경우")
+    void getReviewDetailTest02() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(review.getId()))
+                .willReturn(Optional.of(review));
+
+        /* 동일한 제품명 리뷰 조회 (2개) */
+        given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
+                .willReturn(List.of(createReview(2L), createReview(3L)));
+        /* 동일한 카테고리 리뷰 조회 (2개) */
+        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(), any()))
+                .willReturn(new SliceImpl<>(List.of(createReview(3L), createReview(4L))));
+        // when
+        ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
+        // then
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getId()).isEqualTo(1L);
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
+        assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
+        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
+        assertThat(reviewDetail.getReviewLikeInfo().getReviewLikedCount()).isEqualTo(review.getLikedCount());
+        verify(reviewRepository, times(1)).findById(anyLong());
+        verify(reviewRepository, times(1)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
     }
 }

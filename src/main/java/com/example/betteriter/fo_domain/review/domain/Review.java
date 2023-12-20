@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.review.domain;
 
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
@@ -9,6 +10,7 @@ import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Status;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Where;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.persistence.*;
@@ -19,13 +21,17 @@ import java.util.List;
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
 @Entity(name = "REVIEW")
 public class Review extends BaseEntity {
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ReviewScrap> reviewScraped = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Setter
     @JoinColumn(name = "writer_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Users writer;
@@ -46,43 +52,37 @@ public class Review extends BaseEntity {
     private double starPoint;
     @Column(name = "short_review", nullable = false)
     private String shortReview;
-
     @Column(name = "click_cnt")
     private long clickCount; // 클릭 수
     @Column(name = "liked_cnt")
     private long likedCount; // 좋아요 수
     @Column(name = "scraped_cnt")
     private long scrapedCount; // 스크랩 수
-
-
     @Lob // 최대 500 자
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
     @Lob // 최대 500 자
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED
-
-
     // --------------- Review 관련 엔티티 ---------------- //
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewScrap> reviewScraped = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();
+    @Setter
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> reviewComment = new ArrayList<>();
 
     @Builder
     private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
                    String productName, int amount, int storeName, LocalDate boughtAt,
                    double starPoint, String shortReview, String goodPoint, Status status,
-                   String badPoint, long clickCount, List<ReviewImage> reviewImages,
-                   List<ReviewScrap> reviewScraped, List<ReviewLike> reviewLiked, long likedCount, long scrapedCount
+                   String badPoint, long clickCount, long likedCount, long scrapedCount
     ) {
         this.id = id;
         this.writer = writer;
@@ -96,10 +96,7 @@ public class Review extends BaseEntity {
         this.shortReview = shortReview;
         this.goodPoint = goodPoint;
         this.badPoint = badPoint;
-        this.reviewImages = reviewImages;
-        this.reviewScraped = reviewScraped;
         this.clickCount = clickCount;
-        this.reviewLiked = reviewLiked;
         this.likedCount = likedCount;
         this.scrapedCount = scrapedCount;
         this.status = status;
@@ -112,6 +109,11 @@ public class Review extends BaseEntity {
     // review 클릭 수를 초기화하는 메소드
     public void resetClickCounts() {
         this.clickCount = 0L;
+    }
+
+
+    public void setReviewImage(ReviewImage reviewImage) {
+        this.reviewImages.add(reviewImage);
     }
 
     // 매주 월요일 자정 실행

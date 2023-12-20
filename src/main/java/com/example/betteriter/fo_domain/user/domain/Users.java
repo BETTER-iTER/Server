@@ -53,12 +53,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private List<Category> categories;
 
-    @OneToMany(mappedBy = "followee")
-    private List<Follow> following; // 회원이 팔로잉 하는 유저 리스트
-
-    @OneToMany(mappedBy = "follower")
-    private List<Follow> follower; // 회원을 팔로잉 하는 유저 리스트
-
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<ReviewScrap> reviewScraps; // 유저가 스크랩한 리뷰
 
@@ -75,7 +69,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Builder
     protected Users(Long id, String oauthId, String email, String password, RoleType roleType,
                     boolean isExpert, List<Category> categories,
-                    List<Follow> following, List<Follow> follower,
                     List<ReviewScrap> reviewScraps, List<ReviewLike> reviewLikes,
                     List<Review> reviews, UsersDetail usersDetail
     ) {
@@ -86,8 +79,6 @@ public class Users extends BaseEntity implements UserDetails {
         this.roleType = roleType;
         this.isExpert = isExpert;
         this.categories = categories;
-        this.following = following;
-        this.follower = follower;
         this.reviewScraps = reviewScraps;
         this.reviewLikes = reviewLikes;
         this.reviews = reviews;

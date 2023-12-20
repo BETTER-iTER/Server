@@ -771,4 +771,5 @@ public class ReviewRepositoryTest {
         assertThat(content.get(1)).isEqualTo(review02);
         assertThat(content.get(2)).isEqualTo(review01);
     }
+
 }

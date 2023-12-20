@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_NOT_FOUND;
@@ -75,7 +76,7 @@ public class ReviewService {
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
 
-        return new ReviewResponse(reviewResponse, result.hasNext(), true);
+        return new ReviewResponse(reviewResponse, result.hasNext(), !result.isEmpty());
     }
 
     /**
@@ -108,7 +109,6 @@ public class ReviewService {
     /* 리뷰 상세 조회 */
     @Transactional(readOnly = true)
     public ReviewDetailResponse getReviewDetail(Long reviewId) {
-
         // 1. reviewId 에 해당하는 리뷰 상세 데이터
         Review review = this.findReviewById(reviewId);
 
@@ -119,15 +119,15 @@ public class ReviewService {
         if (relatedReviews.size() == 4) {
             return ReviewDetailResponse.of(review, relatedReviews);
         }
-
         int remain = 4 - relatedReviews.size();
+        // 3. 동일한 카테고리 중 좋아요 + 스크랩 순 정렬 조회 (나머지)
+        List<Review> restRelatedReviews
+                = this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(review.getCategory(), PageRequest.of(0, remain)).getContent();
+        // 4. 관련 리뷰 결과
+        List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
+                .collect(Collectors.toList());
 
-        // 3. 동일한 스펙을 가지는 리뷰 조회
-        List<ReviewSpecData> reviewSpecData = review.getSpecData();
-
-
-//        this.reviewRepository.findRelatedReviewsByReviewSpecData()
-        return null;
+        return ReviewDetailResponse.of(review, totalRelatedReviews);
     }
 
     private Slice<Review> getReviews(String name, String sort, int page) {

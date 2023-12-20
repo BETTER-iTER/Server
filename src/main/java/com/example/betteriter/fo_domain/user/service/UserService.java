@@ -43,7 +43,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public GetUserInfoResponseDto getUserInfo() {
         Users currentUser = this.getCurrentUser();
-        return GetUserInfoResponseDto.from(currentUser, currentUser.getUsersDetail());
+        return GetUserInfoResponseDto.from(currentUser);
     }
 
 

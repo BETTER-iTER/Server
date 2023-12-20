@@ -18,11 +18,11 @@ public class UsersDetail extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "usr_nickname", unique = true)
+    @Column(name = "usr_nickname", unique = true, nullable = false)
     private String nickName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "usr_job")
+    @Column(name = "usr_job", nullable = false)
     private Job job;
 
     @Column(name = "usr_profile_img")
