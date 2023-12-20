@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +60,8 @@ public class ReviewDetailResponse {
 
     @Getter
     @NoArgsConstructor
-    static class GetRelatedReviewResponseDto {
+    public static class GetRelatedReviewResponseDto {
+        private Long id;
         private String productName;
         private String reviewImage;
         private String writerName;
@@ -68,9 +69,10 @@ public class ReviewDetailResponse {
 
 
         @Builder
-        public GetRelatedReviewResponseDto(String productName, String reviewImage,
+        public GetRelatedReviewResponseDto(Long id, String productName, String reviewImage,
                                            String writerName, boolean isExpert
         ) {
+            this.id = id;
             this.productName = productName;
             this.reviewImage = reviewImage;
             this.writerName = writerName;
@@ -80,7 +82,7 @@ public class ReviewDetailResponse {
         public static List<GetRelatedReviewResponseDto> from(List<Review> reviews) {
             return reviews.stream()
                     .map(r -> new GetRelatedReviewResponseDto(
-                            r.getProductName(), getFirstImageWithReview(r), r.getWriter().getUsername(), r.getWriter().isExpert()))
+                            r.getId(), r.getProductName(), getFirstImageWithReview(r), r.getWriter().getUsername(), r.getWriter().isExpert()))
                     .collect(Collectors.toList());
         }
 
@@ -177,14 +179,16 @@ public class ReviewDetailResponse {
         @Getter
         @NoArgsConstructor
         public static class ReviewCommentResponse {
+            private Long id;
             private GetUserResponseForLikeAndComment reviewCommentUserInfo;
             private String comment;
-            private LocalDateTime commentCreatedAt;
+            private LocalDate commentCreatedAt;
 
             @Builder
-            public ReviewCommentResponse(GetUserResponseForLikeAndComment reviewCommentUserInfo,
-                                         String comment, LocalDateTime commentCreatedAt
+            public ReviewCommentResponse(Long id, GetUserResponseForLikeAndComment reviewCommentUserInfo,
+                                         String comment, LocalDate commentCreatedAt
             ) {
+                this.id = id;
                 this.reviewCommentUserInfo = reviewCommentUserInfo;
                 this.comment = comment;
                 this.commentCreatedAt = commentCreatedAt;
@@ -193,9 +197,10 @@ public class ReviewDetailResponse {
             public static List<ReviewCommentResponse> from(List<Comment> comments) {
                 return comments.stream()
                         .map(c -> ReviewCommentResponse.builder()
+                                .id(c.getId())
                                 .reviewCommentUserInfo(GetUserResponseForLikeAndComment.from(c.getUsers()))
                                 .comment(c.getComment())
-                                .commentCreatedAt(c.getCreatedAt()).build()
+                                .commentCreatedAt(c.getCreatedAt().toLocalDate()).build()
                         )
                         .collect(Collectors.toList());
             }
