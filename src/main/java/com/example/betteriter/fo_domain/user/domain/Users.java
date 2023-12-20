@@ -6,10 +6,7 @@ import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.RoleType;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,6 +35,7 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(name = "usr_email", nullable = false, unique = true)
     private String email;
 
+    @Setter
     @Column(name = "usr_pwd", unique = true)
     private String password;
 
@@ -55,12 +53,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private List<Category> categories;
 
-    @OneToMany(mappedBy = "followee")
-    private List<Follow> following; // 회원이 팔로잉 하는 유저 리스트
-
-    @OneToMany(mappedBy = "follower")
-    private List<Follow> follower; // 회원을 팔로잉 하는 유저 리스트
-
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<ReviewScrap> reviewScraps; // 유저가 스크랩한 리뷰
 
@@ -70,13 +62,13 @@ public class Users extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Review> reviews; // 유저가 작성한 리뷰
 
+    @Setter
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UsersDetail usersDetail; // 유저 상세 정보
 
     @Builder
     protected Users(Long id, String oauthId, String email, String password, RoleType roleType,
                     boolean isExpert, List<Category> categories,
-                    List<Follow> following, List<Follow> follower,
                     List<ReviewScrap> reviewScraps, List<ReviewLike> reviewLikes,
                     List<Review> reviews, UsersDetail usersDetail
     ) {
@@ -87,8 +79,6 @@ public class Users extends BaseEntity implements UserDetails {
         this.roleType = roleType;
         this.isExpert = isExpert;
         this.categories = categories;
-        this.following = following;
-        this.follower = follower;
         this.reviewScraps = reviewScraps;
         this.reviewLikes = reviewLikes;
         this.reviews = reviews;
@@ -128,14 +118,6 @@ public class Users extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setUsersDetail(UsersDetail usersDetail) {
-        this.usersDetail = usersDetail;
     }
 
     public void setUsersCategory(List<Category> categories) {

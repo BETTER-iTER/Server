@@ -29,7 +29,8 @@ public class ReviewImage {
     private int orderNum;
 
     @Builder
-    private ReviewImage(Review review, String imgUrl, int orderNum) {
+    private ReviewImage(Long id, Review review, String imgUrl, int orderNum) {
+        this.id = id;
         this.review = review;
         this.imgUrl = imgUrl;
         this.orderNum = orderNum;
