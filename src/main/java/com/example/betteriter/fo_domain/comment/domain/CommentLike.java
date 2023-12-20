@@ -2,15 +2,16 @@ package com.example.betteriter.fo_domain.comment.domain;
 
 
 import com.example.betteriter.fo_domain.user.domain.Users;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "COMMENT_LIKE")
 public class CommentLike {
@@ -25,4 +26,10 @@ public class CommentLike {
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Users users;
+
+    @Builder
+    private CommentLike(Comment comment, Users users) {
+        this.comment = comment;
+        this.users = users;
+    }
 }
