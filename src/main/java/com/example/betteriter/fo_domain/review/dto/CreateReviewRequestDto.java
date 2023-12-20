@@ -32,7 +32,7 @@ public class CreateReviewRequestDto {
     private String manufacturer; // 제조사 이름
 
     @NotNull(message = "가격은 필수 입력 값입니다.")
-    private int amount; // 가격
+    private int price; // 가격
 
     @NotNull(message = "구매처 정보는 필수 입력 값입니다.")
     private int storeName; // 구매처
@@ -54,14 +54,14 @@ public class CreateReviewRequestDto {
 
     @Builder
     private CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                   String manufacturer, int amount, int storeName, String shortReview,
+                                   String manufacturer, int price, int storeName, String shortReview,
                                    int starPoint, String goodPoint, String badPoint, List<Long> specData,
                                    List<CreateReviewImageRequestDto> images) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
         this.manufacturer = manufacturer;
-        this.amount = amount;
+        this.price = price;
         this.storeName = storeName;
         this.shortReview = shortReview;
         this.starPoint = starPoint;
@@ -78,7 +78,7 @@ public class CreateReviewRequestDto {
                 .productName(productName)
                 .boughtAt(boughtAt)
                 .manufacturer(manufacturer)
-                .amount(amount)
+                .price(price)
                 .storeName(storeName)
                 .shortReview(shortReview)
                 .starPoint(starPoint)

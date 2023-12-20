@@ -7,6 +7,7 @@ import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Job;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,14 @@ import java.util.stream.Collectors;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
 
+@JsonPropertyOrder({"reviewDetail", "writerInfo", "reviewLikeInfo", "reviewCommentInfo", "relatedReviews"})
 @Getter
 @NoArgsConstructor
 public class ReviewDetailResponse {
     @JsonProperty("reviewDetail")
     private GetReviewDetailResponseDto getReviewDetailResponseDto; // 리뷰 상세 데이터
     private GetUserResponseDto writerInfo; // 리뷰 작성자 장보
+    @JsonProperty("relatedReviews")
     private List<GetRelatedReviewResponseDto> getRelatedReviewResponseDto; // 연관 리뷰 데이터
     private ReviewLikeInfo reviewLikeInfo; // 리뷰 좋아요 데이터
     private ReviewCommentInfo reviewCommentInfo; // 리뷰 댓글 데이터

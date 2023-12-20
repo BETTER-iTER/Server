@@ -42,8 +42,8 @@ public class Review extends BaseEntity {
     private Category category;
     @Column(name = "product_name", nullable = false)
     private String productName;
-    @Column(name = "amount", nullable = false)
-    private int amount;
+    @Column(name = "price")
+    private int price;
     @Column(name = "store_name", nullable = false)
     private int storeName;
     @Column(name = "bought_at", nullable = false)
@@ -80,7 +80,7 @@ public class Review extends BaseEntity {
 
     @Builder
     private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
-                   String productName, int amount, int storeName, LocalDate boughtAt,
+                   String productName, int storeName, LocalDate boughtAt, int price,
                    double starPoint, String shortReview, String goodPoint, Status status,
                    String badPoint, long clickCount, long likedCount, long scrapedCount
     ) {
@@ -89,9 +89,9 @@ public class Review extends BaseEntity {
         this.manufacturer = manufacturer;
         this.category = category;
         this.productName = productName;
-        this.amount = amount;
         this.storeName = storeName;
         this.boughtAt = boughtAt;
+        this.price = price;
         this.starPoint = starPoint;
         this.shortReview = shortReview;
         this.goodPoint = goodPoint;
