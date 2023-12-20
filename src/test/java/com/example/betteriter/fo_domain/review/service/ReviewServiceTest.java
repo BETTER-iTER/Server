@@ -27,17 +27,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.LAPTOP;
 import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
+import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -46,7 +46,6 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith({MockitoExtension.class})
 public class ReviewServiceTest {
-
     @InjectMocks
     private ReviewService reviewService;
 
@@ -71,30 +70,41 @@ public class ReviewServiceTest {
     private static Review createReview(long count) {
 
         Users users = Users.builder()
-                .usersDetail(UsersDetail.builder()
-                        .nickName("nickName")
-                        .job(Job.DEVELOPER)
-                        .profileImage("profileImage")
-                        .build())
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
                 .build();
-        return Review.builder()
+
+
+        Review review = Review.builder()
                 .writer(users)
                 .category(PC)
                 .productName("productName")
-                .reviewImages(List.of(ReviewImage.builder()
-                        .imgUrl("img")
-                        .orderNum(0)
-                        .build()))
+                .category(PC)
                 .amount(10)
                 .storeName(1)
+                .status(ACTIVE)
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
+                .likedCount(count)
+                .scrapedCount(count)
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
                 .clickCount(count)
                 .shortReview("short")
                 .build();
 
+        review.setReviewImage(createReviewImage(review));
+        return review;
+    }
+
+    private static ReviewImage createReviewImage(Review review) {
+        return ReviewImage.builder()
+                .id(review.getId())
+                .review(review)
+                .orderNum(0)
+                .imgUrl("imgUrl")
+                .build();
     }
 
     @Test
@@ -258,11 +268,11 @@ public class ReviewServiceTest {
                 .build();
 
 
-        given(reviewRepository.findReviewByCategory(any(Category.class), any(Pageable.class)))
+        given(reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
                 .willReturn(new SliceImpl<>(List.of(review01, review02, review03, review04)));
 
         // when
-        ReviewResponse result = this.reviewService.getReviewByCategory(PC);
+        ReviewResponse result = this.reviewService.getReviewByCategory(PC, 1);
         // then
         for (GetReviewResponseDto getReviewResponseDto : result.getGetReviewResponseDtoList()) {
             System.out.println("getReviewResponseDto = " + getReviewResponseDto);
@@ -270,67 +280,23 @@ public class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("리뷰 이름 조회 테스트를 진행한다.(비어있는 경우)")
-    void getReviewBySearchTest() {
+    @DisplayName("카테고리에 해당하는 모든 리뷰를 리뷰의 스크랩 수 + 좋아요 순으로 정렬해서 조회한다.")
+    void getReviewByCategoryServiceTest() {
         // given
-        List<Review> reviewResult =
-                List.of(createReview(1L), createReview(2L), createReview(3L));
+        Review review00 = createReview(1L);
+        Review review01 = createReview(2L);
+        Review review02 = createReview(3L);
 
-        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
-                .willReturn(new SliceImpl<>(Collections.emptyList()));
 
-        given(this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc())
-                .willReturn(reviewResult);
+        Slice<Review> result = new SliceImpl<>(List.of(review00, review01, review02));
+        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
+                .willReturn(result);
         // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "likeCount");
-
+        ReviewResponse response = this.reviewService.getReviewByCategory(PC, 2);
         // then
-        assertThat(result.isHasNext()).isFalse();
-        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
-        assertThat(result.isExisted()).isFalse();
-        verify(reviewRepository, times(1)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
-        verify(reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any(PageRequest.class));
-    }
-
-    @Test
-    @DisplayName("리뷰 이름 조회 테스트를 진행한다.(비어있지 않은 경우)")
-    void getReviewBySearchTest02() {
-        // given
-        List<Review> reviewResult =
-                List.of(createReview(1L), createReview(2L), createReview(3L));
-
-        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
-                .willReturn(new SliceImpl<>(reviewResult));
-
-
-        // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "likeCount");
-
-        // then
-        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
-        assertThat(result.isHasNext()).isFalse();
-        assertThat(result.isExisted()).isTrue();
-        verify(reviewRepository, times(0)).findFirst20ByOrderByClickCountDescCreatedAtDesc();
-    }
-
-    @Test
-    @DisplayName("변경된 리뷰 이름 조회 테스트를 진행한다.")
-    void getReviewBySearchTest03() {
-        // given
-        List<Review> reviewResult =
-                List.of(createReview(1L), createReview(2L), createReview(3L));
-
-        given(this.reviewRepository.findByProductNameOrderByCreatedAtDesc(anyString(), any()))
-                .willReturn(new SliceImpl<>(reviewResult));
-        // when
-        ReviewResponse result = this.reviewService.getReviewBySearch("productName", "latest");
-
-        // then
-        verify(this.reviewRepository, times(1)).findByProductNameOrderByCreatedAtDesc(anyString(), any());
-        verify(this.reviewRepository, times(0)).findByProductNameOrderByScrapedCountDescCreatedAtDesc(anyString(), any());
-        verify(this.reviewRepository, times(0)).findByProductNameOrderByLikedCountDescCreatedAtDesc(anyString(), any());
-
-        assertThat(result.getGetReviewResponseDtoList()).hasSize(3);
-        assertThat(result.isExisted()).isTrue();
+        List<GetReviewResponseDto> getReviewResponseDtoList = response.getGetReviewResponseDtoList();
+        assertThat(response.isHasNext()).isFalse();
+        assertThat(response.isExisted()).isTrue();
+        assertThat(getReviewResponseDtoList).hasSize(3);
     }
 }
