@@ -40,7 +40,7 @@ public class ReviewServiceIntegratedTest {
                 .writer(users)
                 .category(PC)
                 .productName("productName")
-                .amount(10)
+                .price(10)
                 .storeName(1)
                 .boughtAt(LocalDate.now())
                 .starPoint(1)

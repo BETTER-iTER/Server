@@ -434,7 +434,7 @@ class ReviewControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.result.writerInfo.id").value(1))
-                .andExpect(jsonPath("$.result.getRelatedReviewResponseDto[0].productName").value("productName"));
+                .andExpect(jsonPath("$.result.relatedReviews[0].productName").value("productName"));
     }
 
 }
