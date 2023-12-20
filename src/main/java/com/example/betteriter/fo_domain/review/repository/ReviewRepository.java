@@ -7,13 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findFirst7ByCategoryOrderByCreatedAtDesc(Category category);
 
-    List<Review> findFirst7ByWriterInOrderByCreatedAtDesc(List<Users> writers);
+    /* 특정 회원이 팔로우 하는 팔로잉들이 작성한 모든 리뷰 최신순으로 7개 조회 */
+    @Query("SELECT r from REVIEW r WHERE r.writer " +
+            "IN (SELECT u FROM USERS u WHERE u.id " +
+            "IN (SELECT f.followee from FOLLOW f where f.follower = :users))" +
+            "ORDER BY r.createdAt DESC ")
+    List<Review> findFirst7WrittenByFollowingCreatedAtDesc(@Param("users") Users users, Pageable pageable);
 
     // sum(count (r.reviewLiked),count(r.reviewScraped))
     @Query("SELECT r FROM REVIEW r " +
@@ -23,14 +29,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY (COALESCE(COUNT(rs), 0) + COALESCE(COUNT(rl), 0)) DESC")
     List<Review> findTop7ReviewHavingMostScrapedAndLiked(Pageable pageable);
 
-    @Query("select r from REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE r.category = :category " +
-            "GROUP BY r.id " +
-            "ORDER BY (COALESCE(COUNT(rl),0) + COALESCE(COUNT(rs),0)) DESC, " +
-            "r.createdAt DESC")
-    Slice<Review> findReviewByCategory(Category category, Pageable pageable);
+    @Query("SELECT r from REVIEW r WHERE r.category =:category " +
+            "ORDER BY (r.scrapedCount + r.likedCount) DESC, r.createdAt DESC")
+    Slice<Review> findReviewByCategoryOrderByScrapedCountAndLikedCount(@Param("category") Category category, Pageable pageable);
 
 
     List<Review> findFirst20ByOrderByClickCountDescCreatedAtDesc();
@@ -41,8 +42,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
+            "WHERE rs.users = :user " +
             "GROUP BY r.id " +
             "ORDER BY r.createdAt DESC")
     List<Review> findAllByTargetId(Long id);
@@ -50,8 +50,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status != 'DELETED'" +
+            "WHERE rs.users = :user " +
             "GROUP BY r.id " +
             "ORDER BY r.createdAt DESC")
     List<Review> findAllByUser(Long id);
@@ -59,8 +58,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
+            "WHERE rs.users = :user " +
             "GROUP BY r.id " +
             "ORDER BY r.createdAt DESC")
     List<Review> findAllByReviewScrapedUser(Users user);
@@ -68,8 +66,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rl.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
+            "WHERE rl.users = :user " +
             "GROUP BY r.id " +
             "ORDER BY r.createdAt DESC")
     List<Review> findAllByReviewLikedUser(Users user);
@@ -81,4 +78,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /* 스크랩 수 많은 리뷰 조회 */
     Slice<Review> findByProductNameOrderByScrapedCountDescCreatedAtDesc(String name, Pageable pageable);
 
+    /* 동일한 제품명 리뷰 조회 (좋아요 + 스크랩 수 많은 순) */
+    @Query(value = "select * from review where product_name = :productName " +
+            "order by (scraped_cnt + liked_cnt) DESC, created_at DESC LIMIT 4", nativeQuery = true)
+    List<Review> findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(@Param("productName") String productName);
+
+    /* 같은 스펙을 가지는 리뷰 조회 (좋아요 + 스크랩 수 많은 순) */
+    @Query("SELECT r from REVIEW r JOIN r.specData rsd JOIN rsd.specData sd " +
+            "WHERE rsd.id = :reviewSpecDataId " +
+            "AND sd.data IN (SELECT sd.data FROM ReviewSpecData rsd JOIN rsd.specData sd WHERE rsd.id = :reviewSpecDataId) " +
+            "ORDER BY (r.likedCount + r.scrapedCount) DESC")
+    List<Review> findRelatedReviewsByReviewSpecData(@Param("reviewSpecData") Long reviewSpecData, Pageable pageable);
+
+    /* 리뷰의 작성자 팔로워가 많은 순으로 리뷰 조회 */
+    @Query("SELECT r from REVIEW r JOIN r.writer w LEFT JOIN FOLLOW f " +
+            "ON f.followee = w WHERE r.productName = :productName " +
+            "GROUP BY r ORDER BY COUNT(f.id) DESC ,r.createdAt DESC")
+    Slice<Review> findByProductNameOrderByMostWriterFollower(@Param("productName") String productName, Pageable pageable);
 }
