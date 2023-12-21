@@ -44,12 +44,12 @@ public class ReviewDetailResponse {
         this.reviewCommentInfo = reviewCommentInfo;
     }
 
-    public static ReviewDetailResponse of(Review review, List<Review> relatedReviews) {
+    public static ReviewDetailResponse of(Review review, List<Review> relatedReviews, Users currentUser) {
         GetReviewDetailResponseDto reviewDetail = GetReviewDetailResponseDto.from(review); // 리뷰 상세
         GetUserResponseDto writerInfo = GetUserResponseDto.from(review.getWriter()); // 리뷰 작성자 데이터
         List<GetRelatedReviewResponseDto> getRelatedReviewResponseDto = GetRelatedReviewResponseDto.from(relatedReviews); // 연관 리뷰 데이터
         ReviewLikeInfo reviewLikeInfo = ReviewLikeInfo.from(review); // 리뷰 좋아요 데이터
-        ReviewCommentInfo reviewCommentInfo = ReviewCommentInfo.from(review); // 리뷰 댓글 데이터
+        ReviewCommentInfo reviewCommentInfo = ReviewCommentInfo.from(review, currentUser); // 리뷰 댓글 데이터
 
         return ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(reviewDetail)
@@ -163,6 +163,7 @@ public class ReviewDetailResponse {
     @Getter
     @NoArgsConstructor
     public static class ReviewCommentInfo {
+        @JsonProperty("reviewComments")
         private List<ReviewCommentResponse> reviewCommentResponses;
         private long reviewCommentCount;
 
@@ -172,9 +173,9 @@ public class ReviewDetailResponse {
             this.reviewCommentCount = reviewCommentCount;
         }
 
-        public static ReviewCommentInfo from(Review review) {
+        public static ReviewCommentInfo from(Review review, Users currentUser) {
             return ReviewCommentInfo.builder()
-                    .reviewCommentResponses(ReviewCommentResponse.from(review.getReviewComment()))
+                    .reviewCommentResponses(ReviewCommentResponse.from(review.getReviewComment(),currentUser))
                     .reviewCommentCount(review.getReviewComment().size())
                     .build();
         }
@@ -186,25 +187,28 @@ public class ReviewDetailResponse {
             private GetUserResponseForLikeAndComment reviewCommentUserInfo;
             private String comment;
             private LocalDate commentCreatedAt;
+            private boolean isMine; // 로그인한 유저의 댓글인지 여부
 
             @Builder
             public ReviewCommentResponse(Long id, GetUserResponseForLikeAndComment reviewCommentUserInfo,
-                                         String comment, LocalDate commentCreatedAt
+                                         String comment, LocalDate commentCreatedAt, boolean isMine
             ) {
                 this.id = id;
                 this.reviewCommentUserInfo = reviewCommentUserInfo;
                 this.comment = comment;
                 this.commentCreatedAt = commentCreatedAt;
+                this.isMine = isMine;
             }
 
-            public static List<ReviewCommentResponse> from(List<Comment> comments) {
+            public static List<ReviewCommentResponse> from(List<Comment> comments, Users users) {
                 return comments.stream()
                         .map(c -> ReviewCommentResponse.builder()
                                 .id(c.getId())
                                 .reviewCommentUserInfo(GetUserResponseForLikeAndComment.from(c.getUsers()))
                                 .comment(c.getComment())
-                                .commentCreatedAt(c.getCreatedAt().toLocalDate()).build()
-                        )
+                                .commentCreatedAt(c.getCreatedAt().toLocalDate())
+                                .isMine(c.getUsers().getId().equals(users.getId()))
+                                .build())
                         .collect(Collectors.toList());
             }
         }

@@ -115,7 +115,7 @@ public class ReviewService {
                 = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(review.getProductName());
 
         if (relatedReviews.size() == 4) {
-            return ReviewDetailResponse.of(review, relatedReviews);
+            return ReviewDetailResponse.of(review, relatedReviews, getCurrentUser());
         }
         int remain = 4 - relatedReviews.size();
         // 3. 동일한 카테고리 중 좋아요 + 스크랩 순 정렬 조회 (나머지)
@@ -125,7 +125,7 @@ public class ReviewService {
         List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
                 .collect(Collectors.toList());
 
-        return ReviewDetailResponse.of(review, totalRelatedReviews);
+        return ReviewDetailResponse.of(review, totalRelatedReviews, getCurrentUser());
     }
 
     /* 리뷰 좋아요 */

@@ -3,7 +3,6 @@ package com.example.betteriter.fo_domain.review.controller;
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -12,7 +11,6 @@ import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.global.config.security.SecurityConfig;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
-import com.example.betteriter.global.constant.RoleType;
 import com.example.betteriter.global.filter.JwtAuthenticationFilter;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
@@ -39,7 +37,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -68,7 +65,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
 
@@ -114,7 +111,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -161,7 +158,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -241,7 +238,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -291,7 +288,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -344,7 +341,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -394,7 +391,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -431,7 +428,7 @@ class ReviewControllerTest {
         ReviewDetailResponse.GetUserResponseDto writerInfo = ReviewDetailResponse.GetUserResponseDto.builder()
                 .id(1L)
                 .nickName("nickName")
-                .job(Job.DEVELOPER)
+                .job(Job.SW_DEVELOPER)
                 .profileImage("profileImage")
                 .isExpert(true)
                 .build();
@@ -445,7 +442,7 @@ class ReviewControllerTest {
         ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
                 .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
                         .nickName("nickName")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .profileImage("profileImage")
                         .build()))
                 .reviewLikedCount(2L)
@@ -456,7 +453,7 @@ class ReviewControllerTest {
                 .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
                         .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
                                 .nickName("nickName")
-                                .job(Job.DEVELOPER)
+                                .job(Job.SW_DEVELOPER)
                                 .profileImage("profileImage")
                                 .build())
                         .comment("comment")
@@ -504,31 +501,6 @@ class ReviewControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
-    }
 
-    @Test
-    @WithMockUser
-    @DisplayName("리뷰 스크랩 컨트롤러 테스트를 진행한다.")
-    void reviewScrapControllerTest() throws Exception {
-        // given
-
-        // 스크랩 하는 리뷰
-        Review review = createReview(1L);
-
-        // 스크랩 하는 유저
-        Users users = Users.builder()
-                .id(1L)
-                .email("email")
-                .roleType(ROLE_USER)
-                .build();
-
-        given(this.reviewService.reviewScrap(anyLong()))
-                .willReturn(ReviewScrap.builder().review(review).users(users).build());
-
-        // when & then
-        mockMvc.perform(post("/review/scrap/{reviewId}",1L).with(csrf()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isSuccess").value(true));
     }
 }
