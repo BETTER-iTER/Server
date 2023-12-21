@@ -72,6 +72,15 @@ public class ReviewController {
         return ResponseDto.onSuccess(this.reviewService.getReviewDetail(reviewId));
     }
 
+    /* 리뷰 좋아요 */
+    @PostMapping("/like/{reviewId}")
+    public ResponseDto<Long> reviewLike(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.reviewLike(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
 
     private void checkRequestValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

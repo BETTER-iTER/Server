@@ -110,6 +110,13 @@ public class Review extends BaseEntity {
         this.clickCount = 0L;
     }
 
+    public void countReviewScrapedCount() {
+        this.scrapedCount += 1;
+    }
+
+    public void countReviewLikedCount() {
+        this.likedCount += 1;
+    }
 
     public void setReviewImage(ReviewImage reviewImage) {
         this.reviewImages.add(reviewImage);
