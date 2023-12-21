@@ -142,7 +142,7 @@ public class ReviewService {
 
     /* 리뷰 스크랩 */
     @Transactional
-    public void reviewScrap(Long reviewId) {
+    public ReviewScrap reviewScrap(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
         // 2. 현재 로그인한 회원 조회
@@ -150,6 +150,7 @@ public class ReviewService {
         ReviewScrap reviewScrap = this.reviewScrapRepository.save(ReviewScrap.builder().review(review).users(currentUser).build());
         // 3. 리뷰 스크랩 카운트 증가
         review.countReviewScrapedCount();
+        return reviewScrap;
     }
 
     private Slice<Review> getReviews(String name, String sort, int page) {

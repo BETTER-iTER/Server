@@ -8,12 +8,10 @@ import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
+import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
-import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
+import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.service.UserService;
@@ -39,6 +37,7 @@ import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.byLessThan;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -63,6 +62,9 @@ public class ReviewServiceTest {
 
     @Mock
     private ReviewLikeRepository reviewLikeRepository;
+
+    @Mock
+    private ReviewScrapRepository reviewScrapRepository;
 
     @Mock
     private ReviewImageRepository reviewImageRepository;
@@ -404,5 +406,39 @@ public class ReviewServiceTest {
         verify(reviewRepository, times(1)).findById(anyLong());
         verify(userService, times(1)).getCurrentUser();
         verify(reviewLikeRepository, times(1)).save(any(ReviewLike.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 스크랩을 한다.")
+    void reviewScrapServiceTest(){
+        // given
+
+        // 스크랩 하는 리뷰
+        Review review = createReview(1L);
+
+        // 좋아요 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(users);
+
+        given(this.reviewScrapRepository.save(any(ReviewScrap.class)))
+                .willReturn(ReviewScrap.builder().review(review).users(users).build());
+
+        // when
+        ReviewScrap reviewScrap = this.reviewService.reviewScrap(1L);
+        // then
+        assertThat(reviewScrap.getReview()).isEqualTo(review);
+        assertThat(reviewScrap.getUsers()).isEqualTo(users);
+        verify(this.reviewRepository,times(1)).findById(anyLong());
+        verify(this.userService,times(1)).getCurrentUser();
+        verify(this.reviewScrapRepository,times(1)).save(any(ReviewScrap.class));
     }
 }
