@@ -2,16 +2,10 @@ package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
-import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewLike;
-import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
+import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
-import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
+import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
@@ -43,6 +37,7 @@ public class ReviewService {
     private final ManufacturerService manufacturerService;
 
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewScrapRepository reviewScrapRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSpecDataRepository reviewSpecDataRepository;
@@ -140,10 +135,22 @@ public class ReviewService {
         Review review = this.findReviewById(reviewId);
         // 2. 현재 로그인한 회원 조회
         Users currentUser = this.getCurrentUser();
-
         ReviewLike reviewLike = this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
         // 3. 리뷰 좋아요 카운트 증가
         review.countReviewLikedCount();
+    }
+
+    /* 리뷰 스크랩 */
+    @Transactional
+    public ReviewScrap reviewScrap(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        // 2. 현재 로그인한 회원 조회
+        Users currentUser = this.getCurrentUser();
+        ReviewScrap reviewScrap = this.reviewScrapRepository.save(ReviewScrap.builder().review(review).users(currentUser).build());
+        // 3. 리뷰 스크랩 카운트 증가
+        review.countReviewScrapedCount();
+        return reviewScrap;
     }
 
     private Slice<Review> getReviews(String name, String sort, int page) {
@@ -242,7 +249,8 @@ public class ReviewService {
     }
 
     public List<Review> getReviewList(Long id) {
-        return this.reviewRepository.findAllByUser(id);
+//        return this.reviewRepository.findAllByUser(id);
+        return null;
     }
 
     public List<Review> getScrapReviewList(Users user) {
@@ -254,6 +262,7 @@ public class ReviewService {
     }
 
     public List<Review> getTargetReviewList(Long id) {
-        return this.reviewRepository.findAllByTargetId(id);
+//        return this.reviewRepository.findAllByTargetId(id);
+        return null;
     }
 }

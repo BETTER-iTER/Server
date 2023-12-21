@@ -39,21 +39,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Slice<Review> findByProductNameOrderByCreatedAtDesc(String name, Pageable pageable);
 
 
-    @Query("SELECT r FROM REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user " +
-            "GROUP BY r.id " +
-            "ORDER BY r.createdAt DESC")
-    List<Review> findAllByTargetId(Long id);
-
-    @Query("SELECT r FROM REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user " +
-            "GROUP BY r.id " +
-            "ORDER BY r.createdAt DESC")
-    List<Review> findAllByUser(Long id);
+//    @Query("SELECT r FROM REVIEW r " +
+//            "LEFT JOIN r.reviewLiked rl " +
+//            "LEFT JOIN r.reviewScraped rs " +
+//            "WHERE rs.users = :user " +
+//            "GROUP BY r.id " +
+//            "ORDER BY r.createdAt DESC")
+//    List<Review> findAllByTargetId(Long id);
+//
+//    @Query("SELECT r FROM REVIEW r " +
+//            "LEFT JOIN r.reviewLiked rl " +
+//            "LEFT JOIN r.reviewScraped rs " +
+//            "WHERE rs.users = :user " +
+//            "GROUP BY r.id " +
+//            "ORDER BY r.createdAt DESC")
+//    List<Review> findAllByUser(Long id);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
