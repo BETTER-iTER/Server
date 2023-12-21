@@ -3,7 +3,6 @@ package com.example.betteriter.fo_domain.review.controller;
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -12,7 +11,6 @@ import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.global.config.security.SecurityConfig;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
-import com.example.betteriter.global.constant.RoleType;
 import com.example.betteriter.global.filter.JwtAuthenticationFilter;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
@@ -39,7 +37,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = RedisUtil.class),
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtUtil.class)}
 )
+@WithMockUser
 class ReviewControllerTest {
 
     @Autowired
@@ -68,7 +66,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
 
@@ -114,7 +112,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -161,7 +159,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -241,7 +239,7 @@ class ReviewControllerTest {
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
                         .profileImage("profileImage")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .build())
                 .build();
 
@@ -291,7 +289,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -344,7 +342,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -394,7 +392,7 @@ class ReviewControllerTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
         Review review = Review.builder()
@@ -431,7 +429,7 @@ class ReviewControllerTest {
         ReviewDetailResponse.GetUserResponseDto writerInfo = ReviewDetailResponse.GetUserResponseDto.builder()
                 .id(1L)
                 .nickName("nickName")
-                .job(Job.DEVELOPER)
+                .job(Job.SW_DEVELOPER)
                 .profileImage("profileImage")
                 .isExpert(true)
                 .build();
@@ -445,7 +443,7 @@ class ReviewControllerTest {
         ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
                 .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
                         .nickName("nickName")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .profileImage("profileImage")
                         .build()))
                 .reviewLikedCount(2L)
@@ -456,7 +454,7 @@ class ReviewControllerTest {
                 .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
                         .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
                                 .nickName("nickName")
-                                .job(Job.DEVELOPER)
+                                .job(Job.SW_DEVELOPER)
                                 .profileImage("profileImage")
                                 .build())
                         .comment("comment")
@@ -504,31 +502,106 @@ class ReviewControllerTest {
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
+
     }
 
     @Test
-    @WithMockUser
-    @DisplayName("리뷰 스크랩 컨트롤러 테스트를 진행한다.")
-    void reviewScrapControllerTest() throws Exception {
+    @DisplayName("리뷰 상세 조회 API 리팩토링에 대한 컨트롤러 테스트를 진행한다.")
+    void getReviewDetailTest() throws Exception {
         // given
 
-        // 스크랩 하는 리뷰
-        Review review = createReview(1L);
-
-        // 스크랩 하는 유저
         Users users = Users.builder()
                 .id(1L)
                 .email("email")
                 .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
-        given(this.reviewService.reviewScrap(anyLong()))
-                .willReturn(ReviewScrap.builder().review(review).users(users).build());
+        Review review = Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .price(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("short")
+                .build();
 
+        GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
+                .id(1L)
+                .productName("productName")
+                .reviewSpecData(List.of("spec1", "spec2"))
+                .starPoint(2.0)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("shortReview")
+                .manufacturer("삼성")
+                .storeName(1)
+                .boughtAt(LocalDate.of(2023, 12, 12))
+                .createdAt(LocalDate.of(2023, 12, 22))
+                .reviewImages(List.of(GetReviewImageResponseDto.builder().imgUrl("imageUrl").orderNum(1).build()))
+                .scrapedCount(2L)
+                .build();
+
+        ReviewDetailResponse.GetUserResponseDto writerInfo = ReviewDetailResponse.GetUserResponseDto.builder()
+                .id(1L)
+                .nickName("nickName")
+                .job(Job.SW_DEVELOPER)
+                .profileImage("profileImage")
+                .isExpert(true)
+                .build();
+
+        List<ReviewDetailResponse.GetRelatedReviewResponseDto> getRelatedReviewResponseDtos
+                = List.of(ReviewDetailResponse.GetRelatedReviewResponseDto.builder().productName("productName")
+                .reviewImage("reviewImage")
+                .writerName("동근")
+                .isExpert(true).build());
+
+        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
+                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
+                        .nickName("nickName")
+                        .job(Job.SW_DEVELOPER)
+                        .profileImage("profileImage")
+                        .build()))
+                .reviewLikedCount(2L)
+                .build();
+
+        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
+                reviewCommentCount(2L)
+                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
+                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
+                                .nickName("nickName")
+                                .job(Job.SW_DEVELOPER)
+                                .profileImage("profileImage")
+                                .build())
+                        .comment("comment")
+                        .commentCreatedAt(LocalDate.now())
+                        .isMine(true)
+                        .build()))
+                .build();
+
+        ReviewDetailResponse response = ReviewDetailResponse.builder()
+                .getReviewDetailResponseDto(getReviewDetailResponseDto)
+                .writerInfo(writerInfo)
+                .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
+                .reviewLikeInfo(reviewLikeInfo)
+                .reviewCommentInfo(reviewCommentInfo)
+                .build();
+
+        given(this.reviewService.getReviewDetail(anyLong()))
+                .willReturn(response);
         // when & then
-        mockMvc.perform(post("/review/scrap/{reviewId}",1L).with(csrf()))
-                .andDo(print())
+        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isSuccess").value(true));
+                .andDo(print())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.result.writerInfo.id").value(1))
+                .andExpect(jsonPath("$.result.relatedReviews[0].productName").value("productName"))
+                .andExpect(jsonPath("$.result.reviewCommentInfo.reviewComments[0].mine").value(true));
     }
 }

@@ -14,6 +14,97 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
+import com.example.betteriter.global.constant.Status;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
 
 @Slf4j
 @Getter

@@ -31,7 +31,7 @@ public class ReviewServiceIntegratedTest {
         Users users = Users.builder()
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickName")
-                        .job(Job.DEVELOPER)
+                        .job(Job.SW_DEVELOPER)
                         .profileImage("profileImage")
                         .build())
                 .build();

@@ -77,7 +77,7 @@ public class ReviewServiceTest {
         Users users = Users.builder()
                 .email("email")
                 .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
 
@@ -214,7 +214,7 @@ public class ReviewServiceTest {
                 .isExpert(true)
                 .usersDetail(UsersDetail.builder()
                         .nickName("nickname")
-                        .job(Job.DEVELOPER).build())
+                        .job(Job.SW_DEVELOPER).build())
                 .build();
 
 

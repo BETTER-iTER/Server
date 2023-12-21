@@ -116,7 +116,7 @@ public class DeserializerTest {
                 .email("danaver12@daum.net")
                 .password("1234")
                 .nickName("nickname")
-                .job(Job.DESIGNER)
+                .job(Job.SW_DEVELOPER)
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(joinDto);
