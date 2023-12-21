@@ -74,10 +74,19 @@ public class ReviewController {
 
     /* 리뷰 좋아요 */
     @PostMapping("/like/{reviewId}")
-    public ResponseDto<Long> reviewLike(
+    public ResponseDto<Void> reviewLike(
             @PathVariable Long reviewId
     ) {
         this.reviewService.reviewLike(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
+    /* 리뷰 스크랩 */
+    @PostMapping("/scrap/{reviewId}")
+    public ResponseDto<Void> reviewScrap(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.reviewScrap(reviewId);
         return ResponseDto.onSuccess(null);
     }
 
