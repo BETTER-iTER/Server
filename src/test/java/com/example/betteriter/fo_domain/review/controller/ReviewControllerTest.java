@@ -1,6 +1,8 @@
 package com.example.betteriter.fo_domain.review.controller;
 
+import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -58,6 +60,47 @@ class ReviewControllerTest {
     @MockBean
     private ReviewService reviewService;
 
+    private static Review createReview(long count) {
+
+        Users users = Users.builder()
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.DEVELOPER).build())
+                .build();
+
+
+        Review review = Review.builder()
+                .id(count)
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .price(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .manufacturer(Manufacturer.builder().coName("삼성").build())
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .likedCount(count)
+                .scrapedCount(count)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .clickCount(count)
+                .shortReview("short")
+                .build();
+
+        review.setReviewImage(createReviewImage(review));
+        return review;
+    }
+
+    private static ReviewImage createReviewImage(Review review) {
+        return ReviewImage.builder()
+                .id(review.getId())
+                .review(review)
+                .orderNum(0)
+                .imgUrl("imgUrl")
+                .build();
+    }
 
     @Test
     @WithMockUser(username = "choi")
@@ -437,4 +480,27 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.result.relatedReviews[0].productName").value("productName"));
     }
 
+    @Test
+    @WithMockUser
+    @DisplayName("리뷰 좋아요 컨트롤러 테스트를 진행한다.")
+    void reviewLikeControllerTest() throws Exception {
+        // given
+
+        // 좋아요 하는 리뷰
+        Review review = createReview(1L);
+
+        // 좋아요 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+        // when && then
+        mockMvc.perform(post("/review/like/{reviewId}", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
 }
