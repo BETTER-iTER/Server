@@ -7,9 +7,11 @@ import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
+import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
@@ -58,6 +60,9 @@ public class ReviewServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
+
+    @Mock
+    private ReviewLikeRepository reviewLikeRepository;
 
     @Mock
     private ReviewImageRepository reviewImageRepository;
@@ -366,5 +371,38 @@ public class ReviewServiceTest {
         assertThat(reviewDetail.getReviewLikeInfo().getReviewLikedCount()).isEqualTo(review.getLikedCount());
         verify(reviewRepository, times(1)).findById(anyLong());
         verify(reviewRepository, times(1)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요를 한다.")
+    void reviewLikeServiceTest() {
+        // given
+
+        // 좋아요 하는 리뷰
+        Review review = createReview(1L);
+
+        // 좋아요 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(users);
+
+        given(this.reviewLikeRepository.save(any(ReviewLike.class)))
+                .willReturn(ReviewLike.builder().review(review).users(users).build());
+        // when
+        ReviewLike reviewLike = null;
+        // then
+        assertThat(reviewLike.getUsers()).isEqualTo(users);
+        assertThat(reviewLike.getReview()).isEqualTo(review);
+        verify(reviewRepository, times(1)).findById(anyLong());
+        verify(userService, times(1)).getCurrentUser();
+        verify(reviewLikeRepository, times(1)).save(any(ReviewLike.class));
     }
 }

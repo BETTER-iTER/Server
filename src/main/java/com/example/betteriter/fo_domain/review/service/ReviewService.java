@@ -4,10 +4,12 @@ import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService
 import com.example.betteriter.bo_domain.spec.service.SpecService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
+import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
@@ -40,6 +42,7 @@ public class ReviewService {
     private final SpecService specService;
     private final ManufacturerService manufacturerService;
 
+    private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSpecDataRepository reviewSpecDataRepository;
@@ -109,7 +112,7 @@ public class ReviewService {
     /* 리뷰 상세 조회 */
     @Transactional(readOnly = true)
     public ReviewDetailResponse getReviewDetail(Long reviewId) {
-        // 1. reviewId 에 해당하는 리뷰 상세 데이터
+        // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
 
         // 2. 동일한 제품명 리뷰 조회(4)
@@ -128,6 +131,19 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         return ReviewDetailResponse.of(review, totalRelatedReviews);
+    }
+
+    /* 리뷰 좋아요 */
+    @Transactional
+    public void reviewLike(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        // 2. 현재 로그인한 회원 조회
+        Users currentUser = this.getCurrentUser();
+
+        ReviewLike reviewLike = this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
+        // 3. 리뷰 좋아요 카운트 증가
+        review.countReviewLikedCount();
     }
 
     private Slice<Review> getReviews(String name, String sort, int page) {

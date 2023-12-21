@@ -772,4 +772,16 @@ public class ReviewRepositoryTest {
         assertThat(content.get(2)).isEqualTo(review01);
     }
 
+    @Test
+    @DisplayName("리뷰 조회 테스트 - review 조회 후 size(r.getReviewLiked) 하는 경우 다 가져오는지 테스트")
+    void findReviewByIdTest() {
+        // given
+        Review review01 = createReview(1L);
+        Review review02 = createReview(2L);
+        Review review03 = createReview(3L);
+        // when
+        Optional<Review> review = this.reviewRepository.findById(1L);
+        review.ifPresent(value -> System.out.println("hello" + value.getReviewLiked().size()));
+        // then
+    }
 }
