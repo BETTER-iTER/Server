@@ -9,6 +9,7 @@ import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Status;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Where;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@DynamicUpdate
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

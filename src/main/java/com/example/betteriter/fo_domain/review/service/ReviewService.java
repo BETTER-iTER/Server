@@ -249,7 +249,8 @@ public class ReviewService {
     }
 
     public List<Review> getReviewList(Long id) {
-        return this.reviewRepository.findAllByUser(id);
+//        return this.reviewRepository.findAllByUser(id);
+        return null;
     }
 
     public List<Review> getScrapReviewList(Users user) {
@@ -261,6 +262,7 @@ public class ReviewService {
     }
 
     public List<Review> getTargetReviewList(Long id) {
-        return this.reviewRepository.findAllByTargetId(id);
+//        return this.reviewRepository.findAllByTargetId(id);
+        return null;
     }
 }
