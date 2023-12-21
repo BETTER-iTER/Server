@@ -49,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = RedisUtil.class),
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtUtil.class)}
 )
+@WithMockUser
 class ReviewControllerTest {
 
     @Autowired
@@ -502,5 +503,105 @@ class ReviewControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 API 리팩토링에 대한 컨트롤러 테스트를 진행한다.")
+    void getReviewDetailTest() throws Exception {
+        // given
+
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
+                .build();
+
+        Review review = Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .price(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("short")
+                .build();
+
+        GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
+                .id(1L)
+                .productName("productName")
+                .reviewSpecData(List.of("spec1", "spec2"))
+                .starPoint(2.0)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("shortReview")
+                .manufacturer("삼성")
+                .storeName(1)
+                .boughtAt(LocalDate.of(2023, 12, 12))
+                .createdAt(LocalDate.of(2023, 12, 22))
+                .reviewImages(List.of(GetReviewImageResponseDto.builder().imgUrl("imageUrl").orderNum(1).build()))
+                .scrapedCount(2L)
+                .build();
+
+        ReviewDetailResponse.GetUserResponseDto writerInfo = ReviewDetailResponse.GetUserResponseDto.builder()
+                .id(1L)
+                .nickName("nickName")
+                .job(Job.SW_DEVELOPER)
+                .profileImage("profileImage")
+                .isExpert(true)
+                .build();
+
+        List<ReviewDetailResponse.GetRelatedReviewResponseDto> getRelatedReviewResponseDtos
+                = List.of(ReviewDetailResponse.GetRelatedReviewResponseDto.builder().productName("productName")
+                .reviewImage("reviewImage")
+                .writerName("동근")
+                .isExpert(true).build());
+
+        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
+                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
+                        .nickName("nickName")
+                        .job(Job.SW_DEVELOPER)
+                        .profileImage("profileImage")
+                        .build()))
+                .reviewLikedCount(2L)
+                .build();
+
+        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
+                reviewCommentCount(2L)
+                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
+                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
+                                .nickName("nickName")
+                                .job(Job.SW_DEVELOPER)
+                                .profileImage("profileImage")
+                                .build())
+                        .comment("comment")
+                        .commentCreatedAt(LocalDate.now())
+                        .isMine(true)
+                        .build()))
+                .build();
+
+        ReviewDetailResponse response = ReviewDetailResponse.builder()
+                .getReviewDetailResponseDto(getReviewDetailResponseDto)
+                .writerInfo(writerInfo)
+                .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
+                .reviewLikeInfo(reviewLikeInfo)
+                .reviewCommentInfo(reviewCommentInfo)
+                .build();
+
+        given(this.reviewService.getReviewDetail(anyLong()))
+                .willReturn(response);
+        // when & then
+        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.result.writerInfo.id").value(1))
+                .andExpect(jsonPath("$.result.relatedReviews[0].productName").value("productName"))
+                .andExpect(jsonPath("$.result.reviewCommentInfo.reviewComments[0].mine").value(true));
     }
 }

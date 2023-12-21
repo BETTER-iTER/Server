@@ -79,7 +79,7 @@ public class UserServiceTest {
                 .roleType(RoleType.ROLE_USER)
                 .isExpert(true)
                 .usersDetail(UsersDetail.builder()
-                        .job(Job.DESIGNER)
+                        .job(Job.SW_DEVELOPER)
                         .profileImage("profileImage")
                         .build())
                 .build();
@@ -107,7 +107,7 @@ public class UserServiceTest {
                 .roleType(RoleType.ROLE_USER)
                 .isExpert(true)
                 .usersDetail(UsersDetail.builder()
-                        .job(Job.DESIGNER)
+                        .job(Job.SW_DEVELOPER)
                         .profileImage("profileImage")
                         .build())
                 .build();

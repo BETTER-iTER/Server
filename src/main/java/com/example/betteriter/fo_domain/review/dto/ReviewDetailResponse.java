@@ -120,6 +120,7 @@ public class ReviewDetailResponse {
 
         public static ReviewDetailResponse.GetUserResponseDto from(Users writer) {
             return ReviewDetailResponse.GetUserResponseDto.builder()
+                    .id(writer.getId())
                     .nickName(writer.getUsersDetail().getNickName())
                     .job(writer.getUsersDetail().getJob())
                     .isExpert(writer.isExpert())
