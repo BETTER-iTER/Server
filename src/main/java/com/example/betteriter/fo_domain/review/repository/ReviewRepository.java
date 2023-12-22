@@ -3,6 +3,8 @@ package com.example.betteriter.fo_domain.review.repository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,38 +39,30 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Slice<Review> findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(String productName, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
-            "GROUP BY r.id " +
+            "WHERE r.writer = :user " +
             "ORDER BY r.createdAt DESC")
-    List<Review> findAllByTargetId(Long id);
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByTargetId(@Param("user") Users user);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "WHERE r.writer = :user " +
+            "ORDER BY r.createdAt DESC")
+    @Where(clause = "r.status != 'DELETED'")
+    List<Review> findAllByUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status != 'DELETED'" +
-            "GROUP BY r.id " +
+            "WHERE rs.users = :user " +
             "ORDER BY r.createdAt DESC")
-    List<Review> findAllByUser(Long id);
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByReviewScrapedUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rs.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
-            "GROUP BY r.id " +
+            "WHERE rl.users = :user " +
             "ORDER BY r.createdAt DESC")
-    List<Review> findAllByReviewScrapedUser(Users user);
-
-    @Query("SELECT r FROM REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rl.users = :user AND " +
-            "   r.status = 'ACTIVE'" +
-            "GROUP BY r.id " +
-            "ORDER BY r.createdAt DESC")
-    List<Review> findAllByReviewLikedUser(Users user);
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByReviewLikedUser(@Param("user") Users user);
 }

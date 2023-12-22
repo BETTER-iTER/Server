@@ -14,7 +14,7 @@ public class FollowResponse {
 
     @Getter
     @Builder
-    public class UnfollowingDto {
+    public static class UnfollowingDto {
         private String email;
         private String message;
     }

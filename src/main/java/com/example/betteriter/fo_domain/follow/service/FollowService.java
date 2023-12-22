@@ -12,6 +12,10 @@ import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class FollowService {
     private final FollowWriteRepository followWriteRepository;
     private final FollowReadRepository followReadRepository;
 
+    @Transactional
     public Follow following(FollowRequest.FollowingDto followingRequestDto) {
         Users user = userService.getCurrentUser();
         Users targetUser = userService.getUserByEmail(followingRequestDto.getEmail());
@@ -30,6 +35,7 @@ public class FollowService {
         return followWriteRepository.save(follow);
     }
 
+    @Transactional
     public void unfollowing(FollowRequest.UnfollowingDto unfollowingRequestDto) {
         Users user = userService.getCurrentUser();
         Users targetUser = userService.getUserByEmail(unfollowingRequestDto.getEmail());
@@ -44,5 +50,23 @@ public class FollowService {
         if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
 
         return follow;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Users> getFollowerList(Users user) {
+        List<Follow> followers = followReadRepository.findByFollowerId(user.getId());
+
+        return followers.stream()
+                .map(Follow::getFollowee)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Users> getFolloweeList(Users user) {
+        List<Follow> followees = followReadRepository.findByFolloweeId(user.getId());
+
+        return followees.stream()
+                .map(Follow::getFollower)
+                .collect(Collectors.toList());
     }
 }

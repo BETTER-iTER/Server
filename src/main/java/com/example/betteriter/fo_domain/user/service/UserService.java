@@ -83,11 +83,13 @@ public class UserService {
     }
 
     /* 회원 정보 가져오기 */
+    @Transactional(readOnly = true)
     public Users getUserById(Long userId) {
         return this.usersRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public Users getUserByEmail(String email) {
         return this.usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
