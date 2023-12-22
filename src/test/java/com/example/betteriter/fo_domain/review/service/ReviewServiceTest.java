@@ -433,10 +433,7 @@ public class ReviewServiceTest {
                 .willReturn(ReviewScrap.builder().review(review).users(users).build());
 
         // when
-        ReviewScrap reviewScrap = this.reviewService.reviewScrap(1L);
         // then
-        assertThat(reviewScrap.getReview()).isEqualTo(review);
-        assertThat(reviewScrap.getUsers()).isEqualTo(users);
         verify(this.reviewRepository,times(1)).findById(anyLong());
         verify(this.userService,times(1)).getCurrentUser();
         verify(this.reviewScrapRepository,times(1)).save(any(ReviewScrap.class));

@@ -109,13 +109,14 @@ public class ReviewService {
     public ReviewDetailResponse getReviewDetail(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
+        Users currentUser = this.getCurrentUser();
 
         // 2. 동일한 제품명 리뷰 조회(4)
         List<Review> relatedReviews
                 = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(review.getProductName());
 
         if (relatedReviews.size() == 4) {
-            return ReviewDetailResponse.of(review, relatedReviews, getCurrentUser());
+            return ReviewDetailResponse.of(review, relatedReviews, currentUser);
         }
         int remain = 4 - relatedReviews.size();
         // 3. 동일한 카테고리 중 좋아요 + 스크랩 순 정렬 조회 (나머지)
@@ -125,7 +126,7 @@ public class ReviewService {
         List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
                 .collect(Collectors.toList());
 
-        return ReviewDetailResponse.of(review, totalRelatedReviews, getCurrentUser());
+        return ReviewDetailResponse.of(review, totalRelatedReviews, currentUser);
     }
 
     /* 리뷰 좋아요 */
@@ -135,22 +136,21 @@ public class ReviewService {
         Review review = this.findReviewById(reviewId);
         // 2. 현재 로그인한 회원 조회
         Users currentUser = this.getCurrentUser();
-        ReviewLike reviewLike = this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
+        this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
         // 3. 리뷰 좋아요 카운트 증가
         review.countReviewLikedCount();
     }
 
     /* 리뷰 스크랩 */
     @Transactional
-    public ReviewScrap reviewScrap(Long reviewId) {
+    public void reviewScrap(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
         // 2. 현재 로그인한 회원 조회
         Users currentUser = this.getCurrentUser();
-        ReviewScrap reviewScrap = this.reviewScrapRepository.save(ReviewScrap.builder().review(review).users(currentUser).build());
+        this.reviewScrapRepository.save(ReviewScrap.builder().review(review).users(currentUser).build());
         // 3. 리뷰 스크랩 카운트 증가
         review.countReviewScrapedCount();
-        return reviewScrap;
     }
 
     private Slice<Review> getReviews(String name, String sort, int page) {

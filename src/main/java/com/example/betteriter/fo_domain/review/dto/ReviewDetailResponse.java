@@ -45,7 +45,8 @@ public class ReviewDetailResponse {
     }
 
     public static ReviewDetailResponse of(Review review, List<Review> relatedReviews, Users currentUser) {
-        GetReviewDetailResponseDto reviewDetail = GetReviewDetailResponseDto.from(review); // 리뷰 상세
+        GetReviewDetailResponseDto reviewDetail
+                = GetReviewDetailResponseDto.from(review,isCurrentUserLikeReview(review,currentUser),isCurrentUserScrapReview(review,currentUser)); // 리뷰 상세
         GetUserResponseDto writerInfo = GetUserResponseDto.from(review.getWriter()); // 리뷰 작성자 데이터
         List<GetRelatedReviewResponseDto> getRelatedReviewResponseDto = GetRelatedReviewResponseDto.from(relatedReviews); // 연관 리뷰 데이터
         ReviewLikeInfo reviewLikeInfo = ReviewLikeInfo.from(review); // 리뷰 좋아요 데이터
@@ -240,5 +241,16 @@ public class ReviewDetailResponse {
                     .profileImage(users.getUsersDetail().getProfileImage())
                     .build();
         }
+    }
+
+    private static boolean isCurrentUserLikeReview(Review review, Users currentUser) {
+        return review.getReviewLiked().stream()
+                .anyMatch(reviewLike -> reviewLike.getUsers().getId().equals(currentUser.getId()));
+    }
+
+
+    private static boolean isCurrentUserScrapReview(Review review, Users currentUser) {
+        return review.getReviewScraped().stream()
+                .anyMatch(reviewScrap -> reviewScrap.getUsers().getId().equals(currentUser.getId()));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.review.dto;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,15 @@ public class GetReviewDetailResponseDto {
     private LocalDate createdAt; // 작성일
     private List<GetReviewImageResponseDto> reviewImages; // 리뷰 이미지
     private long scrapedCount; // 리뷰 스크랩 갯수
+    private boolean isScrap; // 리뷰 스크랩 여부
+    private boolean isLike; // 리뷰 좋아요 여부
 
 
     @Builder
     public GetReviewDetailResponseDto(Long id, String productName, List<String> reviewSpecData, double starPoint,
                                       String goodPoint, String badPoint, String shortReview, String manufacturer,
-                                      int storeName, LocalDate boughtAt, LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages, long scrapedCount
+                                      int storeName, LocalDate boughtAt, LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages,
+                                      long scrapedCount, boolean isScrap, boolean isLike
     ) {
         this.id = id;
         this.productName = productName;
@@ -45,9 +49,11 @@ public class GetReviewDetailResponseDto {
         this.createdAt = createdAt;
         this.reviewImages = reviewImages;
         this.scrapedCount = scrapedCount;
+        this.isScrap = isScrap;
+        this.isLike = isLike;
     }
 
-    public static GetReviewDetailResponseDto from(Review review) {
+    public static GetReviewDetailResponseDto from(Review review, boolean isLike, boolean isScrap) {
         return GetReviewDetailResponseDto.builder()
                 .id(review.getId())
                 .productName(review.getProductName())
@@ -62,6 +68,8 @@ public class GetReviewDetailResponseDto {
                 .createdAt(review.getCreatedAt() == null ? null : review.getCreatedAt().toLocalDate())
                 .reviewImages(GetReviewImageResponseDto.of(review.getReviewImages()))
                 .scrapedCount(review.getScrapedCount())
+                .isLike(isLike)
+                .isScrap(isScrap)
                 .build();
     }
 
