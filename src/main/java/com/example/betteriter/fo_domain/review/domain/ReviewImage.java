@@ -29,13 +29,16 @@ public class ReviewImage {
     private int orderNum;
 
     @Builder
-    private ReviewImage(String imgUrl, int orderNum) {
+    private ReviewImage(Long id, Review review, String imgUrl, int orderNum) {
+        this.id = id;
+        this.review = review;
         this.imgUrl = imgUrl;
         this.orderNum = orderNum;
     }
 
-    public static ReviewImage createReviewImage(String imgUrl, int orderNum) {
+    public static ReviewImage createReviewImage(Review review, String imgUrl, int orderNum) {
         return ReviewImage.builder()
+                .review(review)
                 .imgUrl(imgUrl)
                 .orderNum(orderNum)
                 .build();

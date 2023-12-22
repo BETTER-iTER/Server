@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.review.controller;
 
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
 import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
+import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
@@ -47,17 +48,46 @@ public class ReviewController {
     /* 카테고리 별 리뷰 조회 */
     @GetMapping("/category")
     public ResponseDto<ReviewResponse> getReviewsByCategory(
-            @RequestParam String category
+            @RequestParam String category,
+            @RequestParam int page
     ) {
-        return ResponseDto.onSuccess(this.reviewService.getReviewByCategory(Category.from(category)));
+        return ResponseDto.onSuccess(this.reviewService.getReviewByCategory(Category.from(category), page));
     }
 
-    /* 이름으로 리뷰 조회 */
+    /* 상품 명 + 필터링 리뷰 조회 */
     @GetMapping("/search")
     public ResponseDto<ReviewResponse> getReviewsBySearch(
-            @RequestParam String name
+            @RequestParam String name,
+            @RequestParam String sort,
+            @RequestParam int page
     ) {
-        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name));
+        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name, sort, page));
+    }
+
+    /* 리뷰 상세 조회 */
+    @GetMapping("/detail/{reviewId}")
+    public ResponseDto<ReviewDetailResponse> getReviewDetail(
+            @PathVariable Long reviewId
+    ) {
+        return ResponseDto.onSuccess(this.reviewService.getReviewDetail(reviewId));
+    }
+
+    /* 리뷰 좋아요 */
+    @PostMapping("/like/{reviewId}")
+    public ResponseDto<Void> reviewLike(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.reviewLike(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
+    /* 리뷰 스크랩 */
+    @PostMapping("/scrap/{reviewId}")
+    public ResponseDto<Void> reviewScrap(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.reviewScrap(reviewId);
+        return ResponseDto.onSuccess(null);
     }
 
 

@@ -27,7 +27,8 @@ public class GetUserInfoResponseDto {
         this.isExpert = isExpert;
     }
 
-    public static GetUserInfoResponseDto from(Users users, UsersDetail usersDetail) {
+    public static GetUserInfoResponseDto from(Users users) {
+        UsersDetail usersDetail = users.getUsersDetail();
         return GetUserInfoResponseDto.builder()
                 .nickName(usersDetail.getNickName())
                 .job(usersDetail.getJob())

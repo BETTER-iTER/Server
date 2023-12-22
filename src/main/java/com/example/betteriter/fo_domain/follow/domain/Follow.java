@@ -2,7 +2,10 @@ package com.example.betteriter.fo_domain.follow.domain;
 
 
 import com.example.betteriter.fo_domain.user.domain.Users;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
@@ -14,8 +17,6 @@ import javax.persistence.*;
 
 @Slf4j
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "FOLLOW")
 public class Follow {
@@ -31,4 +32,9 @@ public class Follow {
     @JoinColumn(name = "followee")
     private Users followee; // 팔로우 당하는 유저 id ( 상대방 )
 
+    @Builder
+    private Follow(Users follower, Users followee) {
+        this.follower = follower;
+        this.followee = followee;
+    }
 }

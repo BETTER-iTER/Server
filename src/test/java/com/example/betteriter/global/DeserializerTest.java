@@ -57,8 +57,7 @@ public class DeserializerTest {
                         .category(LAPTOP)
                         .productName("맥북1")
                         .boughtAt(LocalDate.now())
-                        .manufacturerId(1L)
-                        .amount(10000)
+                        .price(10000)
                         .storeName(1)
                         .shortReview("한줄 평")
                         .starPoint(1)
@@ -117,7 +116,7 @@ public class DeserializerTest {
                 .email("danaver12@daum.net")
                 .password("1234")
                 .nickName("nickname")
-                .job(Job.DESIGNER)
+                .job(Job.SW_DEVELOPER)
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(joinDto);

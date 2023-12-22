@@ -8,10 +8,16 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Job {
-    DEVELOPER("개발자"),
+    SW_DEVELOPER("SW 개발자"),
+    GAME_DEVELOPER("게임 개발자"),
     STUDENT("학생"),
     TEACHER("선생님"),
-    DESIGNER("디자이너");
+    VIDEO_DESIGNER("영상 디자이너"),
+    VISUAL_DESIGNER("시각 디자이너"),
+    DATA_ANALYST("데이터 분석가"),
+    PLANNER("기획자"),
+    EDITOR("에디터"),
+    CEO("CEO");
     private final String jobName;
 
     @JsonCreator

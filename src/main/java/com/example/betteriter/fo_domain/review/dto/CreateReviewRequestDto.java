@@ -2,7 +2,6 @@ package com.example.betteriter.fo_domain.review.dto;
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 import lombok.Builder;
@@ -31,7 +30,7 @@ public class CreateReviewRequestDto {
     private String manufacturer; // 제조사 이름
 
     @NotNull(message = "가격은 필수 입력 값입니다.")
-    private int amount; // 가격
+    private int price; // 가격
 
     @NotNull(message = "구매처 정보는 필수 입력 값입니다.")
     private int storeName; // 구매처
@@ -53,14 +52,14 @@ public class CreateReviewRequestDto {
 
     @Builder
     private CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                   String manufacturerName, int amount, int storeName, String shortReview,
+                                   String manufacturer, int price, int storeName, String shortReview,
                                    int starPoint, String goodPoint, String badPoint, List<Long> specData,
                                    List<CreateReviewImageRequestDto> images) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
-        this.manufacturer = manufacturerName;
-        this.amount = amount;
+        this.manufacturer = manufacturer;
+        this.price = price;
         this.storeName = storeName;
         this.shortReview = shortReview;
         this.starPoint = starPoint;
@@ -70,20 +69,19 @@ public class CreateReviewRequestDto {
         this.images = images;
     }
 
-    public Review toEntity(Users users, Manufacturer manufacturer, List<ReviewImage> reviewImages) {
+    public Review toEntity(Users users, Manufacturer manufacturer) {
         return Review.builder()
                 .writer(users)
                 .category(category)
                 .productName(productName)
                 .boughtAt(boughtAt)
                 .manufacturer(manufacturer)
-                .amount(amount)
+                .price(price)
                 .storeName(storeName)
                 .shortReview(shortReview)
                 .starPoint(starPoint)
                 .goodPoint(goodPoint)
                 .badPoint(badPoint)
-                .reviewImages(reviewImages)
                 .build();
     }
 

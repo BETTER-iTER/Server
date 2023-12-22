@@ -2,21 +2,17 @@ package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
-import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
+import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
-import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
-import com.example.betteriter.fo_domain.follow.domain.Follow;
+import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_NOT_FOUND;
@@ -33,14 +31,16 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._REVI
 @RequiredArgsConstructor
 @Service
 public class ReviewService {
+    private static final int SIZE = 7;
     private final UserService userService;
     private final SpecService specService;
     private final ManufacturerService manufacturerService;
 
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewScrapRepository reviewScrapRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSpecDataRepository reviewSpecDataRepository;
-
 
     /* 리뷰 등록 */
     @Transactional
@@ -48,10 +48,12 @@ public class ReviewService {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
                 this.userService.getCurrentUser(),
-                this.manufacturerService.findManufacturerByName(request.getManufacturer()), this.getReviewImages(request))
-        );
+                this.manufacturerService.findManufacturerByName(request.getManufacturer())));
 
-        // 2. 리뷰 스펙 데이터 저장
+        // 2. 리뷰 이미지 저장
+        this.reviewImageRepository.saveAll(this.getReviewImages(review, request));
+
+        // 3. 리뷰 스펙 데이터 저장
         this.reviewSpecDataRepository.saveAll(this.getReviewSpecData(request, review));
         return review.getId();
     }
@@ -64,23 +66,118 @@ public class ReviewService {
 
     /* 카테고리에 해당하는 리뷰 조회 */
     @Transactional(readOnly = true)
-    public ReviewResponse getReviewByCategory(Category category) {
-        Slice<Review> result = this.reviewRepository.findReviewByCategory(category, PageRequest.of(0, 5));
+    public ReviewResponse getReviewByCategory(Category category, int page) {
+        Slice<Review> result
+                = this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(category, PageRequest.of(page, SIZE));
+
         List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
                 .map(GetReviewResponseDto::of)
                 .collect(Collectors.toList());
-        return new ReviewResponse(reviewResponse, result.hasNext());
+
+        return new ReviewResponse(reviewResponse, result.hasNext(), !result.isEmpty());
     }
 
-    /* 이름에 해당하는 리뷰 조회 */
+    /**
+     * - 상품 명 + 필터링 리뷰 조회
+     * case 01 : 없다면 7일 동안 유저들이 많이 클릭한 리뷰 20개 리턴
+     * case 02 : 있다면 최신순 리뷰 리스트 응답
+     **/
     @Transactional(readOnly = true)
-    public ReviewResponse getReviewBySearch(String name) {
-        Slice<Review> result
-                = this.reviewRepository.findFirst20ByProductNameOrderByClickCountDescCreatedAtDesc(name, PageRequest.of(0, 5));
-        List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
+    public ReviewResponse getReviewBySearch(String name, String sort, int page) {
+        // 1. 필터링 따른 상품 이름에 해당하는 리뷰 조회
+        Slice<Review> reviews = getReviews(name, sort, page);
+
+        // 2. 데이터 갯수 null 인 경우
+        if (Objects.requireNonNull(reviews).isEmpty()) {
+            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
+                    .stream()
+                    .map(GetReviewResponseDto::of)
+                    .collect(Collectors.toList());
+            return new ReviewResponse(result, false, false);
+        }
+
+        // 3. 데이터 갯수 null 아닌 경우
+        List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent().stream()
                 .map(GetReviewResponseDto::of)
-                .collect(Collectors.toUnmodifiableList());
-        return new ReviewResponse(reviewResponse, result.hasNext());
+                .collect(Collectors.toList());
+
+        return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
+    }
+
+    /* 리뷰 상세 조회 */
+    @Transactional(readOnly = true)
+    public ReviewDetailResponse getReviewDetail(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        Users currentUser = this.getCurrentUser();
+
+        // 2. 동일한 제품명 리뷰 조회(4)
+        List<Review> relatedReviews
+                = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(review.getProductName());
+
+        if (relatedReviews.size() == 4) {
+            return ReviewDetailResponse.of(review, relatedReviews, currentUser);
+        }
+        int remain = 4 - relatedReviews.size();
+        // 3. 동일한 카테고리 중 좋아요 + 스크랩 순 정렬 조회 (나머지)
+        List<Review> restRelatedReviews
+                = this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(review.getCategory(), PageRequest.of(0, remain)).getContent();
+        // 4. 관련 리뷰 결과
+        List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
+                .collect(Collectors.toList());
+
+        return ReviewDetailResponse.of(review, totalRelatedReviews, currentUser);
+    }
+
+    /* 리뷰 좋아요 */
+    @Transactional
+    public void reviewLike(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        // 2. 현재 로그인한 회원 조회
+        Users currentUser = this.getCurrentUser();
+        this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
+        // 3. 리뷰 좋아요 카운트 증가
+        review.countReviewLikedCount();
+    }
+
+    /* 리뷰 스크랩 */
+    @Transactional
+    public void reviewScrap(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        // 2. 현재 로그인한 회원 조회
+        Users currentUser = this.getCurrentUser();
+        this.reviewScrapRepository.save(ReviewScrap.builder().review(review).users(currentUser).build());
+        // 3. 리뷰 스크랩 카운트 증가
+        review.countReviewScrapedCount();
+    }
+
+    private Slice<Review> getReviews(String name, String sort, int page) {
+        Slice<Review> reviews = null;
+        Pageable pageable = PageRequest.of(page, SIZE);
+        switch (sort) {
+            // 최신순
+            case "latest":
+                reviews = this.reviewRepository
+                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
+                break;
+            // 좋아요 많은 순
+            case "mostLiked":
+                reviews = this.reviewRepository
+                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
+                break;
+            // 스크랩 많은 순
+            case "mostScraped":
+                reviews = this.reviewRepository
+                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
+
+                // 리뷰 작성자의 팔로워가 많은 순
+            case "mostFollowers":
+                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
+                break;
+        }
+        return reviews;
     }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
@@ -109,15 +206,12 @@ public class ReviewService {
         return result;
     }
 
-    /* 팔로우 하는 유저가 등록한 리뷰 리스트 조회 메소드 */
+    /* 팔로우 하는 유저가 등록한 리뷰 리스트 최신순 7개 조회 메소드 */
     public List<ReviewResponseDto> getFollowingReviews() {
         Users users = this.getCurrentUser();
-        List<Users> followee = users.getFollowing().stream()
-                .map(Follow::getFollowee)
-                .collect(Collectors.toList());
-
-        return this.reviewRepository.findFirst7ByWriterInOrderByCreatedAtDesc(followee)
-                .stream().map(review -> review.of(this.getFirstImageWithReview(review)))
+        return this.reviewRepository.findFirst7WrittenByFollowingCreatedAtDesc(users, PageRequest.of(0, SIZE))
+                .stream()
+                .map(review -> review.of(this.getFirstImageWithReview(review)))
                 .collect(Collectors.toList());
     }
 
@@ -143,9 +237,9 @@ public class ReviewService {
                 .getImgUrl();
     }
 
-    private List<ReviewImage> getReviewImages(CreateReviewRequestDto request) {
+    private List<ReviewImage> getReviewImages(Review review, CreateReviewRequestDto request) {
         return request.getImages().stream()
-                .map(r -> ReviewImage.createReviewImage(r.getImgUrl(), request.getImages().indexOf(r)))
+                .map(r -> ReviewImage.createReviewImage(review, r.getImgUrl(), request.getImages().indexOf(r)))
                 .collect(Collectors.toList());
     }
 
@@ -167,6 +261,6 @@ public class ReviewService {
     }
 
     public List<Review> getTargetReviewList(Users user) {
-        return this.reviewRepository.findAllByTargetId(user);
+        return this.reviewRepository.findAllByTargetUser(user);
     }
 }
