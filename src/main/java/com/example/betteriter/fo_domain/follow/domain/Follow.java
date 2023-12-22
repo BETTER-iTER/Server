@@ -1,6 +1,7 @@
-package com.example.betteriter.fo_domain.user.domain;
+package com.example.betteriter.fo_domain.follow.domain;
 
 
+import com.example.betteriter.fo_domain.user.domain.Users;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

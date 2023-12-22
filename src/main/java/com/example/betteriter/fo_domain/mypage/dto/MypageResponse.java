@@ -8,10 +8,18 @@ public class MypageResponse {
     @Getter
     @Builder
     public static class MyReviewDto{
-        private Long review_id;
+        private Long reviewId;
         private String title;
-        private String profile_image;
-        private Long like_count;
-        private Long scrap_count;
+        private String profileImage;
+        private Long likeCount;
+        private Long scrapCount;
+    }
+
+    @Getter
+    @Builder
+    public static class FollowerDto {
+        private String email;
+        private String profileImage;
+        private String nickname;
     }
 }

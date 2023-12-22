@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.user.domain;
 
+import com.example.betteriter.fo_domain.follow.domain.Follow;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;

@@ -3,11 +3,12 @@ package com.example.betteriter.fo_domain.review.repository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -56,21 +57,32 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 //    List<Review> findAllByUser(Long id);
 
     @Query("SELECT r FROM REVIEW r " +
+            "WHERE r.writer = :user " +
+            "ORDER BY r.id DESC")
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByTargetUser(@Param("user") Users user);
+
+    @Query("SELECT r FROM REVIEW r " +
+            "WHERE r.writer = :user " +
+            "ORDER BY r.id DESC")
+    @Where(clause = "r.status != 'DELETED'")
+    List<Review> findAllByUser(@Param("user") Users user);
+
+    @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rs.users = :user " +
-            "GROUP BY r.id " +
-            "ORDER BY r.createdAt DESC")
-    List<Review> findAllByReviewScrapedUser(Users user);
+            "ORDER BY r.id DESC")
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByReviewScrapedUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rl.users = :user " +
-            "GROUP BY r.id " +
-            "ORDER BY r.createdAt DESC")
-    List<Review> findAllByReviewLikedUser(Users user);
-
+            "ORDER BY r.id DESC")
+    @Where(clause = "r.status = 'ACTIVE'")
+    List<Review> findAllByReviewLikedUser(@Param("user") Users user);
 
     /* 좋아요 수 많은 리뷰 조회 */
     Slice<Review> findByProductNameOrderByLikedCountDescCreatedAtDesc(String name, Pageable pageable);
