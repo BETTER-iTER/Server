@@ -14,7 +14,6 @@ import javax.persistence.*;
  * - follower : 유저를 팔로우 하는 유저
  * - followee : 유저가 팔로우 하는 유저
  **/
-
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

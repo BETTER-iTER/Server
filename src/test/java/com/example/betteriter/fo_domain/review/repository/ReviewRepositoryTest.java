@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.review.repository;
 
+import com.example.betteriter.fo_domain.follow.domain.Follow;
+import com.example.betteriter.fo_domain.follow.repository.FollowRepository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.user.domain.Follow;
 import com.example.betteriter.fo_domain.user.domain.Users;
-import com.example.betteriter.fo_domain.user.repository.FollowRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
