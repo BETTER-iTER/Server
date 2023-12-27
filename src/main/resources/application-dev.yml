@@ -1,0 +1,23 @@
+## dev(개발) env
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        format_sql: true
+
+## 개발 환경 = debug
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
