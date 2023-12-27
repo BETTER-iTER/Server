@@ -104,6 +104,15 @@ public class ReviewController {
         return ResponseDto.onSuccess(null);
     }
 
+    /* 리뷰 삭제 */
+    @DeleteMapping("/{reviewId}")
+    public ResponseDto<Void> deleteReview(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.deleteReview(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
 
     private void checkRequestValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

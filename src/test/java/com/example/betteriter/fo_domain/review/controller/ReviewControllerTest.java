@@ -5,9 +5,11 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
+import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.config.security.SecurityConfig;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
@@ -39,8 +41,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -785,5 +786,34 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.result").isNotEmpty())
                 .andExpect(jsonPath("$.result[0].id").value(1))
                 .andExpect(jsonPath("$.result[0].reviewCommentUserInfo.userId").value(1));
+    }
+
+    @Test
+    @DisplayName("리뷰을 삭제한다 - 일치하는 리뷰가 존재하지 않는다.")
+    void deleteReviewControllerTestInFail() throws Exception {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewService.deleteReview(anyLong()))
+                .willThrow(new ReviewHandler(ErrorStatus._REVIEW_NOT_FOUND));
+        // when & then
+        mockMvc.perform(delete("/review/{reviewId}", 1L).with(csrf()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.isSuccess").value(false))
+                .andExpect(jsonPath("$.code").value("REVIEW_NOT_FOUND_400"));
+    }
+
+    @Test
+    @DisplayName("리뷰를 삭제한다 - 성공")
+    void deleteReviewControllerTestInSuccess() throws Exception {
+        // given
+        Review review = createReview(1L);
+        // when
+
+        // then
+        mockMvc.perform(delete("/review/{reviewId}", 1L).with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
