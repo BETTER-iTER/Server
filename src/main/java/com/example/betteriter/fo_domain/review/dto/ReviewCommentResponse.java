@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.review.dto;
 
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Job;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 
 /**
  * - 리뷰 댓글 데이터 응답 DTO
-**/
+ **/
 @Getter
 @NoArgsConstructor
 public class ReviewCommentResponse {
@@ -31,6 +32,16 @@ public class ReviewCommentResponse {
         this.comment = comment;
         this.createdAt = createdAt;
         this.isMine = isMine;
+    }
+
+    public static ReviewCommentResponse from(Comment comment, boolean isMine) {
+        return ReviewCommentResponse.builder()
+                .id(comment.getId())
+                .reviewCommentUserInfoResponse(ReviewCommentUserInfoResponse.from(comment.getUsers()))
+                .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt() == null ? null : comment.getCreatedAt().toLocalDate())
+                .isMine(isMine)
+                .build();
     }
 
     @Getter

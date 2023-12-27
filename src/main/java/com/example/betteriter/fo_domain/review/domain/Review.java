@@ -128,6 +128,10 @@ public class Review extends BaseEntity {
         this.reviewLiked = reviewLikes;
     }
 
+    public void setReviewsComment(List<Comment> comments) {
+        this.reviewComment = comments;
+    }
+
     // 매주 월요일 자정 실행
     @Scheduled(cron = "0 0 0 ? * MON")
     public void resetClickCountsScheduler() {

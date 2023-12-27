@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.follow.service.FollowService;
 import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
@@ -141,13 +142,22 @@ public class ReviewService {
 
     /* 리뷰 상세 좋아요 조회 */
     @Transactional(readOnly = true)
-    public List<ReviewLikeResponse> getReviewDetailLike(Long reviewId) {
+    public List<ReviewLikeResponse> getReviewDetailLikes(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
 
         // 2. review 관련 reviewLike 리스트 가져오기 & 반환
         return review.getReviewLiked().stream()
                 .map(reviewLike -> ReviewLikeResponse.from(reviewLike.getUsers()))
+                .collect(Collectors.toList());
+    }
+
+    /* 리뷰 상세 댓글 조회 */
+    @Transactional(readOnly = true)
+    public List<ReviewCommentResponse> getReviewDetailComments(Long reviewId) {
+        Users currentUser = this.getCurrentUser();
+        return this.findReviewById(reviewId).getReviewComment().stream()
+                .map(comment -> ReviewCommentResponse.from(comment, this.isCurrentUserCommentReview(comment, currentUser)))
                 .collect(Collectors.toList());
     }
 
@@ -302,5 +312,10 @@ public class ReviewService {
 
     private boolean isCurrentUserFollowReviewWriter(Review review, Users currentUser) {
         return this.followService.isFollow(currentUser, review.getWriter());
+    }
+
+    /* 댓글 작성자와 로그인한 유저가 동일한지 확인 */
+    private boolean isCurrentUserCommentReview(Comment comment, Users currentUser) {
+        return currentUser.getId().equals(comment.getUsers().getId());
     }
 }

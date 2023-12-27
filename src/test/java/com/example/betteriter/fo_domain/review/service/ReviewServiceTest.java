@@ -5,6 +5,7 @@ import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService
 import com.example.betteriter.bo_domain.spec.domain.Spec;
 import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.follow.service.FollowService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
@@ -122,7 +123,10 @@ public class ReviewServiceTest {
         List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
                 ReviewLike.builder().review(review).users(user02).build());
 
+        List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").orderNum(1).groupId(1).status(ACTIVE).build(),
+                Comment.builder().users(user02).comment("comment02").orderNum(2).groupId(2).status(ACTIVE).build());
 
+        review.setReviewsComment(comments);
         review.setReviewLikes(reviewLikes);
 
         review.setReviewImage(createReviewImage(review));
@@ -481,7 +485,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("리뷰 상세 조회 좋아요 조회")
+    @DisplayName("리뷰 상세 조회 좋아요 조회을 한다.")
     void getReviewDetailLike() {
         // given
         Review review = createReview(1L);
@@ -490,7 +494,7 @@ public class ReviewServiceTest {
                 .willReturn(Optional.of(review));
 
         // when
-        List<ReviewLikeResponse> result = this.reviewService.getReviewDetailLike(1L);
+        List<ReviewLikeResponse> result = this.reviewService.getReviewDetailLikes(1L);
 
         // then
         assertThat(result).hasSize(2);
@@ -498,6 +502,28 @@ public class ReviewServiceTest {
         for (ReviewLikeResponse reviewLikeResponse : result) {
             System.out.println(reviewLikeResponse.getUserId());
             System.out.println(reviewLikeResponse.getNickname());
+        }
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 댓글 조회를 한다.")
+    void test() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(Users.builder().id(1L).email("email").roleType(ROLE_USER).build());
+        // when
+        List<ReviewCommentResponse> result = this.reviewService.getReviewDetailComments(1L);
+        // then
+        assertThat(result).hasSize(2);
+        verify(userService, times(1)).getCurrentUser();
+        for (ReviewCommentResponse reviewCommentResponse : result) {
+            System.out.println(reviewCommentResponse.getComment());
+            System.out.println(reviewCommentResponse.isMine());
         }
     }
 }

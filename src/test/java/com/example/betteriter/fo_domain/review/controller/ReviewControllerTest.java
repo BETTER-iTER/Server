@@ -551,7 +551,7 @@ class ReviewControllerTest {
         given(this.reviewService.getReviewDetail(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail", 1L))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -629,7 +629,7 @@ class ReviewControllerTest {
         given(this.reviewService.getReviewDetail(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail/", 1L))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -722,9 +722,8 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("리뷰 상세 좋아요 조회를 한다.")
-    void test() throws Exception {
+    void getReviewDetailLikeControllerTest() throws Exception {
         // given
-
         ReviewLikeResponse response01 = ReviewLikeResponse.builder()
                 .userId(1L)
                 .nickname("nick01")
@@ -742,15 +741,49 @@ class ReviewControllerTest {
 
         List<ReviewLikeResponse> response = List.of(response01, response02);
 
-        given(this.reviewService.getReviewDetailLike(anyLong()))
+        given(this.reviewService.getReviewDetailLikes(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/{reviewId}/detail/like", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail/likes", 1L))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.code").value("SUCCESS_200"))
                 .andExpect(jsonPath("$.result").isNotEmpty())
                 .andExpect(jsonPath("$.result[0].userId").value(1));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 댓글 조회를 한다.")
+    void getReviewDetailCommentsControllerTest() throws Exception {
+        // given
+
+
+        ReviewCommentResponse reviewCommentResponse01 = ReviewCommentResponse.builder()
+                .id(1L)
+                .reviewCommentUserInfoResponse(ReviewCommentResponse.ReviewCommentUserInfoResponse.builder()
+                        .userId(1L)
+                        .nickname("nick01")
+                        .job(SW_DEVELOPER)
+                        .profileImage("profileImage")
+                        .build())
+                .comment("comment01")
+                .createdAt(LocalDate.now())
+                .isMine(true)
+                .build();
+
+        List<ReviewCommentResponse> response = List.of(reviewCommentResponse01);
+
+        given(this.reviewService.getReviewDetailComments(1L))
+                .willReturn(response);
+        // when & then
+        mockMvc.perform(get("/review/{reviewId}/detail/comments", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.result").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].id").value(1))
+                .andExpect(jsonPath("$.result[0].reviewCommentUserInfo.userId").value(1));
     }
 }
