@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.PC;
+import static com.example.betteriter.global.constant.Job.CEO;
+import static com.example.betteriter.global.constant.Job.SW_DEVELOPER;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.mockito.ArgumentMatchers.*;
@@ -441,8 +443,6 @@ class ReviewControllerTest {
                 .isExpert(true).build());
 
 
-
-
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
@@ -542,7 +542,6 @@ class ReviewControllerTest {
                 .isExpert(true).build());
 
 
-
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
@@ -619,7 +618,6 @@ class ReviewControllerTest {
                 .reviewImage("reviewImage")
                 .writerName("동근")
                 .isExpert(true).build());
-
 
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
@@ -715,11 +713,44 @@ class ReviewControllerTest {
                 .willReturn(response);
 
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}",1L))
+        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.reviewDetail.manufacturer").value("삼성"))
                 .andExpect(jsonPath("$.result.reviewDetail.storeName").value(1));
+    }
 
+    @Test
+    @DisplayName("리뷰 상세 좋아요 조회를 한다.")
+    void test() throws Exception {
+        // given
+
+        ReviewLikeResponse response01 = ReviewLikeResponse.builder()
+                .userId(1L)
+                .nickname("nick01")
+                .job(CEO)
+                .profileImage("profileImage")
+                .build();
+
+        ReviewLikeResponse response02 = ReviewLikeResponse.builder()
+                .userId(2L)
+                .nickname("nick02")
+                .job(SW_DEVELOPER)
+                .profileImage("profileImage")
+                .build();
+
+
+        List<ReviewLikeResponse> response = List.of(response01, response02);
+
+        given(this.reviewService.getReviewDetailLike(anyLong()))
+                .willReturn(response);
+        // when & then
+        mockMvc.perform(get("/review/{reviewId}/detail/like", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.result").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].userId").value(1));
     }
 }

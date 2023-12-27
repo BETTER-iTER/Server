@@ -136,10 +136,10 @@ public class ReviewService {
 
         return ReviewDetailResponse.of(review, totalRelatedReviews,
                 currentUserLikeReview, currentUserScrapReview,
-                currentUserFollowReviewWriter ,isCurrentUserIsReviewWriter);
+                currentUserFollowReviewWriter, isCurrentUserIsReviewWriter);
     }
 
-    /* 리뷰 상세 조회 좋아요 조회 */
+    /* 리뷰 상세 좋아요 조회 */
     @Transactional(readOnly = true)
     public List<ReviewLikeResponse> getReviewDetailLike(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
@@ -301,6 +301,6 @@ public class ReviewService {
     }
 
     private boolean isCurrentUserFollowReviewWriter(Review review, Users currentUser) {
-        return this.followService.isFollow(currentUser,review.getWriter());
+        return this.followService.isFollow(currentUser, review.getWriter());
     }
 }
