@@ -1,6 +1,5 @@
 package com.example.betteriter.fo_domain.review.dto;
 
-import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Job;
 import lombok.Builder;

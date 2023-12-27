@@ -77,17 +77,31 @@ public class ReviewServiceTest {
 
     private static Review createReview(long count) {
 
-        Users users = Users.builder()
+        Users writer = Users.builder()
                 .id(1L)
                 .email("email")
                 .roleType(ROLE_USER)
                 .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
+        Users user01 = Users.builder()
+                .id(2L)
+                .email("email01")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nick01").job(Job.SW_DEVELOPER).build())
+                .build();
+
+        Users user02 = Users.builder()
+                .id(3L)
+                .email("email02")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nick02").job(Job.CEO).build())
+                .build();
+
 
         Review review = Review.builder()
                 .id(count)
-                .writer(users)
+                .writer(writer)
                 .category(PC)
                 .productName("productName")
                 .category(PC)
@@ -104,6 +118,12 @@ public class ReviewServiceTest {
                 .clickCount(count)
                 .shortReview("short")
                 .build();
+
+        List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
+                ReviewLike.builder().review(review).users(user02).build());
+
+
+        review.setReviewLikes(reviewLikes);
 
         review.setReviewImage(createReviewImage(review));
         return review;
@@ -458,5 +478,26 @@ public class ReviewServiceTest {
         verify(this.reviewRepository, times(1)).findById(anyLong());
         verify(this.userService, times(1)).getCurrentUser();
         verify(this.reviewScrapRepository, times(1)).save(any(ReviewScrap.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 좋아요 조회")
+    void getReviewDetailLike() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when
+        List<ReviewLikeResponse> result = this.reviewService.getReviewDetailLike(1L);
+
+        // then
+        assertThat(result).hasSize(2);
+
+        for (ReviewLikeResponse reviewLikeResponse : result) {
+            System.out.println(reviewLikeResponse.getUserId());
+            System.out.println(reviewLikeResponse.getNickname());
+        }
     }
 }
