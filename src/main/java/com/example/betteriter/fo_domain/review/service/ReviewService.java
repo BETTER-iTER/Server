@@ -26,8 +26,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_NOT_FOUND;
+import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -188,7 +187,11 @@ public class ReviewService {
     /* 리뷰 삭제 */
     @Transactional
     public Void deleteReview(Long reviewId) {
-        this.reviewRepository.delete(this.findReviewById(reviewId));
+        Review review = this.findReviewById(reviewId);
+        if (!review.getWriter().getId().equals(this.getCurrentUser().getId())) {
+            throw new ReviewHandler(_REVIEW_WRITER_IS_NOT_MATCH);
+        }
+        this.reviewRepository.delete(review);
         return null;
     }
 
