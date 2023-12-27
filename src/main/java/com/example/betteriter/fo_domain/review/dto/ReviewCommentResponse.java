@@ -39,7 +39,7 @@ public class ReviewCommentResponse {
                 .id(comment.getId())
                 .reviewCommentUserInfoResponse(ReviewCommentUserInfoResponse.from(comment.getUsers()))
                 .comment(comment.getComment())
-                .createdAt(comment.getCreatedAt() == null ? null : comment.getCreatedAt().toLocalDate())
+                .createdAt(comment.getCreatedAt().toLocalDate())
                 .isMine(isMine)
                 .build();
     }

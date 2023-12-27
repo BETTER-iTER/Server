@@ -120,14 +120,17 @@ public class Review extends BaseEntity {
         this.likedCount += 1;
     }
 
+    // TODO : 제거
     public void setReviewImage(ReviewImage reviewImage) {
         this.reviewImages.add(reviewImage);
     }
 
+    // TODO : 제거
     public void setReviewLikes(List<ReviewLike> reviewLikes) {
         this.reviewLiked = reviewLikes;
     }
 
+    // TODO : 제거
     public void setReviewsComment(List<Comment> comments) {
         this.reviewComment = comments;
     }
