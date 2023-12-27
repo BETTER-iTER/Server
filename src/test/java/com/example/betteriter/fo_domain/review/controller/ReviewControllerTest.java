@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.betteriter.global.constant.Category.PC;
+import static com.example.betteriter.global.constant.Job.CEO;
+import static com.example.betteriter.global.constant.Job.SW_DEVELOPER;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.mockito.ArgumentMatchers.*;
@@ -411,7 +413,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -440,34 +442,11 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
-
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .build()))
-                .build();
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))
@@ -533,7 +512,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -562,41 +541,17 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
-
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .isMine(true)
-                        .build()))
-                .build();
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail", 1L))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -633,7 +588,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -664,41 +619,17 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
-
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .isMine(true)
-                        .build()))
-                .build();
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail/", 1L))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -707,5 +638,152 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.result.reviewCommentInfo.reviewComments[0].mine").value(true))
                 .andExpect(jsonPath("$.result.reviewDetail.like").value(true))
                 .andExpect(jsonPath("$.result.reviewDetail.scrap").value(true));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 API 변경으로 인한 컨트롤러 테스트 재진행")
+    void getReviewDetailTest03() throws Exception {
+        // given
+
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
+                .build();
+
+        Review review = Review.builder()
+                .writer(users)
+                .category(PC)
+                .productName("productName")
+                .category(PC)
+                .price(10)
+                .storeName(1)
+                .status(ACTIVE)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("short")
+                .build();
+
+        GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
+                .reviewId(1L)
+                .productName("productName")
+                .reviewSpecData(List.of("spec1", "spec2"))
+                .starPoint(2.0)
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .shortReview("shortReview")
+                .manufacturer("삼성")
+                .storeName(1)
+                .boughtAt(LocalDate.of(2023, 12, 12))
+                .createdAt(LocalDate.of(2023, 12, 22))
+                .reviewImages(List.of(GetReviewImageResponseDto.builder().imgUrl("imageUrl").orderNum(1).build()))
+                .scrapedCount(2L)
+                .likedCount(3L)
+                .commentCount(100L)
+                .isFollow(true)
+                .isMine(false)
+                .isLike(true)
+                .isScrap(true)
+                .build();
+
+        ReviewDetailResponse.GetUserResponseDto writerInfo = ReviewDetailResponse.GetUserResponseDto.builder()
+                .id(1L)
+                .nickName("nickName")
+                .job(Job.SW_DEVELOPER)
+                .profileImage("profileImage")
+                .isExpert(true)
+                .build();
+
+        List<ReviewDetailResponse.GetRelatedReviewResponseDto> getRelatedReviewResponseDtos
+                = List.of(ReviewDetailResponse.GetRelatedReviewResponseDto.builder().productName("productName")
+                .reviewImage("reviewImage")
+                .writerName("동근")
+                .isExpert(true).build());
+
+        ReviewDetailResponse response = ReviewDetailResponse.builder()
+                .getReviewDetailResponseDto(getReviewDetailResponseDto)
+                .writerInfo(writerInfo)
+                .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
+                .build();
+
+        given(this.reviewService.getReviewDetail(anyLong()))
+                .willReturn(response);
+
+        // when & then
+        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.reviewDetail.manufacturer").value("삼성"))
+                .andExpect(jsonPath("$.result.reviewDetail.storeName").value(1));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 좋아요 조회를 한다.")
+    void getReviewDetailLikeControllerTest() throws Exception {
+        // given
+        ReviewLikeResponse response01 = ReviewLikeResponse.builder()
+                .userId(1L)
+                .nickname("nick01")
+                .job(CEO)
+                .profileImage("profileImage")
+                .build();
+
+        ReviewLikeResponse response02 = ReviewLikeResponse.builder()
+                .userId(2L)
+                .nickname("nick02")
+                .job(SW_DEVELOPER)
+                .profileImage("profileImage")
+                .build();
+
+
+        List<ReviewLikeResponse> response = List.of(response01, response02);
+
+        given(this.reviewService.getReviewDetailLikes(anyLong()))
+                .willReturn(response);
+        // when & then
+        mockMvc.perform(get("/review/{reviewId}/detail/likes", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.result").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].userId").value(1));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 댓글 조회를 한다.")
+    void getReviewDetailCommentsControllerTest() throws Exception {
+        // given
+
+
+        ReviewCommentResponse reviewCommentResponse01 = ReviewCommentResponse.builder()
+                .id(1L)
+                .reviewCommentUserInfoResponse(ReviewCommentResponse.ReviewCommentUserInfoResponse.builder()
+                        .userId(1L)
+                        .nickname("nick01")
+                        .job(SW_DEVELOPER)
+                        .profileImage("profileImage")
+                        .build())
+                .comment("comment01")
+                .createdAt(LocalDate.now())
+                .isMine(true)
+                .build();
+
+        List<ReviewCommentResponse> response = List.of(reviewCommentResponse01);
+
+        given(this.reviewService.getReviewDetailComments(1L))
+                .willReturn(response);
+        // when & then
+        mockMvc.perform(get("/review/{reviewId}/detail/comments", 1L))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.code").value("SUCCESS_200"))
+                .andExpect(jsonPath("$.result").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].id").value(1))
+                .andExpect(jsonPath("$.result[0].reviewCommentUserInfo.userId").value(1));
     }
 }

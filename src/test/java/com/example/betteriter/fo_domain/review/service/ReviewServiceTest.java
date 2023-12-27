@@ -5,6 +5,8 @@ import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService
 import com.example.betteriter.bo_domain.spec.domain.Spec;
 import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
+import com.example.betteriter.fo_domain.follow.service.FollowService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
@@ -37,7 +39,6 @@ import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.byLessThan;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -58,6 +59,9 @@ public class ReviewServiceTest {
     private ManufacturerService manufacturerService;
 
     @Mock
+    private FollowService followService;
+
+    @Mock
     private ReviewRepository reviewRepository;
 
     @Mock
@@ -74,16 +78,31 @@ public class ReviewServiceTest {
 
     private static Review createReview(long count) {
 
-        Users users = Users.builder()
+        Users writer = Users.builder()
+                .id(1L)
                 .email("email")
                 .roleType(ROLE_USER)
                 .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
                 .build();
 
+        Users user01 = Users.builder()
+                .id(2L)
+                .email("email01")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nick01").job(Job.SW_DEVELOPER).build())
+                .build();
+
+        Users user02 = Users.builder()
+                .id(3L)
+                .email("email02")
+                .roleType(ROLE_USER)
+                .usersDetail(UsersDetail.builder().nickName("nick02").job(Job.CEO).build())
+                .build();
+
 
         Review review = Review.builder()
                 .id(count)
-                .writer(users)
+                .writer(writer)
                 .category(PC)
                 .productName("productName")
                 .category(PC)
@@ -100,6 +119,15 @@ public class ReviewServiceTest {
                 .clickCount(count)
                 .shortReview("short")
                 .build();
+
+        List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
+                ReviewLike.builder().review(review).users(user02).build());
+
+        List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").orderNum(1).groupId(1).status(ACTIVE).build(),
+                Comment.builder().users(user02).comment("comment02").orderNum(2).groupId(2).status(ACTIVE).build());
+
+        review.setReviewsComment(comments);
+        review.setReviewLikes(reviewLikes);
 
         review.setReviewImage(createReviewImage(review));
         return review;
@@ -329,8 +357,16 @@ public class ReviewServiceTest {
         // given
         Review review = createReview(1L);
 
+        Users currentUser = Users.builder()
+                .email("danaver12@daum.net")
+                .roleType(ROLE_USER)
+                .build();
+
         given(this.reviewRepository.findById(review.getId()))
                 .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 */
         given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
@@ -338,7 +374,7 @@ public class ReviewServiceTest {
         // when
         ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
         // then
-        assertThat(reviewDetail.getGetReviewDetailResponseDto().getId()).isEqualTo(1L);
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getReviewId()).isEqualTo(1L);
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
         assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
@@ -353,8 +389,16 @@ public class ReviewServiceTest {
         // given
         Review review = createReview(1L);
 
+        Users currentUser = Users.builder()
+                .email("danaver12@daum.net")
+                .roleType(ROLE_USER)
+                .build();
+
         given(this.reviewRepository.findById(review.getId()))
                 .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 (2개) */
         given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
@@ -362,15 +406,16 @@ public class ReviewServiceTest {
         /* 동일한 카테고리 리뷰 조회 (2개) */
         given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(), any()))
                 .willReturn(new SliceImpl<>(List.of(createReview(3L), createReview(4L))));
+
         // when
         ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
         // then
-        assertThat(reviewDetail.getGetReviewDetailResponseDto().getId()).isEqualTo(1L);
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getReviewId()).isEqualTo(1L);
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
         assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
         assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
-        assertThat(reviewDetail.getReviewLikeInfo().getReviewLikedCount()).isEqualTo(review.getLikedCount());
+
         verify(reviewRepository, times(1)).findById(anyLong());
         verify(reviewRepository, times(1)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
     }
@@ -410,7 +455,7 @@ public class ReviewServiceTest {
 
     @Test
     @DisplayName("리뷰 스크랩을 한다.")
-    void reviewScrapServiceTest(){
+    void reviewScrapServiceTest() {
         // given
 
         // 스크랩 하는 리뷰
@@ -434,8 +479,51 @@ public class ReviewServiceTest {
 
         // when
         // then
-        verify(this.reviewRepository,times(1)).findById(anyLong());
-        verify(this.userService,times(1)).getCurrentUser();
-        verify(this.reviewScrapRepository,times(1)).save(any(ReviewScrap.class));
+        verify(this.reviewRepository, times(1)).findById(anyLong());
+        verify(this.userService, times(1)).getCurrentUser();
+        verify(this.reviewScrapRepository, times(1)).save(any(ReviewScrap.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 좋아요 조회을 한다.")
+    void getReviewDetailLike() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when
+        List<ReviewLikeResponse> result = this.reviewService.getReviewDetailLikes(1L);
+
+        // then
+        assertThat(result).hasSize(2);
+
+        for (ReviewLikeResponse reviewLikeResponse : result) {
+            System.out.println(reviewLikeResponse.getUserId());
+            System.out.println(reviewLikeResponse.getNickname());
+        }
+    }
+
+    @Test
+    @DisplayName("리뷰 상세 조회 댓글 조회를 한다.")
+    void test() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(Users.builder().id(1L).email("email").roleType(ROLE_USER).build());
+        // when
+        List<ReviewCommentResponse> result = this.reviewService.getReviewDetailComments(1L);
+        // then
+        assertThat(result).hasSize(2);
+        verify(userService, times(1)).getCurrentUser();
+        for (ReviewCommentResponse reviewCommentResponse : result) {
+            System.out.println(reviewCommentResponse.getComment());
+            System.out.println(reviewCommentResponse.isMine());
+        }
     }
 }

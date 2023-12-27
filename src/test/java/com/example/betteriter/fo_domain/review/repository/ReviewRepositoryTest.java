@@ -784,4 +784,22 @@ public class ReviewRepositoryTest {
         review.ifPresent(value -> System.out.println("hello" + value.getReviewLiked().size()));
         // then
     }
+
+    @Test
+    @DisplayName("동일한 제품명을 좋아요 + 스크랩 많은 순으로 조회한다.")
+    void findTop4ByProductNameOrderByScrapedCntPlusLikedCntDescTest(){
+        // given
+        Review review01 = createReview(1L);
+        Review review02 = createReview(2L);
+        Review review03 = createReview(3L);
+        Review review04 = createReview(4L);
+
+        List<Review> reviews = this.reviewRepository.saveAll(List.of(review01, review02, review03, review04));
+
+        // when
+        List<Review> result = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc("productName");
+        // then
+        assertThat(result).hasSize(4);
+        assertThat(result.get(0).getProductName()).isEqualTo("productName");
+    }
 }

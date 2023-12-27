@@ -40,32 +40,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Slice<Review> findByProductNameOrderByCreatedAtDesc(String name, Pageable pageable);
 
 
-//    @Query("SELECT r FROM REVIEW r " +
-//            "LEFT JOIN r.reviewLiked rl " +
-//            "LEFT JOIN r.reviewScraped rs " +
-//            "WHERE rs.users = :user " +
-//            "GROUP BY r.id " +
-//            "ORDER BY r.createdAt DESC")
-//    List<Review> findAllByTargetId(Long id);
-//
-//    @Query("SELECT r FROM REVIEW r " +
-//            "LEFT JOIN r.reviewLiked rl " +
-//            "LEFT JOIN r.reviewScraped rs " +
-//            "WHERE rs.users = :user " +
-//            "GROUP BY r.id " +
-//            "ORDER BY r.createdAt DESC")
-//    List<Review> findAllByUser(Long id);
 
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
             "ORDER BY r.id DESC")
-    @Where(clause = "r.status = 'ACTIVE'")
     List<Review> findAllByTargetUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
             "ORDER BY r.id DESC")
-    @Where(clause = "r.status != 'DELETED'")
     List<Review> findAllByUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
@@ -73,7 +56,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rs.users = :user " +
             "ORDER BY r.id DESC")
-    @Where(clause = "r.status = 'ACTIVE'")
     List<Review> findAllByReviewScrapedUser(@Param("user") Users user);
 
     @Query("SELECT r FROM REVIEW r " +
@@ -81,7 +63,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rl.users = :user " +
             "ORDER BY r.id DESC")
-    @Where(clause = "r.status = 'ACTIVE'")
     List<Review> findAllByReviewLikedUser(@Param("user") Users user);
 
     /* 좋아요 수 많은 리뷰 조회 */

@@ -2,6 +2,8 @@ package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
 import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.fo_domain.comment.domain.Comment;
+import com.example.betteriter.fo_domain.follow.service.FollowService;
 import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
@@ -35,6 +37,7 @@ public class ReviewService {
     private final UserService userService;
     private final SpecService specService;
     private final ManufacturerService manufacturerService;
+    private final FollowService followService;
 
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewScrapRepository reviewScrapRepository;
@@ -115,8 +118,14 @@ public class ReviewService {
         List<Review> relatedReviews
                 = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(review.getProductName());
 
+        boolean currentUserLikeReview = this.isCurrentUserLikeReview(review, currentUser);
+        boolean currentUserScrapReview = this.isCurrentUserScrapReview(review, currentUser);
+        boolean currentUserFollowReviewWriter = this.isCurrentUserFollowReviewWriter(review, currentUser);
+        boolean isCurrentUserIsReviewWriter = this.currentUserIsReviewWriter(review, currentUser);
+
         if (relatedReviews.size() == 4) {
-            return ReviewDetailResponse.of(review, relatedReviews, currentUser);
+            return ReviewDetailResponse.of(review, relatedReviews,
+                    currentUserLikeReview, currentUserScrapReview, currentUserFollowReviewWriter, isCurrentUserIsReviewWriter);
         }
         int remain = 4 - relatedReviews.size();
         // 3. 동일한 카테고리 중 좋아요 + 스크랩 순 정렬 조회 (나머지)
@@ -126,7 +135,30 @@ public class ReviewService {
         List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
                 .collect(Collectors.toList());
 
-        return ReviewDetailResponse.of(review, totalRelatedReviews, currentUser);
+        return ReviewDetailResponse.of(review, totalRelatedReviews,
+                currentUserLikeReview, currentUserScrapReview,
+                currentUserFollowReviewWriter, isCurrentUserIsReviewWriter);
+    }
+
+    /* 리뷰 상세 좋아요 조회 */
+    @Transactional(readOnly = true)
+    public List<ReviewLikeResponse> getReviewDetailLikes(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+
+        // 2. review 관련 reviewLike 리스트 가져오기 & 반환
+        return review.getReviewLiked().stream()
+                .map(reviewLike -> ReviewLikeResponse.from(reviewLike.getUsers()))
+                .collect(Collectors.toList());
+    }
+
+    /* 리뷰 상세 댓글 조회 */
+    @Transactional(readOnly = true)
+    public List<ReviewCommentResponse> getReviewDetailComments(Long reviewId) {
+        Users currentUser = this.getCurrentUser();
+        return this.findReviewById(reviewId).getReviewComment().stream()
+                .map(comment -> ReviewCommentResponse.from(comment, this.isCurrentUserCommentReview(comment, currentUser)))
+                .collect(Collectors.toList());
     }
 
     /* 리뷰 좋아요 */
@@ -262,5 +294,28 @@ public class ReviewService {
 
     public List<Review> getTargetReviewList(Users user) {
         return this.reviewRepository.findAllByTargetUser(user);
+    }
+
+    private boolean isCurrentUserLikeReview(Review review, Users currentUser) {
+        return review.getReviewLiked().stream()
+                .anyMatch(reviewLike -> reviewLike.getUsers().getId().equals(currentUser.getId()));
+    }
+
+    private boolean isCurrentUserScrapReview(Review review, Users currentUser) {
+        return review.getReviewScraped().stream()
+                .anyMatch(reviewScrap -> reviewScrap.getUsers().getId().equals(currentUser.getId()));
+    }
+
+    private boolean currentUserIsReviewWriter(Review review, Users currentUser) {
+        return review.getWriter().getId().equals(currentUser.getId());
+    }
+
+    private boolean isCurrentUserFollowReviewWriter(Review review, Users currentUser) {
+        return this.followService.isFollow(currentUser, review.getWriter());
+    }
+
+    /* 댓글 작성자와 로그인한 유저가 동일한지 확인 */
+    private boolean isCurrentUserCommentReview(Comment comment, Users currentUser) {
+        return currentUser.getId().equals(comment.getUsers().getId());
     }
 }
