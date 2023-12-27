@@ -507,7 +507,7 @@ public class ReviewServiceTest {
 
     @Test
     @DisplayName("리뷰 상세 조회 댓글 조회를 한다.")
-    void test() {
+    void getReviewDetailCommentsServiceTest() {
         // given
         Review review = createReview(1L);
 
@@ -525,5 +525,21 @@ public class ReviewServiceTest {
             System.out.println(reviewCommentResponse.getComment());
             System.out.println(reviewCommentResponse.isMine());
         }
+    }
+
+    @Test
+    @DisplayName("")
+    void deleteReviewServiceTest() {
+        // given
+        Review review = createReview(1L);
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when
+        this.reviewService.deleteReview(1L);
+        // then
+        verify(this.reviewRepository, times(1)).findById(anyLong());
+        verify(this.reviewRepository, times(1)).delete(any(Review.class));
     }
 }

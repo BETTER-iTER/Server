@@ -185,6 +185,13 @@ public class ReviewService {
         review.countReviewScrapedCount();
     }
 
+    /* 리뷰 삭제 */
+    @Transactional
+    public Void deleteReview(Long reviewId) {
+        this.reviewRepository.delete(this.findReviewById(reviewId));
+        return null;
+    }
+
     private Slice<Review> getReviews(String name, String sort, int page) {
         Slice<Review> reviews = null;
         Pageable pageable = PageRequest.of(page, SIZE);
