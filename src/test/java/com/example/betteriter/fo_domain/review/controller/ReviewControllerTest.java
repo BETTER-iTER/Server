@@ -411,7 +411,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -440,34 +440,13 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
 
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .build()))
-                .build();
+
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))
@@ -533,7 +512,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -562,35 +541,12 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
 
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .isMine(true)
-                        .build()))
-                .build();
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))
@@ -633,7 +589,7 @@ class ReviewControllerTest {
                 .build();
 
         GetReviewDetailResponseDto getReviewDetailResponseDto = GetReviewDetailResponseDto.builder()
-                .id(1L)
+                .reviewId(1L)
                 .productName("productName")
                 .reviewSpecData(List.of("spec1", "spec2"))
                 .starPoint(2.0)
@@ -664,35 +620,12 @@ class ReviewControllerTest {
                 .writerName("동근")
                 .isExpert(true).build());
 
-        ReviewDetailResponse.ReviewLikeInfo reviewLikeInfo = ReviewDetailResponse.ReviewLikeInfo.builder()
-                .reviewLikeUserInfo(List.of(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                        .nickName("nickName")
-                        .job(Job.SW_DEVELOPER)
-                        .profileImage("profileImage")
-                        .build()))
-                .reviewLikedCount(2L)
-                .build();
 
-        ReviewDetailResponse.ReviewCommentInfo reviewCommentInfo = ReviewDetailResponse.ReviewCommentInfo.builder().
-                reviewCommentCount(2L)
-                .reviewCommentResponses(List.of(ReviewDetailResponse.ReviewCommentInfo.ReviewCommentResponse.builder()
-                        .reviewCommentUserInfo(ReviewDetailResponse.GetUserResponseForLikeAndComment.builder()
-                                .nickName("nickName")
-                                .job(Job.SW_DEVELOPER)
-                                .profileImage("profileImage")
-                                .build())
-                        .comment("comment")
-                        .commentCreatedAt(LocalDate.now())
-                        .isMine(true)
-                        .build()))
-                .build();
 
         ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .getReviewDetailResponseDto(getReviewDetailResponseDto)
                 .writerInfo(writerInfo)
                 .getRelatedReviewResponseDto(getRelatedReviewResponseDtos)
-                .reviewLikeInfo(reviewLikeInfo)
-                .reviewCommentInfo(reviewCommentInfo)
                 .build();
 
         given(this.reviewService.getReviewDetail(anyLong()))

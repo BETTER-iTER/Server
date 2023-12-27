@@ -44,7 +44,7 @@ public class MypageController {
     }
 
     /**
-     * 내가 쓴 리뷰 조회
+     * 내가 스크랩한 리뷰 조회
      *
      * @param id 사용자 id
      * @return List<MypageResponse.MyReviewDto>
@@ -58,7 +58,7 @@ public class MypageController {
     }
 
     /**
-     * 내가 쓴 리뷰 조회
+     * 내가 좋아요 한 리뷰 조회
      *
      * @param id 사용자 id
      * @return List<MypageResponse.MyReviewDto>
@@ -72,7 +72,7 @@ public class MypageController {
     }
 
     /**
-     * 팔로워 조회 (내가 팔로우한 사람)
+     * 팔로워 조회 (나를 팔로우 하는 사람)
      *
      * @param id 사용자 id
      * @return List<MypageResponse.FollowerDto>
@@ -86,7 +86,7 @@ public class MypageController {
     }
 
     /**
-     * 팔로잉 조회 (나를 팔로우한 사람)
+     * 팔로잉 조회 (내가 팔로잉 하는 사람)
      *
      * @param id 사용자 id
      * @return List<MypageResponse.FollowerDto>
