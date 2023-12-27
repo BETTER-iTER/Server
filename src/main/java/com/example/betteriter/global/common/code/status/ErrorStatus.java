@@ -60,6 +60,7 @@ public enum ErrorStatus implements BaseErrorCode {
     _REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_NOT_FOUND_400", "일치하는 리뷰 정보를 찾을 수 없습니다."),
     _REVIEW_NOT_ACTIVATE(HttpStatus.BAD_REQUEST, "REVIEW_NOT_ACTIVATE_400", "삭제되었거나 비공개된 리뷰입니다."),
     _REVIEW_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_IMAGE_NOT_FOUND_400", "일치하는 리뷰 이미지 정보를 찾을 수 없습니다."),
+    _REVIEW_WRITER_IS_NOT_MATCH(HttpStatus.BAD_REQUEST, "REVIEW_WRITER_IS_NOT_MATCH_400", "리뷰의 작성자가 아닙니다."),
 
     // News
     _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
