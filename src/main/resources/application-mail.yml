@@ -1,0 +1,22 @@
+## mail
+spring:
+  config:
+    activate:
+      on-profile: "mail"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD:password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+      auth-code-expiration-millis: 1800000 # 30 * 60 mills (인증 코드 만료 기간)
