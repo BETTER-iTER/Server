@@ -61,4 +61,14 @@ public class MypageResponse {
         private Integer scrapCount;
     }
 
+    @Getter
+    @Builder
+    public static class PointDetailDto {
+        private Long id;
+        private Integer totalPoint;
+        private Integer totalReviewCount;
+        private Integer totalLikeCount;
+        private Integer totalScrapCount;
+    }
+
 }

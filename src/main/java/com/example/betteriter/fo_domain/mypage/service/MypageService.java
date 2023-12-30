@@ -79,4 +79,16 @@ public class MypageService {
         Users user = userService.getCurrentUser();
         return followService.getFolloweeCount(user);
     }
+
+    public Users getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
+    public Integer getTotalLikeCount(Users user) {
+        return reviewService.getTotalLikeCount(user);
+    }
+
+    public Integer getTotalScrapCount(Users user) {
+        return reviewService.getTotalScrapCount(user);
+    }
 }

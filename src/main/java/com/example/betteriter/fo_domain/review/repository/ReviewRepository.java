@@ -4,7 +4,6 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 import io.lettuce.core.dynamic.annotation.Param;
-import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -101,5 +100,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COALESCE(COUNT(r), 0) FROM REVIEW r " +
             "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
             "WHERE rs.users = :user")
+    Integer countByMyScrap(Users user);
+
+    @Query("SELECT COALESCE(COUNT(rl), 0) FROM REVIEW r " +
+            "LEFT JOIN REVIEW_LIKE rl on r.id = rl.id " +
+            "WHERE r.writer = :user")
+    Integer countByReviewLiked(Users user);
+
+    @Query("SELECT COALESCE(COUNT(rs), 0) FROM REVIEW r " +
+            "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
+            "WHERE r.writer = :user")
     Integer countByReviewScraped(Users user);
 }

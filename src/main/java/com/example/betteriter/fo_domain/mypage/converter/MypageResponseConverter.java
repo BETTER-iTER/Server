@@ -66,4 +66,20 @@ public class MypageResponseConverter {
                 .followingCount(followingCount)
                 .build();
     }
+
+    public static MypageResponse.PointDetailDto toPointDetailDto(
+            Users user, Integer totalLikeCount, Integer totalScrapCount
+    ) {
+        Integer totalPoint = user.getReviews().size() * 20 +
+                totalLikeCount * 7 +
+                totalScrapCount * 10;
+
+        return MypageResponse.PointDetailDto.builder()
+                .id(user.getId())
+                .totalPoint(totalPoint)
+                .totalReviewCount(user.getReviews().size())
+                .totalLikeCount(totalLikeCount)
+                .totalScrapCount(totalScrapCount)
+                .build();
+    }
 }
