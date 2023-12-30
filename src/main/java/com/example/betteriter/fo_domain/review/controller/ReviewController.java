@@ -1,9 +1,6 @@
 package com.example.betteriter.fo_domain.review.controller;
 
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
@@ -16,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._METHOD_ARGUMENT_ERROR;
 
@@ -65,11 +63,27 @@ public class ReviewController {
     }
 
     /* 리뷰 상세 조회 */
-    @GetMapping("/detail/{reviewId}")
+    @GetMapping("{reviewId}/detail")
     public ResponseDto<ReviewDetailResponse> getReviewDetail(
             @PathVariable Long reviewId
     ) {
         return ResponseDto.onSuccess(this.reviewService.getReviewDetail(reviewId));
+    }
+
+    /* 리뷰 상세 좋아요 정보 조회 */
+    @GetMapping("/{reviewId}/detail/likes")
+    public ResponseDto<List<ReviewLikeResponse>> getReviewDetailLikes(
+            @PathVariable Long reviewId
+    ) {
+        return ResponseDto.onSuccess(this.reviewService.getReviewDetailLikes(reviewId));
+    }
+
+    /* 리뷰 상세 댓글 정보 조회 */
+    @GetMapping("/{reviewId}/detail/comments")
+    public ResponseDto<List<ReviewCommentResponse>> getReviewDetailComments(
+            @PathVariable Long reviewId
+    ) {
+        return ResponseDto.onSuccess(this.reviewService.getReviewDetailComments(reviewId));
     }
 
     /* 리뷰 좋아요 */
@@ -87,6 +101,15 @@ public class ReviewController {
             @PathVariable Long reviewId
     ) {
         this.reviewService.reviewScrap(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
+    /* 리뷰 삭제 */
+    @DeleteMapping("/{reviewId}")
+    public ResponseDto<Void> deleteReview(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.deleteReview(reviewId);
         return ResponseDto.onSuccess(null);
     }
 

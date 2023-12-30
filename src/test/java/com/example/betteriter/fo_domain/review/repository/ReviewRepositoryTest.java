@@ -1,11 +1,11 @@
 package com.example.betteriter.fo_domain.review.repository;
 
+import com.example.betteriter.fo_domain.follow.domain.Follow;
+import com.example.betteriter.fo_domain.follow.repository.FollowRepository;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.user.domain.Follow;
 import com.example.betteriter.fo_domain.user.domain.Users;
-import com.example.betteriter.fo_domain.user.repository.FollowRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -783,5 +783,23 @@ public class ReviewRepositoryTest {
         Optional<Review> review = this.reviewRepository.findById(1L);
         review.ifPresent(value -> System.out.println("hello" + value.getReviewLiked().size()));
         // then
+    }
+
+    @Test
+    @DisplayName("동일한 제품명을 좋아요 + 스크랩 많은 순으로 조회한다.")
+    void findTop4ByProductNameOrderByScrapedCntPlusLikedCntDescTest(){
+        // given
+        Review review01 = createReview(1L);
+        Review review02 = createReview(2L);
+        Review review03 = createReview(3L);
+        Review review04 = createReview(4L);
+
+        List<Review> reviews = this.reviewRepository.saveAll(List.of(review01, review02, review03, review04));
+
+        // when
+        List<Review> result = this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc("productName");
+        // then
+        assertThat(result).hasSize(4);
+        assertThat(result.get(0).getProductName()).isEqualTo("productName");
     }
 }

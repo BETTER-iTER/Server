@@ -44,14 +44,6 @@ public class FollowService {
 
         followWriteRepository.delete(follow);
     }
-
-    private Follow findFollowData(Users user, Users targetUser) {
-        Follow follow = followReadRepository.findByFolloweeIdAndFollowerId(user.getId(), targetUser.getId());
-        if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
-
-        return follow;
-    }
-
     @Transactional(readOnly = true)
     public List<Users> getFollowerList(Users user) {
         List<Follow> followers = followReadRepository.findByFollowerId(user.getId());
@@ -70,9 +62,14 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public boolean isFollow(Users currentUser, Users user) {
-        Follow follow = followReadRepository.findByFolloweeIdAndFollowerId(user.getId(), currentUser.getId());
-        return follow != null;
+    public boolean isFollow(Users follower, Users followee) {
+        return this.followReadRepository.existsByFollowerAndFollowee(follower,followee);
+    }
+
+    private Follow findFollowData(Users user, Users targetUser) {
+        Follow follow = followReadRepository.findByFolloweeIdAndFollowerId(user.getId(), targetUser.getId());
+        if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
+
+        return follow;
     }
 }
