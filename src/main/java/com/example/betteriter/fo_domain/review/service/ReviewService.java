@@ -290,16 +290,19 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewHandler(_REVIEW_NOT_FOUND));
     }
 
-    public List<Review> getReviewList(Users user) {
-        return this.reviewRepository.findAllByUser(user);
+    public List<Review> getReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByUser(user, pageable);
     }
 
-    public List<Review> getScrapReviewList(Users user) {
-        return this.reviewRepository.findAllByReviewScrapedUser(user);
+    public List<Review> getScrapReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByReviewScrapedUser(user, pageable);
     }
 
-    public List<Review> getLikeReviewList(Users user) {
-        return this.reviewRepository.findAllByReviewLikedUser(user);
+    public List<Review> getLikeReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByReviewLikedUser(user, pageable);
     }
 
     public List<Review> getTargetReviewList(Users user) {
@@ -327,5 +330,13 @@ public class ReviewService {
     /* 댓글 작성자와 로그인한 유저가 동일한지 확인 */
     private boolean isCurrentUserCommentReview(Comment comment, Users currentUser) {
         return currentUser.getId().equals(comment.getUsers().getId());
+    }
+
+    public Integer getReviewCount(Users user) {
+        return this.reviewRepository.countByWriter(user);
+    }
+
+    public Integer getScrapCount(Users user) {
+        return this.reviewRepository.countByReviewScraped(user);
     }
 }

@@ -5,16 +5,15 @@ import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class FollowRequest {
 
     @Getter
     @Builder
     public static class FollowingDto {
-
-        @Email(message = "이메일 형식이 아닙니다.")
-        @NotEmpty(message = "이메일은 필수 입력 값입니다.")
-        private String email;
+        @NotNull
+        private Long targetId;
     }
 
     @Getter

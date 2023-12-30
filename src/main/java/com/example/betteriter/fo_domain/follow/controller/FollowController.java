@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @Tag(name = "FollowController", description = "Follow API")
 @Slf4j
 @RequiredArgsConstructor
@@ -27,14 +29,16 @@ public class FollowController {
      * 1. 팔로우
      * - /follow/following
      *
+     * TODO: 팔로우 요청시 api 메서드 호출도 되지 않은 시점에서 400 에러 발생
+     *
      * @param followingRequestDto : 팔로우 요청 DTO
      * @return followingResponseDto : 팔로우 응답 DTO
      */
     @PostMapping("/following")
     public ResponseDto<FollowResponse.FollowingDto> following(
-           @RequestBody FollowRequest.FollowingDto followingRequestDto
+           @RequestBody @Valid FollowRequest.FollowingDto followingRequestDto
     ) {
-        Follow follow = this.followService.following(followingRequestDto);
+        Follow follow = followService.following(followingRequestDto);
         return ResponseDto.onSuccess(FollowResponseConverter.toFollowingDto(follow));
     }
 
@@ -47,9 +51,9 @@ public class FollowController {
      */
     @PostMapping("/unfollowing")
     public ResponseDto<FollowResponse.UnfollowingDto> unfollowing(
-           @RequestBody FollowRequest.UnfollowingDto unfollowingRequestDto
+           @RequestBody @Valid FollowRequest.UnfollowingDto unfollowingRequestDto
     ) {
-        this.followService.unfollowing(unfollowingRequestDto);
+        followService.unfollowing(unfollowingRequestDto);
         return ResponseDto.onSuccess(FollowResponseConverter.toUnfollowingDto());
     }
 }

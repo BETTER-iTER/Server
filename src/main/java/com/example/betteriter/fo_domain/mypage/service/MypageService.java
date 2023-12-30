@@ -21,76 +21,62 @@ import java.util.Objects;
 @Service
 public class MypageService {
 
+    private static final int SIZE = 10;
+
     private final UserService userService;
     private final ReviewService reviewService;
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public List<Review> getMyReviewList() {
+    public List<Review> getMyReviewList(int page) {
         Users user = userService.getCurrentUser();
-        return reviewService.getReviewList(user);
+        return reviewService.getReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getScrapReviewList(Long id) {
-        Users user = userService.getUserById(id);
-        return reviewService.getScrapReviewList(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Review> getLikeReviewList(Long id) {
-        Users user = userService.getUserById(id);
-        return reviewService.getLikeReviewList(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Review> getTargetReviewList(Long id){
-        Users user = userService.getUserById(id);
-        return reviewService.getTargetReviewList(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Users> getFollowerList(Long id) {
-        Users user = userService.getUserById(id);
-        return followService.getFollowerList(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Users> getFolloweeList(Long id) {
-        Users user = userService.getUserById(id);
-        return followService.getFolloweeList(user);
-    }
-
-    public boolean checkUserSelf(String email) {
+    public List<Review> getScrapReviewList(int page) {
         Users user = userService.getCurrentUser();
-        return user.getEmail().equals(email);
-    }
-
-    public boolean checkUserSelf(Long id) {
-        Users user = userService.getCurrentUser();
-        return user.getId().equals(id);
+        return reviewService.getScrapReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public MypageResponse.UserProfileDto getUserProfile(Long id) {
-        Users user = userService.getUserById(id);
-        Users currentUser = userService.getCurrentUser();
+    public List<Review> getLikeReviewList(int page) {
+        Users user = userService.getCurrentUser();
+        return reviewService.getLikeReviewList(user, page, SIZE);
+    }
 
-        boolean isFollow = false;
-        boolean isSelf = true;
+    @Transactional(readOnly = true)
+    public List<Users> getFollowerList(int page) {
+        Users user = userService.getCurrentUser();
+        return followService.getFollowerList(user, page, SIZE);
+    }
 
-        if (!Objects.equals(user.getId(), currentUser.getId())) {
-            isFollow = followService.isFollow(currentUser, user);
-            isSelf = false;
-        }
+    @Transactional(readOnly = true)
+    public List<Users> getFolloweeList(int page) {
+        Users user = userService.getCurrentUser();
+        return followService.getFolloweeList(user, page, SIZE);
+    }
 
-        List<Users> followerList = followService.getFollowerList(user);
-        List<Users> followeeList = followService.getFolloweeList(user);
+    @Transactional(readOnly = true)
+    public MypageResponse.UserProfileDto getUserProfile() {
+        Users user = userService.getCurrentUser();
+        Integer reviewCount = reviewService.getReviewCount(user);
+        Integer scrapCount = reviewService.getScrapCount(user);
+        Integer followerCount = followService.getFollowerCount(user);
+        Integer followeeCount = followService.getFolloweeCount(user);
 
         return MypageResponseConverter.toUserProfileDto(
-                user, isFollow, isSelf,
-                (long) followerList.size(),
-                (long) followeeList.size()
+                user, reviewCount, scrapCount, followerCount, followeeCount
         );
+    }
+
+    public Integer getFollowerCount() {
+        Users user = userService.getCurrentUser();
+        return followService.getFollowerCount(user);
+    }
+
+    public Integer getFolloweeCount() {
+        Users user = userService.getCurrentUser();
+        return followService.getFolloweeCount(user);
     }
 }

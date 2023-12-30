@@ -11,6 +11,8 @@ import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,7 @@ public class FollowService {
     @Transactional
     public Follow following(FollowRequest.FollowingDto followingRequestDto) {
         Users user = userService.getCurrentUser();
-        Users targetUser = userService.getUserByEmail(followingRequestDto.getEmail());
+        Users targetUser = userService.getUserById(followingRequestDto.getTargetId());
         Follow follow = FollowConverter.toFollowing(user, targetUser);
 
         return followWriteRepository.save(follow);
@@ -44,20 +46,23 @@ public class FollowService {
 
         followWriteRepository.delete(follow);
     }
-    @Transactional(readOnly = true)
-    public List<Users> getFollowerList(Users user) {
-        List<Follow> followers = followReadRepository.findByFollowerId(user.getId());
 
-        return followers.stream()
+    @Transactional(readOnly = true)
+    public List<Users> getFollowerList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Follow> followerList = followReadRepository.findByFollowerId(user.getId(), pageable);
+
+        return followerList.stream()
                 .map(Follow::getFollowee)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<Users> getFolloweeList(Users user) {
-        List<Follow> followees = followReadRepository.findByFolloweeId(user.getId());
+    public List<Users> getFolloweeList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Follow> followeeList = followReadRepository.findByFolloweeId(user.getId(), pageable);
 
-        return followees.stream()
+        return followeeList.stream()
                 .map(Follow::getFollower)
                 .collect(Collectors.toList());
     }
@@ -71,5 +76,13 @@ public class FollowService {
         if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
 
         return follow;
+    }
+
+    public Integer getFollowerCount(Users user) {
+        return followReadRepository.countFollowByFolloweeId(user.getId());
+    }
+
+    public Integer getFolloweeCount(Users user) {
+        return followReadRepository.countFollowByFollowerId(user.getId());
     }
 }

@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Email;
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -29,87 +28,83 @@ public class MypageController {
     /**
      * 내가 쓴 리뷰 조회
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/{id}")
-    public ResponseDto<List<MypageResponse.MyReviewDto>> getReview(
-            @PathVariable Long id
+    @GetMapping("/review/mine/{page}")
+    public ResponseDto<MypageResponse.ReviewListDto> getReview(
+            @PathVariable @Valid Integer page
     ) {
-        List<Review> reviewList;
-        if (mypageService.checkUserSelf(id)) reviewList = mypageService.getMyReviewList();
-        else reviewList = mypageService.getTargetReviewList(id);
-
-        return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
+        List<Review> reviewList = mypageService.getMyReviewList(page - 1);
+        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
     }
 
     /**
      * 내가 스크랩한 리뷰 조회
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/scrap/{id}")
-    public ResponseDto<List<MypageResponse.MyReviewDto>> getScrapReview(
-            @PathVariable Long id
+    @GetMapping("/review/scrap/{page}")
+    public ResponseDto<MypageResponse.ReviewListDto> getScrapReview(
+            @PathVariable Integer page
     ) {
-        List<Review> reviewList = mypageService.getScrapReviewList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
+        List<Review> reviewList = mypageService.getScrapReviewList(page - 1);
+        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
     }
 
     /**
      * 내가 좋아요 한 리뷰 조회
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/like/{id}")
-    public ResponseDto<List<MypageResponse.MyReviewDto>> getLikeReview(
-            @PathVariable Long id
+    @GetMapping("/review/like/{page}")
+    public ResponseDto<MypageResponse.ReviewListDto> getLikeReview(
+            @PathVariable Integer page
     ) {
-        List<Review> reviewList = mypageService.getLikeReviewList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toMyReviewDtoList(reviewList));
+        List<Review> reviewList = mypageService.getLikeReviewList(page - 1);
+        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
     }
 
     /**
-     * 팔로워 조회 (나를 팔로우 하는 사람)
+     * 팔로워 조회 (나를 팔로우 하는 사람들)
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/follower/{id}")
-    public ResponseDto<List<MypageResponse.FollowerDto>> getFollower(
-            @PathVariable Long id
+    @GetMapping("/follower/{page}")
+    public ResponseDto<MypageResponse.FollowerListDto> getFollower(
+            @PathVariable Integer page
     ) {
-        List<Users> followerList = mypageService.getFollowerList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerDtoList(followerList));
+        List<Users> followerList = mypageService.getFollowerList(page - 1);
+        Integer totalCount = mypageService.getFollowerCount();
+        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followerList, totalCount));
     }
 
     /**
-     * 팔로잉 조회 (내가 팔로잉 하는 사람)
+     * 팔로잉 조회 (내가 팔로우 하는 사람들)
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/followee/{id}")
-    public ResponseDto<List<MypageResponse.FollowerDto>> getFollowee(
-            @PathVariable Long id
+    @GetMapping("/followee/{page}")
+    public ResponseDto<MypageResponse.FollowerListDto> getFollowee(
+            @PathVariable Integer page
     ) {
-        List<Users> followeeList = mypageService.getFolloweeList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerDtoList(followeeList));
+        List<Users> followeeList = mypageService.getFolloweeList(page - 1); // TODO: service 한번에 구하거나 users entity count 필드 추가
+        Integer totalCount = mypageService.getFolloweeCount();
+        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followeeList, totalCount));
     }
 
     /**
      * user profile 조회
      *
-     * @param id 사용자 id
      * @return MypageResponse.UserProfileDto
      */
-    @GetMapping("/profile/{id}")
-public ResponseDto<MypageResponse.UserProfileDto> getUserProfile(
-            @PathVariable Long id
-    ) {
-        MypageResponse.UserProfileDto result = mypageService.getUserProfile(id);
+    @GetMapping("/profile")
+    public ResponseDto<MypageResponse.UserProfileDto> getUserProfile() {
+        MypageResponse.UserProfileDto result = mypageService.getUserProfile();
         return ResponseDto.onSuccess(result);
     }
 }

@@ -49,21 +49,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByUser(@Param("user") Users user);
+    List<Review> findAllByUser(@Param("user") Users user, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rs.users = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByReviewScrapedUser(@Param("user") Users user);
+    List<Review> findAllByReviewScrapedUser(@Param("user") Users user, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rl.users = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByReviewLikedUser(@Param("user") Users user);
+    List<Review> findAllByReviewLikedUser(@Param("user") Users user, Pageable pageable);
 
     /* 좋아요 수 많은 리뷰 조회 */
     Slice<Review> findByProductNameOrderByLikedCountDescCreatedAtDesc(String name, Pageable pageable);
@@ -94,4 +94,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE category = :category " +
             "ORDER BY (scraped_cnt + liked_cnt) DESC, created_at DESC", nativeQuery = true)
     List<Review> findByProductNameOrderByScrapedCountAndLikedCountDescCreatedAtDesc(@Param("category") Category category);
+
+    @Query("SELECT COUNT(r) FROM REVIEW r WHERE r.writer = :user")
+    Integer countByWriter(Users user);
+
+    @Query("SELECT COALESCE(COUNT(r), 0) FROM REVIEW r " +
+            "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
+            "WHERE rs.users = :user")
+    Integer countByReviewScraped(Users user);
 }
