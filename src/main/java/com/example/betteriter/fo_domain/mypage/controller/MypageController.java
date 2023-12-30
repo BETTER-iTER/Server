@@ -98,4 +98,18 @@ public class MypageController {
         List<Users> followeeList = mypageService.getFolloweeList(id);
         return ResponseDto.onSuccess(MypageResponseConverter.toFollowerDtoList(followeeList));
     }
+
+    /**
+     * user profile 조회
+     *
+     * @param id 사용자 id
+     * @return MypageResponse.UserProfileDto
+     */
+    @GetMapping("/profile/{id}")
+public ResponseDto<MypageResponse.UserProfileDto> getUserProfile(
+            @PathVariable Long id
+    ) {
+        MypageResponse.UserProfileDto result = mypageService.getUserProfile(id);
+        return ResponseDto.onSuccess(result);
+    }
 }

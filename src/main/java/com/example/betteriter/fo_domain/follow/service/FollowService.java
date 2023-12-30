@@ -61,9 +61,7 @@ public class FollowService {
                 .map(Follow::getFollower)
                 .collect(Collectors.toList());
     }
-    /**
-     * - 팔로우 여부 체크 메소드
-    **/
+
     public boolean isFollow(Users follower, Users followee) {
         return this.followReadRepository.existsByFollowerAndFollowee(follower,followee);
     }
