@@ -3,6 +3,7 @@ package com.example.betteriter.fo_domain.mypage.converter;
 import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.Users;
+import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,5 +40,19 @@ public class MypageResponseConverter {
         });
 
         return followerDtoList;
+    }
+
+    public static MypageResponse.UserProfileDto toUserProfileDto(
+            Users user, Boolean isFollow, Boolean isSelf, Long followerCount, Long followingCount
+    ) {
+        return MypageResponse.UserProfileDto.builder()
+                .profileImage(user.getUsersDetail().getProfileImage())
+                .nickname(user.getUsersDetail().getNickName())
+                .job(user.getUsersDetail().getJob())
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .isFollow(isFollow)
+                .isSelf(isSelf)
+                .build();
     }
 }

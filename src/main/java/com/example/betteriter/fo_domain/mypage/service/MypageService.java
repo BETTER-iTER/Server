@@ -1,16 +1,20 @@
 package com.example.betteriter.fo_domain.mypage.service;
 
 import com.example.betteriter.fo_domain.follow.service.FollowService;
+import com.example.betteriter.fo_domain.mypage.converter.MypageResponseConverter;
+import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,4 +71,26 @@ public class MypageService {
         return user.getId().equals(id);
     }
 
+    @Transactional(readOnly = true)
+    public MypageResponse.UserProfileDto getUserProfile(Long id) {
+        Users user = userService.getUserById(id);
+        Users currentUser = userService.getCurrentUser();
+
+        boolean isFollow = false;
+        boolean isSelf = true;
+
+        if (!Objects.equals(user.getId(), currentUser.getId())) {
+            isFollow = followService.isFollow(currentUser, user);
+            isSelf = false;
+        }
+
+        List<Users> followerList = followService.getFollowerList(user);
+        List<Users> followeeList = followService.getFolloweeList(user);
+
+        return MypageResponseConverter.toUserProfileDto(
+                user, isFollow, isSelf,
+                (long) followerList.size(),
+                (long) followeeList.size()
+        );
+    }
 }

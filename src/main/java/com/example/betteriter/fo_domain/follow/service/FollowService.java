@@ -69,4 +69,10 @@ public class FollowService {
                 .map(Follow::getFollower)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public boolean isFollow(Users currentUser, Users user) {
+        Follow follow = followReadRepository.findByFolloweeIdAndFollowerId(user.getId(), currentUser.getId());
+        return follow != null;
+    }
 }
