@@ -56,14 +56,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rs.users = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByReviewScrapedUser(@Param("user") Users user);
+    List<Review> findAllByReviewScrapedUser(@Param("user") Users user, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +
             "LEFT JOIN r.reviewScraped rs " +
             "WHERE rl.users = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByReviewLikedUser(@Param("user") Users user);
+    List<Review> findAllByReviewLikedUser(@Param("user") Users user, Pageable pageable);
 
     /* 좋아요 수 많은 리뷰 조회 */
     Slice<Review> findByProductNameOrderByLikedCountDescCreatedAtDesc(String name, Pageable pageable);

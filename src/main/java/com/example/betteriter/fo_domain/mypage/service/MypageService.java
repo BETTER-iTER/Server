@@ -34,15 +34,15 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getScrapReviewList() {
+    public List<Review> getScrapReviewList(int page) {
         Users user = userService.getCurrentUser();
-        return reviewService.getScrapReviewList(user);
+        return reviewService.getScrapReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getLikeReviewList(Long id) {
-        Users user = userService.getUserById(id);
-        return reviewService.getLikeReviewList(user);
+    public List<Review> getLikeReviewList(int page) {
+        Users user = userService.getCurrentUser();
+        return reviewService.getLikeReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)

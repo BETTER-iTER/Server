@@ -295,12 +295,14 @@ public class ReviewService {
         return this.reviewRepository.findAllByUser(user, pageable);
     }
 
-    public List<Review> getScrapReviewList(Users user) {
-        return this.reviewRepository.findAllByReviewScrapedUser(user);
+    public List<Review> getScrapReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByReviewScrapedUser(user, pageable);
     }
 
-    public List<Review> getLikeReviewList(Users user) {
-        return this.reviewRepository.findAllByReviewLikedUser(user);
+    public List<Review> getLikeReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByReviewLikedUser(user, pageable);
     }
 
     public List<Review> getTargetReviewList(Users user) {

@@ -49,7 +49,7 @@ public class MypageController {
     public ResponseDto<MypageResponse.ReviewListDto> getScrapReview(
             @PathVariable Integer page
     ) {
-        List<Review> reviewList = mypageService.getScrapReviewList();
+        List<Review> reviewList = mypageService.getScrapReviewList(page - 1);
         return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
     }
 
@@ -63,7 +63,7 @@ public class MypageController {
     public ResponseDto<MypageResponse.ReviewListDto> getLikeReview(
             @PathVariable Integer page
     ) {
-        List<Review> reviewList = mypageService.getLikeReviewList((long) page);
+        List<Review> reviewList = mypageService.getLikeReviewList(page - 1);
         return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
     }
 
