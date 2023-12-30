@@ -36,9 +36,17 @@ public class MypageResponse {
     @Getter
     @Builder
     public static class FollowerDto {
+        private Long id;
         private String email;
         private String profileImage;
         private String nickname;
+    }
+
+    @Getter
+    @Builder
+    public static class FollowerListDto {
+        private Integer totalCount;
+        private List<FollowerDto> followerList;
     }
 
     @Getter

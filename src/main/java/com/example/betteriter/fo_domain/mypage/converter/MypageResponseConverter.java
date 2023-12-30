@@ -35,7 +35,7 @@ public class MypageResponseConverter {
                 .build();
     }
 
-    public static List<MypageResponse.FollowerDto> toFollowerDtoList(List<Users> followerList) {
+    public static MypageResponse.FollowerListDto toFollowerListDto(List<Users> followerList, Integer totalCount) {
         List<MypageResponse.FollowerDto> followerDtoList = new ArrayList<>();
 
         followerList.forEach(f -> {
@@ -47,7 +47,10 @@ public class MypageResponseConverter {
             followerDtoList.add(followerDto);
         });
 
-        return followerDtoList;
+        return MypageResponse.FollowerListDto.builder()
+                .totalCount(totalCount)
+                .followerList(followerDtoList)
+                .build();
     }
 
     public static MypageResponse.UserProfileDto toUserProfileDto(

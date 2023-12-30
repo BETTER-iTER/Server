@@ -68,31 +68,33 @@ public class MypageController {
     }
 
     /**
-     * 팔로워 조회 (나를 팔로우 하는 사람)
+     * 팔로워 조회 (나를 팔로우 하는 사람들)
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/follower/{id}")
-    public ResponseDto<List<MypageResponse.FollowerDto>> getFollower(
-            @PathVariable Long id
+    @GetMapping("/follower/{page}")
+    public ResponseDto<MypageResponse.FollowerListDto> getFollower(
+            @PathVariable Integer page
     ) {
-        List<Users> followerList = mypageService.getFollowerList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerDtoList(followerList));
+        List<Users> followerList = mypageService.getFollowerList(page - 1);
+        Integer totalCount = mypageService.getFollowerCount();
+        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followerList, totalCount));
     }
 
     /**
-     * 팔로잉 조회 (내가 팔로잉 하는 사람)
+     * 팔로잉 조회 (내가 팔로우 하는 사람들)
      *
-     * @param id 사용자 id
+     * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/followee/{id}")
-    public ResponseDto<List<MypageResponse.FollowerDto>> getFollowee(
-            @PathVariable Long id
+    @GetMapping("/followee/{page}")
+    public ResponseDto<MypageResponse.FollowerListDto> getFollowee(
+            @PathVariable Integer page
     ) {
-        List<Users> followeeList = mypageService.getFolloweeList(id);
-        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerDtoList(followeeList));
+        List<Users> followeeList = mypageService.getFolloweeList(page - 1); // TODO: service 한번에 구하거나 users entity count 필드 추가
+        Integer totalCount = mypageService.getFolloweeCount();
+        return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followeeList, totalCount));
     }
 
     /**

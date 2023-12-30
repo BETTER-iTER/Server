@@ -46,31 +46,15 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getTargetReviewList(Long id){
-        Users user = userService.getUserById(id);
-        return reviewService.getTargetReviewList(user);
+    public List<Users> getFollowerList(int page) {
+        Users user = userService.getCurrentUser();
+        return followService.getFollowerList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public List<Users> getFollowerList(Long id) {
-        Users user = userService.getUserById(id);
-        return followService.getFollowerList(user);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Users> getFolloweeList(Long id) {
-        Users user = userService.getUserById(id);
-        return followService.getFolloweeList(user);
-    }
-
-    public boolean checkUserSelf(String email) {
+    public List<Users> getFolloweeList(int page) {
         Users user = userService.getCurrentUser();
-        return user.getEmail().equals(email);
-    }
-
-    public boolean checkUserSelf(Long id) {
-        Users user = userService.getCurrentUser();
-        return user.getId().equals(id);
+        return followService.getFolloweeList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
@@ -86,13 +70,19 @@ public class MypageService {
             isSelf = false;
         }
 
-        List<Users> followerList = followService.getFollowerList(user);
-        List<Users> followeeList = followService.getFolloweeList(user);
 
         return MypageResponseConverter.toUserProfileDto(
-                user, isFollow, isSelf,
-                (long) followerList.size(),
-                (long) followeeList.size()
+                user, isFollow, isSelf, 0L, 0L
         );
+    }
+
+    public Integer getFollowerCount() {
+        Users user = userService.getCurrentUser();
+        return followService.getFollowerCount(user);
+    }
+
+    public Integer getFolloweeCount() {
+        Users user = userService.getCurrentUser();
+        return followService.getFolloweeCount(user);
     }
 }
