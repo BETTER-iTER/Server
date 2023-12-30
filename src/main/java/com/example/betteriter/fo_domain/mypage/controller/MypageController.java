@@ -107,4 +107,17 @@ public class MypageController {
         MypageResponse.UserProfileDto result = mypageService.getUserProfile();
         return ResponseDto.onSuccess(result);
     }
+
+    /**
+     * user point detail 조회
+     *
+     * @return MypageResponse.PointDetailDto
+     */
+    @GetMapping("/point")
+    public ResponseDto<MypageResponse.PointDetailDto> getPointDetail() {
+        Users user = mypageService.getCurrentUser();
+        Integer totalLikeCount = mypageService.getTotalLikeCount(user);
+        Integer totalScrapCount = mypageService.getTotalScrapCount(user);
+        return ResponseDto.onSuccess(MypageResponseConverter.toPointDetailDto(user, totalLikeCount, totalScrapCount));
+    }
 }

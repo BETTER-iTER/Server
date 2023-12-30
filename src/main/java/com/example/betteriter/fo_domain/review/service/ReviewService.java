@@ -337,6 +337,14 @@ public class ReviewService {
     }
 
     public Integer getScrapCount(Users user) {
+        return this.reviewRepository.countByMyScrap(user);
+    }
+
+    public Integer getTotalLikeCount(Users user) {
+        return this.reviewRepository.countByReviewLiked(user);
+    }
+
+    public Integer getTotalScrapCount(Users user) {
         return this.reviewRepository.countByReviewScraped(user);
     }
 }
