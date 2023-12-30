@@ -290,8 +290,9 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewHandler(_REVIEW_NOT_FOUND));
     }
 
-    public List<Review> getReviewList(Users user) {
-        return this.reviewRepository.findAllByUser(user);
+    public List<Review> getReviewList(Users user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return this.reviewRepository.findAllByUser(user, pageable);
     }
 
     public List<Review> getScrapReviewList(Users user) {

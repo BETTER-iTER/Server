@@ -4,16 +4,33 @@ import com.example.betteriter.global.constant.Job;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 public class MypageResponse {
 
     @Getter
     @Builder
-    public static class MyReviewDto{
+    public static class ReviewDto {
         private Long reviewId;
         private String title;
+        private String thumbnailImage;
+
+        private Long writerId;
+        private Job writerJob;
+        private String writerNickname;
         private String profileImage;
+
         private Long likeCount;
         private Long scrapCount;
+        private Boolean isLike;
+        private Boolean isScrap;
+    }
+
+    @Getter
+    @Builder
+    public static class ReviewListDto {
+        private Integer reviewCount;
+        private List<ReviewDto> reviewList;
     }
 
     @Getter

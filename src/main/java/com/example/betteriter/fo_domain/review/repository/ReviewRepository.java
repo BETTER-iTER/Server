@@ -49,7 +49,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
             "ORDER BY r.id DESC")
-    List<Review> findAllByUser(@Param("user") Users user);
+    List<Review> findAllByUser(@Param("user") Users user, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +
             "LEFT JOIN r.reviewLiked rl " +

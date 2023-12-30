@@ -21,19 +21,21 @@ import java.util.Objects;
 @Service
 public class MypageService {
 
+    private static final int SIZE = 10;
+
     private final UserService userService;
     private final ReviewService reviewService;
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public List<Review> getMyReviewList() {
+    public List<Review> getMyReviewList(int page) {
         Users user = userService.getCurrentUser();
-        return reviewService.getReviewList(user);
+        return reviewService.getReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getScrapReviewList(Long id) {
-        Users user = userService.getUserById(id);
+    public List<Review> getScrapReviewList() {
+        Users user = userService.getCurrentUser();
         return reviewService.getScrapReviewList(user);
     }
 
