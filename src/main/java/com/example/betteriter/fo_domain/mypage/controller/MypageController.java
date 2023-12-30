@@ -100,14 +100,11 @@ public class MypageController {
     /**
      * user profile 조회
      *
-     * @param id 사용자 id
      * @return MypageResponse.UserProfileDto
      */
-    @GetMapping("/profile/{id}")
-public ResponseDto<MypageResponse.UserProfileDto> getUserProfile(
-            @PathVariable Long id
-    ) {
-        MypageResponse.UserProfileDto result = mypageService.getUserProfile(id);
+    @GetMapping("/profile")
+    public ResponseDto<MypageResponse.UserProfileDto> getUserProfile() {
+        MypageResponse.UserProfileDto result = mypageService.getUserProfile();
         return ResponseDto.onSuccess(result);
     }
 }

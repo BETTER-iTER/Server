@@ -94,4 +94,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "WHERE category = :category " +
             "ORDER BY (scraped_cnt + liked_cnt) DESC, created_at DESC", nativeQuery = true)
     List<Review> findByProductNameOrderByScrapedCountAndLikedCountDescCreatedAtDesc(@Param("category") Category category);
+
+    @Query("SELECT COUNT(r) FROM REVIEW r WHERE r.writer = :user")
+    Integer countByWriter(Users user);
+
+    @Query("SELECT COALESCE(COUNT(r), 0) FROM REVIEW r " +
+            "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
+            "WHERE rs.users = :user")
+    Integer countByReviewScraped(Users user);
 }

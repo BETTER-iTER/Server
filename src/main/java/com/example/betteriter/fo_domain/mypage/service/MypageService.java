@@ -58,21 +58,15 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public MypageResponse.UserProfileDto getUserProfile(Long id) {
-        Users user = userService.getUserById(id);
-        Users currentUser = userService.getCurrentUser();
-
-        boolean isFollow = false;
-        boolean isSelf = true;
-
-        if (!Objects.equals(user.getId(), currentUser.getId())) {
-            isFollow = followService.isFollow(currentUser, user);
-            isSelf = false;
-        }
-
+    public MypageResponse.UserProfileDto getUserProfile() {
+        Users user = userService.getCurrentUser();
+        Integer reviewCount = reviewService.getReviewCount(user);
+        Integer scrapCount = reviewService.getScrapCount(user);
+        Integer followerCount = followService.getFollowerCount(user);
+        Integer followeeCount = followService.getFolloweeCount(user);
 
         return MypageResponseConverter.toUserProfileDto(
-                user, isFollow, isSelf, 0L, 0L
+                user, reviewCount, scrapCount, followerCount, followeeCount
         );
     }
 

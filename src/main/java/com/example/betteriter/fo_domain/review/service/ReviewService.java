@@ -331,4 +331,12 @@ public class ReviewService {
     private boolean isCurrentUserCommentReview(Comment comment, Users currentUser) {
         return currentUser.getId().equals(comment.getUsers().getId());
     }
+
+    public Integer getReviewCount(Users user) {
+        return this.reviewRepository.countByWriter(user);
+    }
+
+    public Integer getScrapCount(Users user) {
+        return this.reviewRepository.countByReviewScraped(user);
+    }
 }

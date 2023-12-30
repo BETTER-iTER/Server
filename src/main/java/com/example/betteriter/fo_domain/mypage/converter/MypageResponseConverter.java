@@ -54,16 +54,16 @@ public class MypageResponseConverter {
     }
 
     public static MypageResponse.UserProfileDto toUserProfileDto(
-            Users user, Boolean isFollow, Boolean isSelf, Long followerCount, Long followingCount
+            Users user, Integer reviewCount, Integer scrapCount ,Integer followerCount, Integer followingCount
     ) {
         return MypageResponse.UserProfileDto.builder()
                 .profileImage(user.getUsersDetail().getProfileImage())
                 .nickname(user.getUsersDetail().getNickName())
                 .job(user.getUsersDetail().getJob())
+                .reviewCount(reviewCount)
+                .scrapCount(scrapCount)
                 .followerCount(followerCount)
                 .followingCount(followingCount)
-                .isFollow(isFollow)
-                .isSelf(isSelf)
                 .build();
     }
 }

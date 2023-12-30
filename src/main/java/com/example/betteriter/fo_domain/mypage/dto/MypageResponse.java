@@ -55,10 +55,10 @@ public class MypageResponse {
         private String profileImage;
         private String nickname;
         private Job job;
-        private Long followerCount;
-        private Long followingCount;
-        private Boolean isFollow;
-        private Boolean isSelf;
+        private Integer followerCount;
+        private Integer followingCount;
+        private Integer reviewCount;
+        private Integer scrapCount;
     }
 
 }
