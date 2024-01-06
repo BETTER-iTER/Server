@@ -11,9 +11,9 @@ public interface FollowReadRepository extends JpaRepository<Follow, Long> {
 
     Follow findByFolloweeIdAndFollowerId(Long followeeId, Long followerId);
 
-    List<Follow> findByFolloweeId(Long followeeId, Pageable pageable); // 팔로위(나를 팔로우하는 사람) 목록 조회
+    List<Follow> findByFolloweeIdOrderByCreatedAt(Long followeeId, Pageable pageable); // 팔로위(나를 팔로우하는 사람) 목록 조회
 
-    List<Follow> findByFollowerId(Long followerId, Pageable pageable); // 팔로워(내가 팔로우하는 사람) 목록 조회
+    List<Follow> findByFollowerIdOrderByCreatedAt(Long followerId, Pageable pageable); // 팔로워(내가 팔로우하는 사람) 목록 조회
 
     boolean existsByFollowerAndFollowee(Users follower, Users followee);
 

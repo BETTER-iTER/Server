@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.follow.domain;
 
 
 import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "FOLLOW")
-public class Follow {
+public class Follow extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -79,7 +79,7 @@ public class MypageController {
     public ResponseDto<MypageResponse.FollowerListDto> getFollower(
             @RequestParam int page
     ) {
-        List<Users> followerList = mypageService.getFolloweeList(page);
+        List<Users> followerList = mypageService.getFollowerList(page);
         Integer totalCount = mypageService.getFollowerCount();
         return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followerList, totalCount));
     }
@@ -94,8 +94,8 @@ public class MypageController {
     public ResponseDto<MypageResponse.FollowerListDto> getFollowee(
             @RequestParam int page
     ) {
-        List<Users> followeeList = mypageService.getFolloweeList(page); // TODO: service 한번에 구하거나 users entity count 필드 추가
-        Integer totalCount = mypageService.getFolloweeCount();
+        List<Users> followeeList = mypageService.getFollowingList(page);
+        Integer totalCount = mypageService.getFollowingCount();
         return ResponseDto.onSuccess(MypageResponseConverter.toFollowerListDto(followeeList, totalCount));
     }
 

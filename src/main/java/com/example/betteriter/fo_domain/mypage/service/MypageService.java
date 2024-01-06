@@ -50,9 +50,9 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public List<Users> getFolloweeList(int page) {
+    public List<Users> getFollowingList(int page) {
         Users user = userService.getCurrentUser();
-        return followService.getFolloweeList(user, page, SIZE);
+        return followService.getFollowingList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +73,7 @@ public class MypageService {
         return followService.getFollowerCount(user);
     }
 
-    public Integer getFolloweeCount() {
+    public Integer getFollowingCount() {
         Users user = userService.getCurrentUser();
         return followService.getFolloweeCount(user);
     }
