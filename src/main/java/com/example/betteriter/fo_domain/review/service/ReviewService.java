@@ -180,12 +180,12 @@ public class ReviewService {
 
     /* 리뷰 좋아요 취소 */
     @Transactional
-    public ReviewLike deleteReviewLike(Long reviewId) {
+    public Void deleteReviewLike(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
         ReviewLike reviewLike = checkReviewLikeValidation(review);
         this.reviewLikeRepository.delete(reviewLike);
-        return reviewLike;
+        return null;
     }
 
     @NotNull

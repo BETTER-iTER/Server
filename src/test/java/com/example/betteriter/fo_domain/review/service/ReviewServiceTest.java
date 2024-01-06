@@ -571,11 +571,10 @@ public class ReviewServiceTest {
         given(this.userService.getCurrentUser())
                 .willReturn(user);
         // when
-        ReviewLike result = this.reviewService.deleteReviewLike(1L);
+        this.reviewService.deleteReviewLike(1L);
 
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
         verify(this.reviewLikeRepository, times(1)).findByReview(any(Review.class));
-        assertThat(result.getUsers()).isEqualTo(user);
     }
 }

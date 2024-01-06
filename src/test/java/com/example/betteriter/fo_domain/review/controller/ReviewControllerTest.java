@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_LIKE_USER_NOT_MATCH;
 import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.Job.CEO;
 import static com.example.betteriter.global.constant.Job.SW_DEVELOPER;
@@ -823,11 +824,41 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("리뷰 좋아요 취소를 한다 - 성공")
-    void deleteReviewLikeControllerTestInSucess() {
+    void deleteReviewLikeControllerTestInSuccess() throws Exception {
         // given
 
-        // when
+        // 좋아요 하는 리뷰
+        Review review = createReview(1L);
 
-        // then
+        // 좋아요 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+
+        // when && then
+        mockMvc.perform(delete("/review/like/{reviewId}", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소 좋아요 유저와 로그인 유저 다름 - 실패")
+    void deleteReviewLikeInFailure() throws Exception {
+        // given
+
+        given(this.reviewService.deleteReviewLike(anyLong()))
+                .willThrow(new ReviewHandler(_REVIEW_LIKE_USER_NOT_MATCH));
+        // when && then
+        mockMvc.perform(delete("/review/like/{reviewId}", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.isSuccess").value(false))
+                .andExpect(jsonPath("$.code").value("REVIEW_LIKE_USER_NOT_MATCH_400"));
     }
 }
