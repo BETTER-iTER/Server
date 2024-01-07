@@ -87,7 +87,7 @@ public class ReviewController {
     }
 
     /* 리뷰 좋아요 */
-    @PostMapping("/like/{reviewId}")
+    @PostMapping("/{reviewId}/like")
     public ResponseDto<Void> reviewLike(
             @PathVariable Long reviewId
     ) {
@@ -96,7 +96,7 @@ public class ReviewController {
     }
 
     /* 리뷰 좋아요 취소 */
-    @DeleteMapping("/like/{reviewId}")
+    @DeleteMapping("/{reviewId}/like")
     public ResponseDto<Void> deleteReviewLike(
             @PathVariable Long reviewId
     ) {
@@ -105,11 +105,20 @@ public class ReviewController {
     }
 
     /* 리뷰 스크랩 */
-    @PostMapping("/scrap/{reviewId}")
+    @PostMapping("{reviewId}/scrap/")
     public ResponseDto<Void> reviewScrap(
             @PathVariable Long reviewId
     ) {
         this.reviewService.reviewScrap(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
+    /* 리뷰 스크랩 취소 */
+    @DeleteMapping("{reviewId}/scrap")
+    public ResponseDto<Void> deleteReviewScrap(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.deleteReviewScrap(reviewId);
         return ResponseDto.onSuccess(null);
     }
 
