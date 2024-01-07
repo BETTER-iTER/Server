@@ -531,7 +531,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("리뷰 삭제을 한다.")
+    @DisplayName("리뷰 삭제를 한다.")
     void deleteReviewServiceTest() {
         // given
         Review review = createReview(1L);
@@ -544,5 +544,37 @@ public class ReviewServiceTest {
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
         verify(this.reviewRepository, times(1)).delete(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소를 성공적으로 한다.")
+    void deleteReviewLikeServiceTest() {
+        // given
+        Review review = createReview(1L);
+
+        Users user = Users.builder()
+                .roleType(ROLE_USER)
+                .email("danaver12@daum.net")
+                .build();
+
+        ReviewLike reviewLike = ReviewLike.builder()
+                .review(review)
+                .users(user)
+                .build();
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.reviewLikeRepository.findByReview(any(Review.class)))
+                .willReturn(Optional.of(reviewLike));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(user);
+        // when
+        this.reviewService.deleteReviewLike(1L);
+
+        // then
+        verify(this.reviewRepository, times(1)).findById(anyLong());
+        verify(this.reviewLikeRepository, times(1)).findByReview(any(Review.class));
     }
 }
