@@ -1,9 +1,9 @@
 package com.example.betteriter.fo_domain.review.service;
 
-import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
-import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerConnector;
+import com.example.betteriter.bo_domain.spec.service.SpecConnector;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
-import com.example.betteriter.fo_domain.follow.service.FollowService;
+import com.example.betteriter.fo_domain.follow.service.FollowConnector;
 import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
@@ -33,9 +33,9 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 public class ReviewService {
     private static final int SIZE = 7;
     private final UserConnector userConnector;
-    private final SpecService specService;
-    private final ManufacturerService manufacturerService;
-    private final FollowService followService;
+    private final SpecConnector specConnector;
+    private final ManufacturerConnector manufacturerConnector;
+    private final FollowConnector followConnector;
 
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewScrapRepository reviewScrapRepository;
@@ -49,7 +49,7 @@ public class ReviewService {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
                 this.getCurrentUser(),
-                this.manufacturerService.findManufacturerByName(request.getManufacturer())));
+                this.manufacturerConnector.findManufacturerByName(request.getManufacturer())));
 
         // 2. 리뷰 이미지 저장
         this.reviewImageRepository.saveAll(this.getReviewImages(review, request));
@@ -63,7 +63,7 @@ public class ReviewService {
     /* 리뷰 등록시 카테고리에 해당하는 리뷰 스펙 데이터 조회 (입력 용)*/
     @Transactional(readOnly = true)
     public GetReviewSpecResponseDto getReviewSpecDataResponse(Category category) {
-        return GetReviewSpecResponseDto.from(this.specService.findAllSpecDataByCategory(category));
+        return GetReviewSpecResponseDto.from(this.specConnector.findAllSpecDataByCategory(category));
     }
 
     /* 카테고리에 해당하는 리뷰 조회 */
@@ -262,7 +262,7 @@ public class ReviewService {
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
         // 요청으로 들어온 specData 조회
-        return this.specService.findAllSpecDataByIds(request.getSpecData())
+        return this.specConnector.findAllSpecDataByIds(request.getSpecData())
                 .stream()
                 .map(sd -> ReviewSpecData.createReviewSpecData(review, sd))
                 .collect(Collectors.toList());
@@ -328,7 +328,7 @@ public class ReviewService {
     }
 
     private boolean isCurrentUserFollowReviewWriter(Review review, Users currentUser) {
-        return this.followService.isFollow(currentUser, review.getWriter());
+        return this.followConnector.isFollow(currentUser, review.getWriter());
     }
 
     /* 댓글 작성자와 로그인한 유저가 동일한지 확인 */

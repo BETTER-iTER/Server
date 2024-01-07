@@ -6,22 +6,25 @@ import com.example.betteriter.bo_domain.spec.repository.SpecDataRepository;
 import com.example.betteriter.bo_domain.spec.repository.SpecRepository;
 import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class SpecService {
+public class SpecConnectorImpl implements SpecConnector {
+
     private final SpecRepository specRepository;
     private final SpecDataRepository specDataRepository;
 
+    @Override
     public List<SpecData> findAllSpecDataByIds(List<Long> id) {
         return this.specDataRepository.findAllByIdIn(id);
     }
 
+    @Override
     public List<Spec> findAllSpecDataByCategory(Category category) {
         return this.specRepository.findAllByCategory(category);
     }
