@@ -8,12 +8,18 @@ import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class NotificationService {
+
+    private static final int SIZE = 10;
 
     private final UserService userService;
 
@@ -35,5 +41,11 @@ public class NotificationService {
         );
 
         notificationRepository.save(newNotification);
+    }
+
+    public List<Notification> getNotificationList(Integer page) {
+        Users user = userService.getCurrentUser();
+        Pageable pageable = PageRequest.of(page, SIZE);
+        return notificationRepository.findAllByReceiverOrderByCreatedAtDesc(user, pageable);
     }
 }

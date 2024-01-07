@@ -1,6 +1,7 @@
 package com.example.betteriter.bo_domain.notification.controller;
 
 import com.example.betteriter.bo_domain.notification.converter.NotificationResponseConverter;
+import com.example.betteriter.bo_domain.notification.domain.Notification;
 import com.example.betteriter.bo_domain.notification.dto.NotificationRequest;
 import com.example.betteriter.bo_domain.notification.dto.NotificationResponse;
 import com.example.betteriter.bo_domain.notification.service.NotificationService;
@@ -8,10 +9,9 @@ import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "NotificationControllers", description = "Notification API")
 @Slf4j
@@ -31,5 +31,16 @@ public class NotificationController {
     ) {
         notificationService.createNotification(request);
         return ResponseDto.onSuccess(NotificationResponseConverter.toCreateNotificationDto(request));
+    }
+
+    /**
+     * 알림 리스트 조회
+     */
+    @GetMapping("/{page}")
+    public ResponseDto<List<NotificationResponse.NotificationDto>> getNotificationList(
+            @PathVariable Integer page
+    ) {
+        List<Notification> notificationList = notificationService.getNotificationList(page);
+        return ResponseDto.onSuccess(NotificationResponseConverter.toNotificationDtoList(notificationList));
     }
 }

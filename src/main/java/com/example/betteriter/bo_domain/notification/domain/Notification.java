@@ -46,7 +46,7 @@ public class Notification extends BaseEntity {
     private Boolean isRead = false;
 
     @Column(name = "status", nullable = false)
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
     @Builder
