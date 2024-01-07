@@ -22,13 +22,13 @@ import java.util.List;
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
+@Where(clause = "status = 'ACTIVE'")
 @Entity(name = "REVIEW")
 public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ReviewScrap> reviewScraped = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<ReviewSpecData> specData = new ArrayList<>();
+    private List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,6 +47,8 @@ public class Review extends BaseEntity {
     private int price;
     @Column(name = "store_name", nullable = false)
     private int storeName;
+    @Column(name = "compared_product_name", nullable = false)
+    private String comparedProductName;
     @Column(name = "bought_at", nullable = false)
     private LocalDate boughtAt;
     @Column(name = "star_point", nullable = false)
@@ -80,28 +82,31 @@ public class Review extends BaseEntity {
     private List<Comment> reviewComment = new ArrayList<>();
 
     @Builder
-    private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
-                   String productName, int storeName, LocalDate boughtAt, int price,
-                   double starPoint, String shortReview, String goodPoint, Status status,
-                   String badPoint, long clickCount, long likedCount, long scrapedCount
+    public Review(List<ReviewSpecData> specData, Long id, Users writer, Manufacturer manufacturer,
+                  Category category, String productName, int price, int storeName, String comparedProductName,
+                  LocalDate boughtAt, double starPoint, String shortReview, long clickCount, long likedCount,
+                  long scrapedCount, String goodPoint, String badPoint, Status status
     ) {
+        this.specData = specData;
         this.id = id;
         this.writer = writer;
         this.manufacturer = manufacturer;
         this.category = category;
         this.productName = productName;
-        this.storeName = storeName;
-        this.boughtAt = boughtAt;
         this.price = price;
+        this.storeName = storeName;
+        this.comparedProductName = comparedProductName;
+        this.boughtAt = boughtAt;
         this.starPoint = starPoint;
         this.shortReview = shortReview;
-        this.goodPoint = goodPoint;
-        this.badPoint = badPoint;
         this.clickCount = clickCount;
         this.likedCount = likedCount;
         this.scrapedCount = scrapedCount;
+        this.goodPoint = goodPoint;
+        this.badPoint = badPoint;
         this.status = status;
     }
+
 
     public ReviewResponseDto of(String firstImageUrl) {
         return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName).nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage()).isExpert(writer.isExpert()).build();
