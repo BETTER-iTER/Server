@@ -39,7 +39,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Slice<Review> findByProductNameOrderByCreatedAtDesc(String name, Pageable pageable);
 
 
-
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
             "ORDER BY r.id DESC")
@@ -47,7 +46,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM REVIEW r " +
             "WHERE r.writer = :user " +
-            "ORDER BY r.id DESC")
+            "ORDER BY r.createdAt desc ")
     List<Review> findAllByUser(@Param("user") Users user, Pageable pageable);
 
     @Query("SELECT r FROM REVIEW r " +

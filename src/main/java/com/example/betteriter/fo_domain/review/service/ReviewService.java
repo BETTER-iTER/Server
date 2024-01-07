@@ -13,6 +13,7 @@ import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -175,6 +176,28 @@ public class ReviewService {
         this.reviewLikeRepository.save(ReviewLike.builder().review(review).users(currentUser).build());
         // 3. 리뷰 좋아요 카운트 증가
         review.countReviewLikedCount();
+    }
+
+    /* 리뷰 좋아요 취소 */
+    @Transactional
+    public ReviewLike deleteReviewLike(Long reviewId) {
+        // 1. reviewId 에 해당하는 리뷰 조회
+        Review review = this.findReviewById(reviewId);
+        ReviewLike reviewLike = checkReviewLikeValidation(review);
+        this.reviewLikeRepository.delete(reviewLike);
+        return reviewLike;
+    }
+
+    @NotNull
+    private ReviewLike checkReviewLikeValidation(Review review) {
+        // 2. reviewId 해당하는 ReviewLike 엔티티 조회
+        ReviewLike reviewLike = this.reviewLikeRepository.findByReview(review)
+                .orElseThrow(() -> new ReviewHandler(_REVIEW_LIKE_NOT_FOUND));
+        // 3. reviewLike 의 user 와 current 유저 동일한지 체크
+        if (!Objects.equals(reviewLike.getUsers().getId(), this.getCurrentUser().getId())) {
+            throw new ReviewHandler(_REVIEW_LIKE_USER_NOT_MATCH);
+        }
+        return reviewLike;
     }
 
     /* 리뷰 스크랩 */

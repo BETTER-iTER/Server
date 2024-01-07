@@ -95,6 +95,15 @@ public class ReviewController {
         return ResponseDto.onSuccess(null);
     }
 
+    /* 리뷰 좋아요 취소 */
+    @DeleteMapping("/like/{reviewId}")
+    public ResponseDto<Void> deleteReviewLike(
+            @PathVariable Long reviewId
+    ) {
+        this.reviewService.deleteReviewLike(reviewId);
+        return ResponseDto.onSuccess(null);
+    }
+
     /* 리뷰 스크랩 */
     @PostMapping("/scrap/{reviewId}")
     public ResponseDto<Void> reviewScrap(
