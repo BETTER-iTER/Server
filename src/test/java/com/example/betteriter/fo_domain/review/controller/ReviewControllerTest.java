@@ -210,6 +210,7 @@ class ReviewControllerTest {
                 .price(1000)
                 .storeName(1)
                 .shortReview("shortReview")
+                .comparedProductName("에어팟 2")
                 .starPoint(2)
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
@@ -407,6 +408,7 @@ class ReviewControllerTest {
                 .storeName(1)
                 .status(ACTIVE)
                 .boughtAt(LocalDate.now())
+                .comparedProductName("에어팟 2")
                 .starPoint(1)
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
@@ -422,6 +424,7 @@ class ReviewControllerTest {
                 .badPoint("badPoint")
                 .shortReview("shortReview")
                 .manufacturer("삼성")
+                .comparedProductName("에어팟2")
                 .storeName(1)
                 .boughtAt(LocalDate.of(2023, 12, 12))
                 .createdAt(LocalDate.of(2023, 12, 22))
@@ -453,11 +456,12 @@ class ReviewControllerTest {
         given(this.reviewService.getReviewDetail(anyLong()))
                 .willReturn(response);
         // when & then
-        mockMvc.perform(get("/review/detail/{reviewId}", 1L))
+        mockMvc.perform(get("/review/{reviewId}/detail", 1L))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.result.writerInfo.id").value(1))
+                .andExpect(jsonPath("$.result.reviewDetail.comparedProductName").value("에어팟2"))
                 .andExpect(jsonPath("$.result.relatedReviews[0].productName").value("productName"));
     }
 

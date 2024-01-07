@@ -25,8 +25,13 @@ import java.util.List;
 @Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
+    // --------------- Review 관련 엔티티 ---------------- //
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ReviewScrap> reviewScraped = new ArrayList<>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,6 +50,8 @@ public class Review extends BaseEntity {
     private int price;
     @Column(name = "store_name", nullable = false)
     private int storeName;
+    @Column(name = "compared_product_name", nullable = false)
+    private String comparedProductName;
     @Column(name = "bought_at", nullable = false)
     private LocalDate boughtAt;
     @Column(name = "star_point", nullable = false)
@@ -59,32 +66,28 @@ public class Review extends BaseEntity {
     private long likedCount; // 좋아요 수
     @Column(name = "scraped_cnt")
     private long scrapedCount; // 스크랩 수
-    @Lob // 최대 500 자
+    @Lob
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
-    @Lob // 최대 500 자
+    @Lob
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED
-    // --------------- Review 관련 엔티티 ---------------- //
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewImage> reviewImages = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> reviewComment = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewSpecData> specData = new ArrayList<>();
 
     @Builder
-    private Review(Long id, Users writer, Manufacturer manufacturer, Category category, String productName,
-                   int price, int storeName, LocalDate boughtAt, double starPoint, String shortReview,
-                   long shownCount, long clickCount, long likedCount, long scrapedCount,
-                   String goodPoint, String badPoint, Status status
+    public Review(Long id, Users writer, Manufacturer manufacturer, long shownCount,
+                  Category category, String productName, int price, int storeName, String comparedProductName,
+                  LocalDate boughtAt, double starPoint, String shortReview, long clickCount, long likedCount,
+                  long scrapedCount, String goodPoint, String badPoint, Status status
+
     ) {
         this.id = id;
         this.writer = writer;
@@ -93,6 +96,7 @@ public class Review extends BaseEntity {
         this.productName = productName;
         this.price = price;
         this.storeName = storeName;
+        this.comparedProductName = comparedProductName;
         this.boughtAt = boughtAt;
         this.starPoint = starPoint;
         this.shortReview = shortReview;
@@ -104,6 +108,7 @@ public class Review extends BaseEntity {
         this.badPoint = badPoint;
         this.status = status;
     }
+
 
     public ReviewResponseDto of(String firstImageUrl) {
         return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName).nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage()).isExpert(writer.isExpert()).build();

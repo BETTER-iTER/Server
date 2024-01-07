@@ -83,7 +83,8 @@ public class ReviewDetailResponse {
         public static List<GetRelatedReviewResponseDto> from(List<Review> reviews) {
             return reviews.stream()
                     .map(r -> new GetRelatedReviewResponseDto(
-                            r.getId(), r.getProductName(), getFirstImageWithReview(r), r.getWriter().getUsername(), r.getWriter().isExpert()))
+                            r.getId(), r.getProductName(), getFirstImageWithReview(r),
+                            r.getWriter().getUsersDetail().getNickName(), r.getWriter().isExpert()))
                     .collect(Collectors.toList());
         }
 

@@ -155,6 +155,7 @@ public class ReviewServiceTest {
                         .manufacturer("기타")
                         .price(100000)
                         .storeName(1)
+                        .comparedProductName("에어팟 맥스")
                         .shortReview("한줄 평")
                         .starPoint(1)
                         .goodPoint("goodPoint")
@@ -178,29 +179,28 @@ public class ReviewServiceTest {
                 )); // specData
 
 
-        given(this.reviewRepository.save(any(Review.class)))
-                .willReturn(Review.builder()
-                        .writer(Users.builder()
-                                .oauthId("oauthId")
-                                .email("danaver12@daum.net")
-                                .password("password")
-                                .roleType(ROLE_USER)
-                                .isExpert(true)
-                                .build())
-                        .manufacturer(Manufacturer.createManufacturer("삼성"))
-                        .category(LAPTOP)
-                        .productName("상품명1")
-                        .price(10000)
-                        .storeName(1)
-                        .boughtAt(LocalDate.now())
-                        .starPoint(1)
-                        .shortReview("ShortReview")
-                        .goodPoint("goodPoint")
-                        .badPoint("badPoint")
-                        .build());
+        Review review = Review.builder()
+                .writer(Users.builder()
+                        .oauthId("oauthId")
+                        .email("danaver12@daum.net")
+                        .password("password")
+                        .roleType(ROLE_USER)
+                        .isExpert(true)
+                        .build())
+                .manufacturer(Manufacturer.createManufacturer("삼성"))
+                .category(LAPTOP)
+                .productName("상품명1")
+                .price(10000)
+                .storeName(1)
+                .boughtAt(LocalDate.now())
+                .starPoint(1)
+                .shortReview("ShortReview")
+                .goodPoint("goodPoint")
+                .badPoint("badPoint")
+                .build();
 
-        given(this.reviewSpecDataRepository.saveAll(anyList()))
-                .willReturn(null);
+        given(this.reviewRepository.save(any(Review.class)))
+                .willReturn(review);
 
         // when
         Long result = this.reviewService.createReview(requestDto);
