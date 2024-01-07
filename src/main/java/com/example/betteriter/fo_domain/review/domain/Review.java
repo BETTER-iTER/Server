@@ -18,17 +18,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@DynamicUpdate
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
+@DynamicUpdate
 @Entity(name = "REVIEW")
+@Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ReviewScrap> reviewScraped = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,6 +51,8 @@ public class Review extends BaseEntity {
     private double starPoint;
     @Column(name = "short_review", nullable = false)
     private String shortReview;
+    @Column(name = "shown_cnt")
+    private long shownCount; // 조회 수
     @Column(name = "click_cnt")
     private long clickCount; // 클릭 수
     @Column(name = "liked_cnt")
@@ -78,36 +78,42 @@ public class Review extends BaseEntity {
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> reviewComment = new ArrayList<>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewSpecData> specData = new ArrayList<>();
 
     @Builder
-    private Review(Long id, Users writer, Manufacturer manufacturer, Category category,
-                   String productName, int storeName, LocalDate boughtAt, int price,
-                   double starPoint, String shortReview, String goodPoint, Status status,
-                   String badPoint, long clickCount, long likedCount, long scrapedCount
+    private Review(Users writer, Manufacturer manufacturer, Category category, String productName,
+                   int price, int storeName, LocalDate boughtAt, double starPoint, String shortReview,
+                   long shownCount, long clickCount, long likedCount, long scrapedCount,
+                   String goodPoint, String badPoint, Status status, List<ReviewImage> reviewImages,
+                   List<ReviewLike> reviewLiked, List<Comment> reviewComment, List<ReviewSpecData> specData
     ) {
-        this.id = id;
         this.writer = writer;
         this.manufacturer = manufacturer;
         this.category = category;
         this.productName = productName;
+        this.price = price;
         this.storeName = storeName;
         this.boughtAt = boughtAt;
-        this.price = price;
         this.starPoint = starPoint;
         this.shortReview = shortReview;
-        this.goodPoint = goodPoint;
-        this.badPoint = badPoint;
+        this.shownCount = shownCount;
         this.clickCount = clickCount;
         this.likedCount = likedCount;
         this.scrapedCount = scrapedCount;
+        this.goodPoint = goodPoint;
+        this.badPoint = badPoint;
         this.status = status;
+        this.reviewImages = reviewImages;
+        this.reviewLiked = reviewLiked;
+        this.reviewComment = reviewComment;
+        this.specData = specData;
     }
 
     public ReviewResponseDto of(String firstImageUrl) {
         return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName).nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage()).isExpert(writer.isExpert()).build();
     }
 
-    // review 클릭 수를 초기화하는 메소드
     public void resetClickCounts() {
         this.clickCount = 0L;
     }
@@ -118,6 +124,11 @@ public class Review extends BaseEntity {
 
     public void countReviewLikedCount() {
         this.likedCount += 1;
+    }
+
+    public void addClickCountsAndShownCounts() {
+        this.clickCount++;
+        this.shownCount++;
     }
 
     // TODO : 제거

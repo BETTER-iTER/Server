@@ -17,7 +17,6 @@ public class CommentConverter {
         return Comment.builder()
                 .review(review)
                 .users(writer)
-                .orderNum(1)
                 .comment(comment)
                 .status(Status.ACTIVE)
                 .build();
