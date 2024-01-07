@@ -820,4 +820,14 @@ class ReviewControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소를 한다 - 성공")
+    void deleteReviewLikeControllerTestInSucess() {
+        // given
+
+        // when
+
+        // then
+    }
 }
