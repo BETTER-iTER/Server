@@ -13,6 +13,7 @@ import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
+import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
@@ -39,6 +40,7 @@ import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -565,7 +567,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.reviewLikeRepository.findByReview(any(Review.class)))
+        given(this.reviewLikeRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
                 .willReturn(Optional.of(reviewLike));
 
         given(this.userService.getCurrentUser())
@@ -575,6 +577,69 @@ public class ReviewServiceTest {
 
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
-        verify(this.reviewLikeRepository, times(1)).findByReview(any(Review.class));
+        verify(this.reviewLikeRepository, times(1)).findByReviewAndUsers(any(Review.class), any(Users.class));
+    }
+
+
+    @Test
+    @DisplayName("리뷰 스크랩 취소를 한다 - 성공")
+    void deleteReviewScrapInSuccess() {
+        // given
+        Review review = createReview(1L);
+
+        Users user = Users.builder()
+                .roleType(ROLE_USER)
+                .email("danaver12@daum.net")
+                .build();
+
+        ReviewScrap reviewScrap = ReviewScrap.builder()
+                .review(review)
+                .users(user)
+                .build();
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(user);
+
+        given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
+                .willReturn(Optional.of(reviewScrap));
+
+        // when
+        this.reviewService.deleteReviewScrap(1L);
+
+        // then
+        verify(this.reviewRepository, times(1)).findById(anyLong());
+        verify(this.userService, times(1)).getCurrentUser();
+        verify(this.reviewScrapRepository, times(1)).findByReviewAndUsers(any(), any());
+    }
+
+    @Test
+    @DisplayName("리뷰 스크랩 취소를 한다 - 실패(리뷰스크랩 데이터 존재 x)")
+    void deleteReviewScrapInFailure() {
+        // given
+        Review review = createReview(1L);
+
+        Users user = Users.builder()
+                .roleType(ROLE_USER)
+                .email("danaver12@daum.net")
+                .build();
+
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        given(this.userService.getCurrentUser())
+                .willReturn(user);
+
+        given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
+                .willReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> this.reviewService.deleteReviewScrap(1L))
+                .isInstanceOf(ReviewHandler.class);
+        verify(this.reviewRepository, times(1)).findById(anyLong());
+        verify(this.userService, times(1)).getCurrentUser();
     }
 }
