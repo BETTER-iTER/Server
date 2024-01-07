@@ -14,17 +14,16 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.betteriter.fo_domain.review.dto.GetReviewDetailResponseDto.*;
 import static com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse.GetUserResponseDto.from;
 import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
 
 
 /**
  * - 리뷰 상세 조회 응답 DTO
-**/
-@JsonPropertyOrder({"reviewDetail", "writerInfo", "relatedReviews"})
+ **/
 @Getter
 @NoArgsConstructor
+@JsonPropertyOrder({"reviewDetail", "writerInfo", "relatedReviews"})
 public class ReviewDetailResponse {
     @JsonProperty("reviewDetail")
     private GetReviewDetailResponseDto getReviewDetailResponseDto; // 리뷰 상세 데이터
@@ -46,7 +45,7 @@ public class ReviewDetailResponse {
                                           boolean isCurrentUserScrapReview, boolean isCurrentUserFollow, boolean isCurrentUserIsReviewWriter
     ) {
         GetReviewDetailResponseDto reviewDetail // 리뷰 상세
-                = GetReviewDetailResponseDto.from(review, isCurrentUserLikeReview, isCurrentUserScrapReview,isCurrentUserFollow, isCurrentUserIsReviewWriter);
+                = GetReviewDetailResponseDto.from(review, isCurrentUserLikeReview, isCurrentUserScrapReview, isCurrentUserFollow, isCurrentUserIsReviewWriter);
 
         GetUserResponseDto writerInfo = from(review.getWriter()); // 리뷰 작성자 데이터
 

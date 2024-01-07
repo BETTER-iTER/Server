@@ -69,9 +69,8 @@ public class Review extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED
     // --------------- Review 관련 엔티티 ---------------- //
-    @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewImage> reviewImages = new ArrayList<>();
+    private final List<ReviewImage> reviewImages = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();
@@ -79,15 +78,15 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> reviewComment = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewSpecData> specData = new ArrayList<>();
+    private final List<ReviewSpecData> specData = new ArrayList<>();
 
     @Builder
-    private Review(Users writer, Manufacturer manufacturer, Category category, String productName,
+    private Review(Long id, Users writer, Manufacturer manufacturer, Category category, String productName,
                    int price, int storeName, LocalDate boughtAt, double starPoint, String shortReview,
                    long shownCount, long clickCount, long likedCount, long scrapedCount,
-                   String goodPoint, String badPoint, Status status, List<ReviewImage> reviewImages,
-                   List<ReviewLike> reviewLiked, List<Comment> reviewComment, List<ReviewSpecData> specData
+                   String goodPoint, String badPoint, Status status
     ) {
+        this.id = id;
         this.writer = writer;
         this.manufacturer = manufacturer;
         this.category = category;
@@ -104,10 +103,6 @@ public class Review extends BaseEntity {
         this.goodPoint = goodPoint;
         this.badPoint = badPoint;
         this.status = status;
-        this.reviewImages = reviewImages;
-        this.reviewLiked = reviewLiked;
-        this.reviewComment = reviewComment;
-        this.specData = specData;
     }
 
     public ReviewResponseDto of(String firstImageUrl) {

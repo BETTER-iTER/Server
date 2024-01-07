@@ -77,7 +77,7 @@ public class GetReviewDetailResponseDto {
                 .manufacturer(review.getManufacturer().getCoName())
                 .storeName(review.getStoreName())
                 .boughtAt(review.getBoughtAt())
-                .createdAt(review.getCreatedAt().toLocalDate())
+                .createdAt(review.getCreatedAt() == null ? LocalDate.now() : review.getCreatedAt().toLocalDate())
                 .reviewImages(GetReviewImageResponseDto.of(review.getReviewImages()))
                 .scrapedCount(review.getScrapedCount())
                 .likedCount(review.getLikedCount())
