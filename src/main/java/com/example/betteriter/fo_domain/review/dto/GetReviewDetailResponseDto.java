@@ -21,6 +21,7 @@ public class GetReviewDetailResponseDto {
     private String shortReview; // 리뷰 한줄평
     private String manufacturer; // 제조사 이름
     private int storeName; // 구매처
+    private String comparedProductName; // 비교 제품
     private LocalDate boughtAt; // 구매 일
     private LocalDate createdAt; // 작성일
     private List<GetReviewImageResponseDto> reviewImages; // 리뷰 이미지
@@ -38,7 +39,7 @@ public class GetReviewDetailResponseDto {
     public GetReviewDetailResponseDto(Long reviewId, String productName, List<String> reviewSpecData, double starPoint,
                                       String goodPoint, String badPoint, String shortReview, String manufacturer,
                                       int storeName, LocalDate boughtAt, LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages,
-                                      long scrapedCount, long likedCount, long commentCount,
+                                      long scrapedCount, long likedCount, long commentCount, String comparedProductName,
                                       boolean isScrap, boolean isLike, boolean isFollow, boolean isMine
     ) {
         this.reviewId = reviewId;
@@ -50,6 +51,7 @@ public class GetReviewDetailResponseDto {
         this.shortReview = shortReview;
         this.manufacturer = manufacturer;
         this.storeName = storeName;
+        this.comparedProductName = comparedProductName;
         this.boughtAt = boughtAt;
         this.createdAt = createdAt;
         this.reviewImages = reviewImages;
@@ -74,6 +76,7 @@ public class GetReviewDetailResponseDto {
                 .shortReview(review.getShortReview())
                 .manufacturer(review.getManufacturer().getCoName())
                 .storeName(review.getStoreName())
+                .comparedProductName(review.getComparedProductName())
                 .boughtAt(review.getBoughtAt())
                 .createdAt(review.getCreatedAt().toLocalDate())
                 .reviewImages(GetReviewImageResponseDto.of(review.getReviewImages()))

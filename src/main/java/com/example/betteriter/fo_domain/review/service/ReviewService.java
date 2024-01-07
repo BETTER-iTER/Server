@@ -57,6 +57,7 @@ public class ReviewService {
 
         // 3. 리뷰 스펙 데이터 저장
         this.reviewSpecDataRepository.saveAll(this.getReviewSpecData(request, review));
+
         return review.getId();
     }
 
