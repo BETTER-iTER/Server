@@ -130,11 +130,17 @@ public class Review extends BaseEntity {
     }
 
     public void minusReviewScrapedCount() {
-        this.scrapedCount -= 1;
+        if (this.scrapedCount == 0) {
+            return;
+        }
+        this.scrapedCount--;
     }
 
     public void minusReviewLikedCount() {
-        this.likedCount -= 1;
+        if (this.likedCount == 0) {
+            return;
+        }
+        this.likedCount--;
     }
 
     public void addClickCountsAndShownCounts() {
