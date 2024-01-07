@@ -14,6 +14,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.betteriter.global.constant.Status.ACTIVE;
+
 @Getter
 @NoArgsConstructor
 public class CreateReviewRequestDto {
@@ -36,7 +38,7 @@ public class CreateReviewRequestDto {
     private int storeName; // 구매처
 
     @NotBlank(message = "비교 제품은 필수 입력 값입니다.")
-    private String comparedProductName;
+    private String comparedProductName; // 비교 제품
 
     @NotBlank(message = "한줄평은 필수 입력 값입니다.")
     private String shortReview; // 한줄평
@@ -88,6 +90,7 @@ public class CreateReviewRequestDto {
                 .starPoint(starPoint)
                 .goodPoint(goodPoint)
                 .badPoint(badPoint)
+                .status(ACTIVE)
                 .build();
     }
 
