@@ -209,11 +209,12 @@ public class ReviewService {
 
     /* 리뷰 스크랩 취소 */
     @Transactional
-    public void deleteReviewScrap(Long reviewId) {
+    public Void deleteReviewScrap(Long reviewId) {
         Review review = this.findReviewById(reviewId);
         ReviewScrap reviewScrap = checkReviewScrapValidation(review);
         this.reviewScrapRepository.delete(reviewScrap);
         review.minusReviewScrapedCount();
+        return null;
     }
 
     @NotNull

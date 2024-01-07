@@ -114,7 +114,7 @@ public class ReviewServiceTest {
                 .manufacturer(Manufacturer.builder().coName("삼성").build())
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
-                .likedCount(count)
+                .likedCount(count + 2)
                 .shownCount(count)
                 .scrapedCount(count)
                 .goodPoint("goodPoint")
@@ -587,6 +587,8 @@ public class ReviewServiceTest {
         // given
         Review review = createReview(1L);
 
+        long previousLikedCount = review.getLikedCount();
+
         Users user = Users.builder()
                 .roleType(ROLE_USER)
                 .email("danaver12@daum.net")
@@ -606,8 +608,9 @@ public class ReviewServiceTest {
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
                 .willReturn(Optional.of(reviewScrap));
 
+
         // when
-        this.reviewService.deleteReviewScrap(1L);
+        Void result = this.reviewService.deleteReviewScrap(1L);
 
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
@@ -636,7 +639,7 @@ public class ReviewServiceTest {
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
                 .willReturn(Optional.empty());
 
-        // then
+        // when && then
         assertThatThrownBy(() -> this.reviewService.deleteReviewScrap(1L))
                 .isInstanceOf(ReviewHandler.class);
         verify(this.reviewRepository, times(1)).findById(anyLong());

@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_LIKE_USER_NOT_MATCH;
 import static com.example.betteriter.global.constant.Category.PC;
 import static com.example.betteriter.global.constant.Job.CEO;
 import static com.example.betteriter.global.constant.Job.SW_DEVELOPER;
@@ -483,7 +482,7 @@ class ReviewControllerTest {
                 .build();
 
         // when && then
-        mockMvc.perform(post("/review/like/{reviewId}", 1L)
+        mockMvc.perform(post("/review/{reviewId}/like", 1L)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -839,7 +838,7 @@ class ReviewControllerTest {
 
 
         // when && then
-        mockMvc.perform(delete("/review/like/{reviewId}", 1L)
+        mockMvc.perform(delete("/review/{reviewId}/like", 1L)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -850,15 +849,52 @@ class ReviewControllerTest {
     @DisplayName("리뷰 좋아요 취소 좋아요 유저와 로그인 유저 다름 - 실패")
     void deleteReviewLikeInFailure() throws Exception {
         // given
-
         given(this.reviewService.deleteReviewLike(anyLong()))
-                .willThrow(new ReviewHandler(_REVIEW_LIKE_USER_NOT_MATCH));
+                .willThrow(new ReviewHandler(ErrorStatus._REVIEW_LIKE_NOT_FOUND));
         // when && then
-        mockMvc.perform(delete("/review/like/{reviewId}", 1L)
+        mockMvc.perform(delete("/review/{reviewId}/like", 1L)
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.isSuccess").value(false))
-                .andExpect(jsonPath("$.code").value("REVIEW_LIKE_USER_NOT_MATCH_400"));
+                .andExpect(jsonPath("$.code").value("REVIEW_LIKE_NOT_FOUND_400"));
+    }
+
+    @Test
+    @DisplayName("리뷰 스크랩 취소를 한다 - 성공")
+    void deleteReviewScrapInSuccess() throws Exception {
+        // given
+
+        // 스크랩 하는 리뷰
+        Review review = createReview(1L);
+
+        // 스크랩 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+
+        // when && then
+        this.mockMvc.perform(delete("/review/{reviewId}/scrap", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("리뷰 스크랩 취소 스크랩 유저와 로그인 유저 다름 - 실패")
+    void deleteReviewScrapInFailure() throws Exception {
+        // given
+        given(this.reviewService.deleteReviewScrap(anyLong()))
+                .willThrow(new ReviewHandler(ErrorStatus._REVIEW_SCRAP_NOT_FOUND));
+        // when && then
+        mockMvc.perform(delete("/review/{reviewId}/scrap", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.isSuccess").value(false))
+                .andExpect(jsonPath("$.code").value("REVIEW_SCRAP_NOT_FOUND_400"));
     }
 }
