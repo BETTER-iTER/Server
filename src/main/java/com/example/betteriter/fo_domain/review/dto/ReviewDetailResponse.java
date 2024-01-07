@@ -21,7 +21,6 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._REVI
 /**
  * - 리뷰 상세 조회 응답 DTO
  **/
-@JsonPropertyOrder({"reviewDetail", "writerInfo", "relatedReviews"})
 @Getter
 @NoArgsConstructor
 @JsonPropertyOrder({"reviewDetail", "writerInfo", "relatedReviews"})

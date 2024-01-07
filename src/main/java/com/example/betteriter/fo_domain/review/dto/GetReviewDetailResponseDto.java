@@ -39,10 +39,10 @@ public class GetReviewDetailResponseDto {
     @Builder
     public GetReviewDetailResponseDto(Long reviewId, String productName, List<String> reviewSpecData, double starPoint,
                                       String goodPoint, String badPoint, String shortReview, String manufacturer,
-                                      int storeName, LocalDate boughtAt, LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages,
-                                      long scrapedCount, long likedCount, long commentCount, String comparedProductName,
-                                      int price, long shownCount, long scrapedCount, long likedCount, long commentCount,
-                                      boolean isScrap, boolean isLike, boolean isFollow, boolean isMine
+                                      int storeName, String comparedProductName, LocalDate boughtAt, LocalDate createdAt,
+                                      List<GetReviewImageResponseDto> reviewImages, int price, long shownCount,
+                                      long scrapedCount, long likedCount, long commentCount, boolean isScrap,
+                                      boolean isLike, boolean isFollow, boolean isMine
     ) {
         this.reviewId = reviewId;
         this.productName = productName;
