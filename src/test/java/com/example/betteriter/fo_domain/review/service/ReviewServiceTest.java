@@ -76,7 +76,7 @@ public class ReviewServiceTest {
     @Mock
     private ReviewSpecDataRepository reviewSpecDataRepository;
 
-    private static Review createReview(long count) {
+    private Review createReview(long count) {
 
         Users writer = Users.builder()
                 .id(1L)
@@ -113,6 +113,7 @@ public class ReviewServiceTest {
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
                 .likedCount(count)
+                .shownCount(count)
                 .scrapedCount(count)
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
@@ -123,8 +124,8 @@ public class ReviewServiceTest {
         List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
                 ReviewLike.builder().review(review).users(user02).build());
 
-        List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").orderNum(1).groupId(1).status(ACTIVE).build(),
-                Comment.builder().users(user02).comment("comment02").orderNum(2).groupId(2).status(ACTIVE).build());
+        List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").status(ACTIVE).build(),
+                Comment.builder().users(user02).comment("comment02").status(ACTIVE).build());
 
         review.setReviewsComment(comments);
         review.setReviewLikes(reviewLikes);
@@ -133,7 +134,7 @@ public class ReviewServiceTest {
         return review;
     }
 
-    private static ReviewImage createReviewImage(Review review) {
+    private ReviewImage createReviewImage(Review review) {
         return ReviewImage.builder()
                 .id(review.getId())
                 .review(review)
@@ -379,6 +380,8 @@ public class ReviewServiceTest {
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
         assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
         assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getShownCount()).isEqualTo(2L);
+        assertThat(reviewDetail.getGetReviewDetailResponseDto().getPrice()).isEqualTo(10);
         verify(reviewRepository, times(1)).findById(anyLong());
         verify(reviewRepository, times(0)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
     }
@@ -528,7 +531,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("리뷰 삭제을 한다.")
     void deleteReviewServiceTest() {
         // given
         Review review = createReview(1L);
