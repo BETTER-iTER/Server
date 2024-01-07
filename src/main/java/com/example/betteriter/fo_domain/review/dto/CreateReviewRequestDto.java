@@ -35,6 +35,9 @@ public class CreateReviewRequestDto {
     @NotNull(message = "구매처 정보는 필수 입력 값입니다.")
     private int storeName; // 구매처
 
+    @NotBlank(message = "비교 제품은 필수 입력 값입니다.")
+    private String comparedProductName;
+
     @NotBlank(message = "한줄평은 필수 입력 값입니다.")
     private String shortReview; // 한줄평
 
@@ -51,16 +54,18 @@ public class CreateReviewRequestDto {
     private List<CreateReviewImageRequestDto> images; // 리뷰 이미지
 
     @Builder
-    private CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                   String manufacturer, int price, int storeName, String shortReview,
-                                   int starPoint, String goodPoint, String badPoint, List<Long> specData,
-                                   List<CreateReviewImageRequestDto> images) {
+    public CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
+                                  String manufacturer, int price, int storeName,
+                                  String comparedProductName, String shortReview, int starPoint, String goodPoint,
+                                  String badPoint, List<Long> specData, List<CreateReviewImageRequestDto> images
+    ) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
         this.manufacturer = manufacturer;
         this.price = price;
         this.storeName = storeName;
+        this.comparedProductName = comparedProductName;
         this.shortReview = shortReview;
         this.starPoint = starPoint;
         this.goodPoint = goodPoint;
@@ -77,6 +82,7 @@ public class CreateReviewRequestDto {
                 .boughtAt(boughtAt)
                 .manufacturer(manufacturer)
                 .price(price)
+                .comparedProductName(comparedProductName)
                 .storeName(storeName)
                 .shortReview(shortReview)
                 .starPoint(starPoint)
