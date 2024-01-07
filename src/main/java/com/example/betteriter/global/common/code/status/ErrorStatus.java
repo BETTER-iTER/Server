@@ -64,7 +64,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // REVIEW_LIKE
     _REVIEW_LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_LIKE_NOT_FOUND_400", "일치하는 리뷰 좋아요 정보를 찾을 수 없습니다."),
-    _REVIEW_LIKE_USER_NOT_MATCH(HttpStatus.BAD_REQUEST, "REVIEW_LIKE_USER_NOT_MATCH_400", "리뷰 좋아요 유저와 로그인한 유저가 다릅니다."),
+
+    // REVIEW_SCRAP
+    _REVIEW_SCRAP_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_SCRAP_NOT_FOUND_400", "일치하는 리뷰 스크랩 정보를 찾을 수 없습니다."),
 
     // News
     _NEWS_NOT_FOUND(HttpStatus.BAD_REQUEST, "NEWS_400", "일치하는 뉴스 정보를 찾을 수 없습니다."),
