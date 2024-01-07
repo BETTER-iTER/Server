@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
     private static final int SIZE = 7;
     private final UserService userService;
@@ -108,11 +108,13 @@ public class ReviewService {
     }
 
     /* 리뷰 상세 조회 */
-    @Transactional(readOnly = true)
+    @Transactional
     public ReviewDetailResponse getReviewDetail(Long reviewId) {
         // 1. reviewId 에 해당하는 리뷰 조회
         Review review = this.findReviewById(reviewId);
         Users currentUser = this.getCurrentUser();
+
+        review.addClickCountsAndShownCounts();
 
         // 2. 동일한 제품명 리뷰 조회(4)
         List<Review> relatedReviews
@@ -135,9 +137,11 @@ public class ReviewService {
         List<Review> totalRelatedReviews = Stream.concat(relatedReviews.stream(), restRelatedReviews.stream())
                 .collect(Collectors.toList());
 
+
         return ReviewDetailResponse.of(review, totalRelatedReviews,
                 currentUserLikeReview, currentUserScrapReview,
                 currentUserFollowReviewWriter, isCurrentUserIsReviewWriter);
+
     }
 
     /* 리뷰 상세 좋아요 조회 */

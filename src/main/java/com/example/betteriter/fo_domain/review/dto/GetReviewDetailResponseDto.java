@@ -25,7 +25,8 @@ public class GetReviewDetailResponseDto {
     private LocalDate boughtAt; // 구매 일
     private LocalDate createdAt; // 작성일
     private List<GetReviewImageResponseDto> reviewImages; // 리뷰 이미지
-
+    private int price; // 상품 가격
+    private long shownCount; // 조회 수
     private long scrapedCount; // 리뷰 스크랩 갯수
     private long likedCount; // 리뷰 좋아요 갯수
     private long commentCount; // 리뷰 댓글 갯수
@@ -40,6 +41,7 @@ public class GetReviewDetailResponseDto {
                                       String goodPoint, String badPoint, String shortReview, String manufacturer,
                                       int storeName, LocalDate boughtAt, LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages,
                                       long scrapedCount, long likedCount, long commentCount, String comparedProductName,
+                                      int price, long shownCount, long scrapedCount, long likedCount, long commentCount,
                                       boolean isScrap, boolean isLike, boolean isFollow, boolean isMine
     ) {
         this.reviewId = reviewId;
@@ -55,7 +57,8 @@ public class GetReviewDetailResponseDto {
         this.boughtAt = boughtAt;
         this.createdAt = createdAt;
         this.reviewImages = reviewImages;
-
+        this.price = price;
+        this.shownCount = shownCount;
         this.scrapedCount = scrapedCount;
         this.likedCount = likedCount;
         this.commentCount = commentCount;
@@ -78,11 +81,13 @@ public class GetReviewDetailResponseDto {
                 .storeName(review.getStoreName())
                 .comparedProductName(review.getComparedProductName())
                 .boughtAt(review.getBoughtAt())
-                .createdAt(review.getCreatedAt().toLocalDate())
+                .createdAt(review.getCreatedAt() == null ? LocalDate.now() : review.getCreatedAt().toLocalDate())
                 .reviewImages(GetReviewImageResponseDto.of(review.getReviewImages()))
                 .scrapedCount(review.getScrapedCount())
                 .likedCount(review.getLikedCount())
                 .commentCount(review.getReviewComment().size())
+                .price(review.getPrice())
+                .shownCount(review.getShownCount())
                 .isScrap(isScrap)
                 .isLike(isLike)
                 .isFollow(isFollow)
