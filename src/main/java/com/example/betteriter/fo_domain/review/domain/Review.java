@@ -20,17 +20,16 @@ import java.util.List;
 
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "status = 'ACTIVE'")
 @DynamicUpdate
 @Entity(name = "REVIEW")
 @Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
+    // --------------- Review 관련 엔티티 ---------------- //
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ReviewScrap> reviewScraped = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -74,9 +73,6 @@ public class Review extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED
-    // --------------- Review 관련 엔티티 ---------------- //
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewImage> reviewImages = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();
@@ -87,13 +83,12 @@ public class Review extends BaseEntity {
     private final List<ReviewSpecData> specData = new ArrayList<>();
 
     @Builder
-    public Review(List<ReviewSpecData> specData, Long id, Users writer, Manufacturer manufacturer,
+    public Review(Long id, Users writer, Manufacturer manufacturer, long shownCount,
                   Category category, String productName, int price, int storeName, String comparedProductName,
                   LocalDate boughtAt, double starPoint, String shortReview, long clickCount, long likedCount,
                   long scrapedCount, String goodPoint, String badPoint, Status status
 
     ) {
-        this.specData = specData;
         this.id = id;
         this.writer = writer;
         this.manufacturer = manufacturer;
