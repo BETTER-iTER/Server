@@ -10,6 +10,7 @@ import com.example.betteriter.global.constant.Status;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -22,16 +23,10 @@ import java.util.List;
 @Getter
 @DynamicUpdate
 @Entity(name = "REVIEW")
-@Where(clause = "status = 'ACTIVE'") // ACTIVE 상태인 REVIEW 만 조회
+@Where(clause = "status = 'ACTIVE'")
+@SQLDelete(sql = "UPDATE iterdb.review SET review.status = 'DELETED' WHERE review.id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
-    // --------------- Review 관련 엔티티 ---------------- //
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewImage> reviewImages = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewScrap> reviewScraped = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -74,7 +69,15 @@ public class Review extends BaseEntity {
     private String badPoint;
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status; // ACTIVE, DELETED
+    private Status status; // ACTIVE, DELETED, INACTIVE
+
+    // --------------- Review 관련 엔티티 ---------------- //
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewImage> reviewImages = new ArrayList<>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewScrap> reviewScraped = new ArrayList<>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewSpecData> specData = new ArrayList<>();
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLiked = new ArrayList<>();

@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Getter
@@ -38,6 +40,9 @@ public class Comment extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status; // 댓글 상태: ACTIVE, INACTIVE, DELETED
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> commentLikes = new ArrayList<>();
 
     @Builder
     private Comment(Review review, Users users, String comment, Status status) {
