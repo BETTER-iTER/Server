@@ -30,6 +30,8 @@ public class Review extends BaseEntity {
     private final List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ReviewScrap> reviewScraped = new ArrayList<>();
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ReviewSpecData> specData = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,10 +66,10 @@ public class Review extends BaseEntity {
     private long likedCount; // 좋아요 수
     @Column(name = "scraped_cnt")
     private long scrapedCount; // 스크랩 수
-    @Lob // 최대 500 자
+    @Lob
     @Column(name = "good_point", nullable = false)
     private String goodPoint;
-    @Lob // 최대 500 자
+    @Lob
     @Column(name = "bad_point", nullable = false)
     private String badPoint;
     @Column(name = "status", nullable = false)
@@ -79,8 +81,6 @@ public class Review extends BaseEntity {
     @Setter
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> reviewComment = new ArrayList<>();
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<ReviewSpecData> specData = new ArrayList<>();
 
     @Builder
     public Review(Long id, Users writer, Manufacturer manufacturer, long shownCount,
