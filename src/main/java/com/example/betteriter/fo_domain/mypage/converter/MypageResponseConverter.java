@@ -40,6 +40,7 @@ public class MypageResponseConverter {
 
         followerList.forEach(f -> {
             MypageResponse.FollowerDto followerDto = MypageResponse.FollowerDto.builder()
+                    .id(f.getId())
                     .email(f.getEmail())
                     .profileImage(f.getUsersDetail().getProfileImage())
                     .nickname(f.getUsersDetail().getNickName())

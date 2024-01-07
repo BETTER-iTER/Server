@@ -11,11 +11,13 @@ import com.example.betteriter.fo_domain.user.service.UserService;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,25 +50,29 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public List<Users> getFollowerList(Users user, int page, int size) {
+    public List<Users> getFollowingList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Follow> followerList = followReadRepository.findByFollowerId(user.getId(), pageable);
+        List<Follow> followingList = followReadRepository.findByFollowerIdOrderByCreatedAt(user.getId(), pageable);
 
-        return followerList.stream()
-                .map(Follow::getFollowee)
-                .collect(Collectors.toList());
+        return toUserList(followingList);
     }
 
     @Transactional(readOnly = true)
-    public List<Users> getFolloweeList(Users user, int page, int size) {
+    public List<Users> getFollowerList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Follow> followeeList = followReadRepository.findByFolloweeId(user.getId(), pageable);
+        List<Follow> followerList = followReadRepository.findByFolloweeIdOrderByCreatedAt(user.getId(), pageable);
 
-        return followeeList.stream()
-                .map(Follow::getFollower)
-                .collect(Collectors.toList());
+        return toUserList(followerList);
     }
 
+    @NotNull
+    private static List<Users> toUserList(List<Follow> followingList) {
+        List<Users> usersList = new ArrayList<>();
+        for (Follow follow : followingList) {
+            usersList.add(follow.getFollowee());
+        }
+        return usersList;
+    }
     public boolean isFollow(Users follower, Users followee) {
         return this.followReadRepository.existsByFollowerAndFollowee(follower,followee);
     }
