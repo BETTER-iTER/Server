@@ -4,13 +4,10 @@ import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.RoleType;
 import com.example.betteriter.global.constant.Status;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
-import java.util.Map;
 
 @Slf4j
 @Getter
@@ -30,7 +27,7 @@ public class Notification extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RoleType actorType; // ROLE_USER, ROLE_EXPERTISE, ROLE_ADMIN
 
-    @Column(name = "actor_name", nullable = false)
+    @Column(name = "actor_nickName", nullable = false)
     private String actorName; // User name
 
     @JoinColumn(name = "receiver_id", nullable = false)
@@ -51,4 +48,18 @@ public class Notification extends BaseEntity {
     @Column(name = "status", nullable = false)
     @Enumerated
     private Status status = Status.ACTIVE;
+
+    @Builder
+    public Notification(
+            Users actor, RoleType actorType, String actorName,
+            Users receiver,
+            MessageType messageType, MessageJson messageJson
+    ) {
+        this.actor = actor;
+        this.actorType = actorType;
+        this.actorName = actorName;
+        this.receiver = receiver;
+        this.messageType = messageType;
+        this.messageJson = messageJson;
+    }
 }

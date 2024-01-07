@@ -7,12 +7,10 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Getter
-@Setter
 public class MessageJson {
     private Long id;
     private String title;
     private String content;
-    private String url;
 
     @Override
     public boolean equals(Object o) {
@@ -21,13 +19,20 @@ public class MessageJson {
         MessageJson that = (MessageJson) o;
         return  Objects.equals(id, that.id) &&
                 Objects.equals(title, that.title) &&
-                Objects.equals(content, that.content) &&
-                Objects.equals(url, that.url);
+                Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, content, url);
+        return Objects.hash(id, title, content);
+    }
+
+    public static MessageJson of(Long id, String title, String content) {
+        MessageJson messageJson = new MessageJson();
+        messageJson.id = id;
+        messageJson.title = title;
+        messageJson.content = content;
+        return messageJson;
     }
 
     public static class MessageJsonConverter extends JsonConverter<MessageJson> {}
