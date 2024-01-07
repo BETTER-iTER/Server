@@ -25,7 +25,7 @@ public enum Category {
     SPEAKER("스피커", "https://velog.velcdn.com/images/choidongkuen/post/b0f162b5-eabc-4c41-a98d-750eaa226f77/image.png"),
     BATTERY_CHARGER("보조배터리", "https://velog.velcdn.com/images/choidongkuen/post/59eedd5c-4f27-4e43-b873-5b539d521311/image.png"),
     ACCESSORY("악세서리", "https://velog.velcdn.com/images/choidongkuen/post/b4202564-f549-4459-af56-01cae91f1f48/image.png"),
-    ETC("기타", "기타 URL");
+    ETC("기타", "https://velog.velcdn.com/images/choidongkuen/post/6dcd592a-697c-4055-b614-6d79d4eaf16a/image.png");
 
     private final String categoryName;
     private final String imgUrl;
