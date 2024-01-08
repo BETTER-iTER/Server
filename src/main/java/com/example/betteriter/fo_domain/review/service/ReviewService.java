@@ -14,6 +14,7 @@ import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -85,18 +86,14 @@ public class ReviewService {
      * case 02 : 있다면 최신순 리뷰 리스트 응답
      **/
     @Transactional(readOnly = true)
-    public ReviewResponse getReviewBySearch(String name, String sort, int page) {
+    public ReviewResponse getReviewBySearch(String name, String sort, int page, Category category, boolean expert) {
+        Pageable pageable = PageRequest.of(page, SIZE);
         // 1. 필터링 따른 상품 이름에 해당하는 리뷰 조회
-        Slice<Review> reviews = getReviews(name, sort, page);
+        Slice<Review> reviews = reviewRepository.findReviewsBySearch(name, sort, pageable, category, expert);
 
         // 2. 데이터 갯수 null 인 경우
-        if (Objects.requireNonNull(reviews).isEmpty()) {
-            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
-                    .stream()
-                    .map(GetReviewResponseDto::of)
-                    .collect(Collectors.toList());
-            return new ReviewResponse(result, false, false);
-        }
+        ReviewResponse result = checkIsEmptyReviews(reviews);
+        if (result != null) return result;
 
         // 3. 데이터 갯수 null 아닌 경우
         List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent().stream()
@@ -104,6 +101,19 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
+    }
+
+    @Nullable
+    private ReviewResponse checkIsEmptyReviews(Slice<Review> reviews) {
+        // 검색 결과 없는 경우
+        if (Objects.requireNonNull(reviews).isEmpty()) {
+            List<GetReviewResponseDto> result
+                    = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc().stream()
+                    .map(GetReviewResponseDto::of)
+                    .collect(Collectors.toList());
+            return new ReviewResponse(result, false, false);
+        }
+        return null;
     }
 
     /* 리뷰 상세 조회 */
@@ -233,32 +243,33 @@ public class ReviewService {
         return null;
     }
 
-    private Slice<Review> getReviews(String name, String sort, int page) {
-        Slice<Review> reviews = null;
-        Pageable pageable = PageRequest.of(page, SIZE);
-        switch (sort) {
-            // 최신순
-            case "latest":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
-                break;
-            // 좋아요 많은 순
-            case "mostLiked":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
-                break;
-            // 스크랩 많은 순
-            case "mostScraped":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
-
-                // 리뷰 작성자의 팔로워가 많은 순
-            case "mostFollowers":
-                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
-                break;
-        }
-        return reviews;
-    }
+//    private Slice<Review> getReviews(String name, String sort, int page, Category category, boolean expert) {
+//        Slice<Review> reviews = null;
+//        Pageable pageable = PageRequest.of(page, SIZE);
+//
+//        switch (sort) {
+//            // 최신순
+//            case "latest":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
+//                break;
+//            // 좋아요 많은 순
+//            case "mostLiked":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
+//                break;
+//            // 스크랩 많은 순
+//            case "mostScraped":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
+//
+//                // 리뷰 작성자의 팔로워가 많은 순
+//            case "mostFollowers":
+//                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
+//                break;
+//        }
+//        return reviews;
+//    }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
         // 요청으로 들어온 specData 조회
@@ -304,7 +315,7 @@ public class ReviewService {
         return this.reviewRepository.findAllByReviewScrapedUser(user, pageable);
     }
 
-    public List<Review> getLikeReviewList(Users user, int page, int size) {
+    public Slice<Review> getLikeReviewList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return this.reviewRepository.findAllByReviewLikedUser(user, pageable);
     }
