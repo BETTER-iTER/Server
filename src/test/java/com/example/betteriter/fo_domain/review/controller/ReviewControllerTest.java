@@ -136,7 +136,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt(), any(), any()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
@@ -183,7 +183,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt(), any(), any()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false).build());
@@ -264,7 +264,7 @@ class ReviewControllerTest {
                 .firstImage("firstImage")
                 .build();
 
-        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+        given(reviewService.getReviewBySearch(anyString(), anyString(), anyInt(), any(), any()))
                 .willReturn(ReviewResponse.builder()
                         .getReviewResponseDtoList(List.of(getReviewResponseDto))
                         .hasNext(false)
@@ -282,7 +282,7 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.message").value("OK"))
                 .andExpect(jsonPath("$.result.existed").value(true));
         // then
-        verify(this.reviewService, times(1)).getReviewBySearch(anyString(), anyString(), anyInt());
+        verify(this.reviewService, times(1)).getReviewBySearch(anyString(), anyString(), anyInt(), any(), any());
     }
 
     @Test
@@ -377,7 +377,7 @@ class ReviewControllerTest {
                 .isExisted(true)
                 .build();
 
-        given(this.reviewService.getReviewBySearch(anyString(), anyString(), anyInt()))
+        given(this.reviewService.getReviewBySearch(anyString(), anyString(), anyInt(), any(), any()))
                 .willReturn(reviewResponse);
         // when & then
         mockMvc.perform(get("/review/search")

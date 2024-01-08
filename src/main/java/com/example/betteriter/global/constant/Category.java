@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,10 @@ public enum Category {
     /* 요청으로 들어온 문자열이 Enum 타입으로 역직렬화될때 메소드의 매개변수로 들어감 */
     @JsonCreator
     public static Category from(String name) {
+        if (!StringUtils.hasText(name)) {
+            return null;
+        }
+
         for (Category category : Category.values()) {
             if (category.getCategoryName().equals(name)) {
                 return category;

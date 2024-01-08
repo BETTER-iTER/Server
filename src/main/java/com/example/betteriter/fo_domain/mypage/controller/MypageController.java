@@ -5,11 +5,13 @@ import com.example.betteriter.fo_domain.mypage.converter.MypageResponseConverter
 import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.mypage.service.MypageService;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,11 +64,11 @@ public class MypageController {
      * @return List<MypageResponse.MyReviewDto>
      */
     @GetMapping("/review/like")
-    public ResponseDto<MypageResponse.ReviewListDto> getLikeReview(
+    public ResponseDto<ReviewResponse> getLikeReview(
             @RequestParam int page
     ) {
-        List<Review> reviewList = mypageService.getLikeReviewList(page);
-        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
+        Slice<Review> reviewList = mypageService.getLikeReviewList(page);
+        return ResponseDto.onSuccess(MypageResponseConverter.toReviewResponse(reviewList));
     }
 
     /**
