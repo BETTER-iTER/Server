@@ -60,6 +60,7 @@ public class ReviewRepositoryTest {
                 .price(10)
                 .storeName(1)
                 .status(ACTIVE)
+                .comparedProductName("comparedProductName")
                 .boughtAt(LocalDate.now())
                 .starPoint(1)
                 .likedCount(count)
@@ -787,7 +788,7 @@ public class ReviewRepositoryTest {
 
     @Test
     @DisplayName("동일한 제품명을 좋아요 + 스크랩 많은 순으로 조회한다.")
-    void findTop4ByProductNameOrderByScrapedCntPlusLikedCntDescTest(){
+    void findTop4ByProductNameOrderByScrapedCntPlusLikedCntDescTest() {
         // given
         Review review01 = createReview(1L);
         Review review02 = createReview(2L);

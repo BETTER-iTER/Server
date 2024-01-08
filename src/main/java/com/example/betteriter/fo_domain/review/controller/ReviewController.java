@@ -17,11 +17,11 @@ import java.util.List;
 
 import static com.example.betteriter.global.common.code.status.ErrorStatus._METHOD_ARGUMENT_ERROR;
 
-@Tag(name = "ReviewController", description = "Review API")
 @Slf4j
+@RestController
 @RequestMapping("/review")
 @RequiredArgsConstructor
-@RestController
+@Tag(name = "ReviewController", description = "Review API")
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -57,9 +57,11 @@ public class ReviewController {
     public ResponseDto<ReviewResponse> getReviewsBySearch(
             @RequestParam String name,
             @RequestParam String sort,
-            @RequestParam int page
+            @RequestParam int page,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Boolean expert
     ) {
-        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name, sort, page));
+        return ResponseDto.onSuccess(this.reviewService.getReviewBySearch(name, sort, page, Category.from(category), expert));
     }
 
     /* 리뷰 상세 조회 */

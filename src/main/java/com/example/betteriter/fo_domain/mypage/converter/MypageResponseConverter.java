@@ -2,12 +2,26 @@ package com.example.betteriter.fo_domain.mypage.converter;
 
 import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
+import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.user.domain.Users;
+import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MypageResponseConverter {
+
+    public static ReviewResponse toReviewResponse(Slice<Review> reviews) {
+        List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent()
+                .stream()
+                .map(GetReviewResponseDto::of)
+                .collect(Collectors.toList());
+
+        return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), !reviews.isEmpty());
+    }
+
     public static MypageResponse.ReviewListDto toReviewListDto(List<Review> reviewList) {
         List<MypageResponse.ReviewDto> myReviewList = new ArrayList<>();
 
@@ -16,7 +30,7 @@ public class MypageResponseConverter {
                     .reviewId(r.getId())
                     .title(r.getProductName())
                     .thumbnailImage((!r.getReviewImages().isEmpty()) ?
-                                    r.getReviewImages().get(0).getImgUrl(): null)
+                            r.getReviewImages().get(0).getImgUrl() : null)
                     .writerId(r.getWriter().getId())
                     .writerJob(r.getWriter().getUsersDetail().getJob())
                     .writerNickname(r.getWriter().getUsersDetail().getNickName())
@@ -55,7 +69,7 @@ public class MypageResponseConverter {
     }
 
     public static MypageResponse.UserProfileDto toUserProfileDto(
-            Users user, Integer reviewCount, Integer scrapCount ,Integer followerCount, Integer followingCount
+            Users user, Integer reviewCount, Integer scrapCount, Integer followerCount, Integer followingCount
     ) {
         return MypageResponse.UserProfileDto.builder()
                 .profileImage(user.getUsersDetail().getProfileImage())

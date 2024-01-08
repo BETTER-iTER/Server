@@ -7,7 +7,7 @@ import com.example.betteriter.bo_domain.news.dto.UpdateITNewsRequestDto;
 import com.example.betteriter.bo_domain.news.exception.NewsHandler;
 import com.example.betteriter.bo_domain.news.repository.NewsRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
-import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.fo_domain.user.service.UserConnector;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,19 +15,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class NewsService {
-    private final UserService userService;
+    private final UserConnector userConnector;
     private final NewsRepository newsRepository;
 
     /* ITNews 생성 */
     @Transactional
     public Long createITNews(CreateITNewsRequestDto request) {
-        return this.newsRepository.save(request.toEntity(this.userService.getCurrentUser())).getId();
+        return this.newsRepository.save(request.toEntity(getCurrentUser())).getId();
     }
 
     /* ITNews 조회 */
@@ -46,20 +45,16 @@ public class NewsService {
     /* ITNews 수정 */
     @Transactional
     public void updateITNews(Long id, UpdateITNewsRequestDto request) {
-        Users currentUsers = this.userService.getCurrentUser();
+        Users currentUsers = getCurrentUser();
         this.getNews(id).update(request, currentUsers);
-    }
-
-
-    /* 홈 화면에서 최신순 5개 조회 */
-    public List<ITNewsResponseDto> getTop5ITNews() {
-        return this.newsRepository.findTop5ByOrderByCreatedAtDesc().stream()
-                .map(News::from)
-                .collect(Collectors.toList());
     }
 
     private News getNews(Long id) {
         return this.newsRepository.findById(id)
                 .orElseThrow(() -> new NewsHandler(ErrorStatus._NEWS_NOT_FOUND));
+    }
+
+    private Users getCurrentUser() {
+        return this.userConnector.getCurrentUser();
     }
 }

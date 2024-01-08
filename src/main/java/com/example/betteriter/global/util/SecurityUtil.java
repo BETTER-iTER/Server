@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Slf4j
-@NoArgsConstructor
 @Component
+@NoArgsConstructor
 public class SecurityUtil {
     public void clearSecurityContext() {
         SecurityContextHolder.clearContext();

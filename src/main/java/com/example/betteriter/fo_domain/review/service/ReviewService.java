@@ -1,28 +1,27 @@
 package com.example.betteriter.fo_domain.review.service;
 
-import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
-import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerConnector;
+import com.example.betteriter.bo_domain.spec.service.SpecConnector;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
-import com.example.betteriter.fo_domain.follow.service.FollowService;
+import com.example.betteriter.fo_domain.follow.service.FollowConnector;
 import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
-import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.fo_domain.user.service.UserConnector;
 import com.example.betteriter.global.constant.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,10 +33,10 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 @RequiredArgsConstructor
 public class ReviewService {
     private static final int SIZE = 7;
-    private final UserService userService;
-    private final SpecService specService;
-    private final ManufacturerService manufacturerService;
-    private final FollowService followService;
+    private final UserConnector userConnector;
+    private final SpecConnector specConnector;
+    private final ManufacturerConnector manufacturerConnector;
+    private final FollowConnector followConnector;
 
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewScrapRepository reviewScrapRepository;
@@ -50,8 +49,8 @@ public class ReviewService {
     public Long createReview(CreateReviewRequestDto request) {
         // 1. 리뷰 저장
         Review review = this.reviewRepository.save(request.toEntity(
-                this.userService.getCurrentUser(),
-                this.manufacturerService.findManufacturerByName(request.getManufacturer())));
+                this.getCurrentUser(),
+                this.manufacturerConnector.findManufacturerByName(request.getManufacturer())));
 
         // 2. 리뷰 이미지 저장
         this.reviewImageRepository.saveAll(this.getReviewImages(review, request));
@@ -65,7 +64,7 @@ public class ReviewService {
     /* 리뷰 등록시 카테고리에 해당하는 리뷰 스펙 데이터 조회 (입력 용)*/
     @Transactional(readOnly = true)
     public GetReviewSpecResponseDto getReviewSpecDataResponse(Category category) {
-        return GetReviewSpecResponseDto.from(this.specService.findAllSpecDataByCategory(category));
+        return GetReviewSpecResponseDto.from(this.specConnector.findAllSpecDataByCategory(category));
     }
 
     /* 카테고리에 해당하는 리뷰 조회 */
@@ -87,18 +86,14 @@ public class ReviewService {
      * case 02 : 있다면 최신순 리뷰 리스트 응답
      **/
     @Transactional(readOnly = true)
-    public ReviewResponse getReviewBySearch(String name, String sort, int page) {
+    public ReviewResponse getReviewBySearch(String name, String sort, int page, Category category, boolean expert) {
+        Pageable pageable = PageRequest.of(page, SIZE);
         // 1. 필터링 따른 상품 이름에 해당하는 리뷰 조회
-        Slice<Review> reviews = getReviews(name, sort, page);
+        Slice<Review> reviews = reviewRepository.findReviewsBySearch(name, sort, pageable, category, expert);
 
         // 2. 데이터 갯수 null 인 경우
-        if (Objects.requireNonNull(reviews).isEmpty()) {
-            List<GetReviewResponseDto> result = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc()
-                    .stream()
-                    .map(GetReviewResponseDto::of)
-                    .collect(Collectors.toList());
-            return new ReviewResponse(result, false, false);
-        }
+        ReviewResponse result = checkIsEmptyReviews(reviews);
+        if (result != null) return result;
 
         // 3. 데이터 갯수 null 아닌 경우
         List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent().stream()
@@ -106,6 +101,19 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
+    }
+
+    @Nullable
+    private ReviewResponse checkIsEmptyReviews(Slice<Review> reviews) {
+        // 검색 결과 없는 경우
+        if (Objects.requireNonNull(reviews).isEmpty()) {
+            List<GetReviewResponseDto> result
+                    = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc().stream()
+                    .map(GetReviewResponseDto::of)
+                    .collect(Collectors.toList());
+            return new ReviewResponse(result, false, false);
+        }
+        return null;
     }
 
     /* 리뷰 상세 조회 */
@@ -235,78 +243,45 @@ public class ReviewService {
         return null;
     }
 
-    private Slice<Review> getReviews(String name, String sort, int page) {
-        Slice<Review> reviews = null;
-        Pageable pageable = PageRequest.of(page, SIZE);
-        switch (sort) {
-            // 최신순
-            case "latest":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
-                break;
-            // 좋아요 많은 순
-            case "mostLiked":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
-                break;
-            // 스크랩 많은 순
-            case "mostScraped":
-                reviews = this.reviewRepository
-                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
-
-                // 리뷰 작성자의 팔로워가 많은 순
-            case "mostFollowers":
-                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
-                break;
-        }
-        return reviews;
-    }
+//    private Slice<Review> getReviews(String name, String sort, int page, Category category, boolean expert) {
+//        Slice<Review> reviews = null;
+//        Pageable pageable = PageRequest.of(page, SIZE);
+//
+//        switch (sort) {
+//            // 최신순
+//            case "latest":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
+//                break;
+//            // 좋아요 많은 순
+//            case "mostLiked":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
+//                break;
+//            // 스크랩 많은 순
+//            case "mostScraped":
+//                reviews = this.reviewRepository
+//                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
+//
+//                // 리뷰 작성자의 팔로워가 많은 순
+//            case "mostFollowers":
+//                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
+//                break;
+//        }
+//        return reviews;
+//    }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
         // 요청으로 들어온 specData 조회
-        return this.specService.findAllSpecDataByIds(request.getSpecData())
+        return this.specConnector.findAllSpecDataByIds(request.getSpecData())
                 .stream()
                 .map(sd -> ReviewSpecData.createReviewSpecData(review, sd))
                 .collect(Collectors.toList());
     }
 
-    /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
-    public Map<String, List<ReviewResponseDto>> getUserCategoryReviews() {
-        List<Category> categories = this.getCurrentUser().getCategories(); // 유저가 등록한 관심 카테고리
-        return this.getLatest7ReviewsByCategories(categories); // 카테고리에 해당하는 최신 순 리뷰
-    }
-
-    private Map<String, List<ReviewResponseDto>> getLatest7ReviewsByCategories(List<Category> categories) {
-        Map<String, List<ReviewResponseDto>> result = new LinkedHashMap<>();
-        for (Category category : categories) {
-            List<ReviewResponseDto> reviews =
-                    this.reviewRepository.findFirst7ByCategoryOrderByCreatedAtDesc(category).stream()
-                            .map(review -> review.of(this.getFirstImageWithReview(review)))
-                            .collect(Collectors.toList());
-            result.put(category.getCategoryName(), reviews);
-        }
-        return result;
-    }
-
-    /* 팔로우 하는 유저가 등록한 리뷰 리스트 최신순 7개 조회 메소드 */
-    public List<ReviewResponseDto> getFollowingReviews() {
-        Users users = this.getCurrentUser();
-        return this.reviewRepository.findFirst7WrittenByFollowingCreatedAtDesc(users, PageRequest.of(0, SIZE))
-                .stream()
-                .map(review -> review.of(this.getFirstImageWithReview(review)))
-                .collect(Collectors.toList());
-    }
-
-    /* 가장 많은 스크랩 + 좋아요 수를 가지는 리뷰 가져오는 리스트 */
-    public List<ReviewResponseDto> getMostScrapedAndLikedReviews() {
-        return this.reviewRepository.findTop7ReviewHavingMostScrapedAndLiked(PageRequest.of(0, 7))
-                .stream()
-                .map(review -> review.of(this.getFirstImageWithReview(review)))
-                .collect(Collectors.toList());
-    }
 
     private Users getCurrentUser() {
-        return this.userService.getCurrentUser();
+        return this.userConnector.getCurrentUser();
     }
 
     /* Review 에 첫번째 이미지 가져오는 메소드 */
@@ -340,7 +315,7 @@ public class ReviewService {
         return this.reviewRepository.findAllByReviewScrapedUser(user, pageable);
     }
 
-    public List<Review> getLikeReviewList(Users user, int page, int size) {
+    public Slice<Review> getLikeReviewList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return this.reviewRepository.findAllByReviewLikedUser(user, pageable);
     }
@@ -364,7 +339,7 @@ public class ReviewService {
     }
 
     private boolean isCurrentUserFollowReviewWriter(Review review, Users currentUser) {
-        return this.followService.isFollow(currentUser, review.getWriter());
+        return this.followConnector.isFollow(currentUser, review.getWriter());
     }
 
     /* 댓글 작성자와 로그인한 유저가 동일한지 확인 */
