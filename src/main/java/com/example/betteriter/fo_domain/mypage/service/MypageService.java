@@ -9,6 +9,7 @@ import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,7 @@ public class MypageService {
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getLikeReviewList(int page) {
+    public Slice<Review> getLikeReviewList(int page) {
         Users user = userService.getCurrentUser();
         return reviewService.getLikeReviewList(user, page, SIZE);
     }

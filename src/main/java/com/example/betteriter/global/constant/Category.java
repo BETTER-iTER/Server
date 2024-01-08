@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public enum Category {
     SPEAKER("스피커", "https://velog.velcdn.com/images/choidongkuen/post/b0f162b5-eabc-4c41-a98d-750eaa226f77/image.png"),
     BATTERY_CHARGER("보조배터리", "https://velog.velcdn.com/images/choidongkuen/post/59eedd5c-4f27-4e43-b873-5b539d521311/image.png"),
     ACCESSORY("악세서리", "https://velog.velcdn.com/images/choidongkuen/post/b4202564-f549-4459-af56-01cae91f1f48/image.png"),
-    ETC("기타", "기타 URL");
+    ETC("기타", "https://velog.velcdn.com/images/choidongkuen/post/6dcd592a-697c-4055-b614-6d79d4eaf16a/image.png");
 
     private final String categoryName;
     private final String imgUrl;
@@ -33,6 +34,10 @@ public enum Category {
     /* 요청으로 들어온 문자열이 Enum 타입으로 역직렬화될때 메소드의 매개변수로 들어감 */
     @JsonCreator
     public static Category from(String name) {
+        if (!StringUtils.hasText(name)) {
+            return null;
+        }
+
         for (Category category : Category.values()) {
             if (category.getCategoryName().equals(name)) {
                 return category;

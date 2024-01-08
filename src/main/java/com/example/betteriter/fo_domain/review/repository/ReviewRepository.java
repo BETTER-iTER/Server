@@ -1,6 +1,7 @@
 package com.example.betteriter.fo_domain.review.repository;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.repository.custom.CustomReviewRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -11,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, CustomReviewRepository {
     List<Review> findFirst7ByCategoryOrderByCreatedAtDesc(Category category);
 
     /* 특정 회원이 팔로우 하는 팔로잉들이 작성한 모든 리뷰 최신순으로 7개 조회 */
@@ -56,12 +57,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY r.id DESC")
     List<Review> findAllByReviewScrapedUser(@Param("user") Users user, Pageable pageable);
 
-    @Query("SELECT r FROM REVIEW r " +
-            "LEFT JOIN r.reviewLiked rl " +
-            "LEFT JOIN r.reviewScraped rs " +
-            "WHERE rl.users = :user " +
-            "ORDER BY r.id DESC")
-    List<Review> findAllByReviewLikedUser(@Param("user") Users user, Pageable pageable);
+    @Query("select rl.review from REVIEW_LIKE  rl where rl.users = :user order by rl.createdAt desc")
+    Slice<Review> findAllByReviewLikedUser(@Param("user") Users user, Pageable pageable);
 
     /* 좋아요 수 많은 리뷰 조회 */
     Slice<Review> findByProductNameOrderByLikedCountDescCreatedAtDesc(String name, Pageable pageable);

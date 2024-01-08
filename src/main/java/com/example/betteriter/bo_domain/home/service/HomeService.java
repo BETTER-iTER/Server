@@ -3,9 +3,9 @@ package com.example.betteriter.bo_domain.home.service;
 import com.example.betteriter.bo_domain.home.dto.CategoryResponseDto;
 import com.example.betteriter.bo_domain.home.dto.GetHomeResponseDto;
 import com.example.betteriter.bo_domain.news.dto.ITNewsResponseDto;
-import com.example.betteriter.bo_domain.news.service.NewsService;
+import com.example.betteriter.bo_domain.news.service.NewsConnector;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
-import com.example.betteriter.fo_domain.review.service.ReviewService;
+import com.example.betteriter.fo_domain.review.service.ReviewConnector;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class HomeService {
-    private final NewsService newsService;
-    private final ReviewService reviewService;
+    private final NewsConnector newsConnector;
+    private final ReviewConnector reviewConnector;
 
     /**
-     * 1. 최신 IT 뉴스 5개
+     * 1. 최신 IT 뉴스
      * 2. 모든 카테고리(찐 리뷰)
      * 3. 관심 카테고리 최신 리뷰 리스트
      * 5. 팔로우들의 리뷰 리스트
@@ -32,10 +32,10 @@ public class HomeService {
     @Transactional(readOnly = true)
     public GetHomeResponseDto getHome() {
 
-        List<ITNewsResponseDto> recentItNews = this.newsService.getTop5ITNews();
-        Map<String, List<ReviewResponseDto>> categoryReviews = this.reviewService.getUserCategoryReviews();
-        List<ReviewResponseDto> followingReviews = this.reviewService.getFollowingReviews();
-        List<ReviewResponseDto> mostScrapedAndLikedReviews = this.reviewService.getMostScrapedAndLikedReviews();
+        List<ITNewsResponseDto> recentItNews = this.newsConnector.getTop5ITNews();
+        Map<String, List<ReviewResponseDto>> categoryReviews = this.reviewConnector.getUserCategoryReviews();
+        List<ReviewResponseDto> followingReviews = this.reviewConnector.getFollowingReviews();
+        List<ReviewResponseDto> mostScrapedAndLikedReviews = this.reviewConnector.getMostScrapedAndLikedReviews();
 
         return GetHomeResponseDto.builder()
                 .news(recentItNews) // 1. 최신 IT 뉴스 (5)

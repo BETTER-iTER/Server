@@ -12,8 +12,8 @@ import javax.persistence.*;
 
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS_DETAIL")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UsersDetail extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

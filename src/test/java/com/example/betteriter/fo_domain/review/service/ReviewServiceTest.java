@@ -1,12 +1,12 @@
 package com.example.betteriter.fo_domain.review.service;
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
-import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerService;
+import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerConnector;
 import com.example.betteriter.bo_domain.spec.domain.Spec;
 import com.example.betteriter.bo_domain.spec.domain.SpecData;
-import com.example.betteriter.bo_domain.spec.service.SpecService;
+import com.example.betteriter.bo_domain.spec.service.SpecConnector;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
-import com.example.betteriter.fo_domain.follow.service.FollowService;
+import com.example.betteriter.fo_domain.follow.service.FollowConnector;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
@@ -17,7 +17,7 @@ import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
-import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.fo_domain.user.service.UserConnector;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
 import com.example.betteriter.global.constant.RoleType;
@@ -52,16 +52,16 @@ public class ReviewServiceTest {
     private ReviewService reviewService;
 
     @Mock
-    private UserService userService;
+    private UserConnector userConnector;
 
     @Mock
-    private SpecService specService;
+    private SpecConnector specConnector;
 
     @Mock
-    private ManufacturerService manufacturerService;
+    private ManufacturerConnector manufacturerConnector;
 
     @Mock
-    private FollowService followService;
+    private FollowConnector followConnector;
 
     @Mock
     private ReviewRepository reviewRepository;
@@ -167,10 +167,10 @@ public class ReviewServiceTest {
                                 CreateReviewImageRequestDto.builder().imgUrl("imgUrl2").build())
                         ).build();
 
-        given(this.manufacturerService.findManufacturerByName(anyString()))
+        given(this.manufacturerConnector.findManufacturerByName(anyString()))
                 .willReturn(Manufacturer.createManufacturer("삼성")); // 삼성
 
-        given(this.specService.findAllSpecDataByIds(anyList()))
+        given(this.specConnector.findAllSpecDataByIds(anyList()))
                 .willReturn(List.of(
                         SpecData.builder()
                                 .spec(Spec.createSpec(LAPTOP, "title1"))
@@ -209,7 +209,7 @@ public class ReviewServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(manufacturerService, times(1)).findManufacturerByName(anyString());
+        verify(manufacturerConnector, times(1)).findManufacturerByName(anyString());
         verify(reviewRepository, times(1)).save(any());
         verify(reviewSpecDataRepository, times(1)).saveAll(anyList());
     }
@@ -223,7 +223,7 @@ public class ReviewServiceTest {
         Spec spec02 = Spec.builder().category(category).title("title2").build();
         List<Spec> specs = List.of(spec01, spec02);
 
-        given(this.specService.findAllSpecDataByCategory(any(Category.class)))
+        given(this.specConnector.findAllSpecDataByCategory(any(Category.class)))
                 .willReturn(specs);
         // when
         GetReviewSpecResponseDto reviewSpecResponseDto = this.reviewService.getReviewSpecDataResponse(category);
@@ -368,7 +368,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(review.getId()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 */
@@ -402,7 +402,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(review.getId()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 (2개) */
@@ -443,7 +443,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(users);
 
         given(this.reviewLikeRepository.save(any(ReviewLike.class)))
@@ -454,7 +454,7 @@ public class ReviewServiceTest {
         assertThat(reviewLike.getUsers()).isEqualTo(users);
         assertThat(reviewLike.getReview()).isEqualTo(review);
         verify(reviewRepository, times(1)).findById(anyLong());
-        verify(userService, times(1)).getCurrentUser();
+        verify(userConnector, times(1)).getCurrentUser();
         verify(reviewLikeRepository, times(1)).save(any(ReviewLike.class));
     }
 
@@ -476,7 +476,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(users);
 
         given(this.reviewScrapRepository.save(any(ReviewScrap.class)))
@@ -485,7 +485,7 @@ public class ReviewServiceTest {
         // when
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
-        verify(this.userService, times(1)).getCurrentUser();
+        verify(this.userConnector, times(1)).getCurrentUser();
         verify(this.reviewScrapRepository, times(1)).save(any(ReviewScrap.class));
     }
 
@@ -519,13 +519,13 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(Users.builder().id(1L).email("email").roleType(ROLE_USER).build());
         // when
         List<ReviewCommentResponse> result = this.reviewService.getReviewDetailComments(1L);
         // then
         assertThat(result).hasSize(2);
-        verify(userService, times(1)).getCurrentUser();
+        verify(userConnector, times(1)).getCurrentUser();
         for (ReviewCommentResponse reviewCommentResponse : result) {
             System.out.println(reviewCommentResponse.getComment());
             System.out.println(reviewCommentResponse.isMine());
@@ -570,7 +570,7 @@ public class ReviewServiceTest {
         given(this.reviewLikeRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
                 .willReturn(Optional.of(reviewLike));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(user);
         // when
         this.reviewService.deleteReviewLike(1L);
@@ -602,7 +602,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(user);
 
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
@@ -614,7 +614,7 @@ public class ReviewServiceTest {
 
         // then
         verify(this.reviewRepository, times(1)).findById(anyLong());
-        verify(this.userService, times(1)).getCurrentUser();
+        verify(this.userConnector, times(1)).getCurrentUser();
         verify(this.reviewScrapRepository, times(1)).findByReviewAndUsers(any(), any());
     }
 
@@ -633,7 +633,7 @@ public class ReviewServiceTest {
         given(this.reviewRepository.findById(anyLong()))
                 .willReturn(Optional.of(review));
 
-        given(this.userService.getCurrentUser())
+        given(this.userConnector.getCurrentUser())
                 .willReturn(user);
 
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
@@ -643,6 +643,6 @@ public class ReviewServiceTest {
         assertThatThrownBy(() -> this.reviewService.deleteReviewScrap(1L))
                 .isInstanceOf(ReviewHandler.class);
         verify(this.reviewRepository, times(1)).findById(anyLong());
-        verify(this.userService, times(1)).getCurrentUser();
+        verify(this.userConnector, times(1)).getCurrentUser();
     }
 }

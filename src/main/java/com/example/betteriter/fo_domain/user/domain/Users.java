@@ -1,6 +1,5 @@
 package com.example.betteriter.fo_domain.user.domain;
 
-import com.example.betteriter.fo_domain.follow.domain.Follow;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
@@ -19,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@DynamicInsert
 @Slf4j
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 @Entity(name = "USERS")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

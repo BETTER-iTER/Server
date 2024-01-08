@@ -2,6 +2,7 @@ package com.example.betteriter.fo_domain.review.domain;
 
 
 import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.global.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @Entity(name = "REVIEW_LIKE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReviewLike {
+public class ReviewLike extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

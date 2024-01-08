@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "HomeController", description = "Home API")
 @Slf4j
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class HomeController {
     private final HomeService homeService;
 

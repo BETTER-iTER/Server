@@ -46,9 +46,9 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
  * 2. 사용자 정보가 없는 경우 : UsernameNotFoundException
  * 3. 토큰이 없는 경우 : AuthenticationCredentialsNotFoundException
  **/
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
