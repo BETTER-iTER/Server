@@ -29,9 +29,13 @@ public class GetReviewResponseDto {
     private GetUserResponseDto userInfo; // 리뷰 작성자 정보
     private long scrapedCount; // 스크랩 갯수
     private long likedCount; // 좋아요 갯수
+    private boolean isScrap; // 유저 스크랩 여부
+    private boolean isLike; // 유저 좋아요 여부
 
     @Builder
-    public GetReviewResponseDto(Review review, List<String> reviewSpecData, String firstImage) {
+    public GetReviewResponseDto(Review review, List<String> reviewSpecData,
+                                String firstImage, boolean isScrap, boolean isLike
+    ) {
         this.id = review.getId();
         this.reviewImage = firstImage;
         this.productName = review.getProductName();
@@ -41,12 +45,20 @@ public class GetReviewResponseDto {
         this.userInfo = GetUserResponseDto.from(review);
         this.scrapedCount = review.getScrapedCount();
         this.likedCount = review.getLikedCount();
+        this.isLike = isLike;
+        this.isScrap = isScrap;
     }
 
-    public static GetReviewResponseDto of(Review review) {
+    public static GetReviewResponseDto of(Review review, boolean isScrap, boolean isLike) {
         List<String> reviewSpecDataToStr = getReviewSpecDataToStr(review);
         String firstImage = getFirstImageWithReview(review);
-        return new GetReviewResponseDto(review, reviewSpecDataToStr, firstImage);
+        return GetReviewResponseDto.builder()
+                .review(review)
+                .reviewSpecData(reviewSpecDataToStr)
+                .firstImage(firstImage)
+                .isScrap(isScrap)
+                .isLike(isLike)
+                .build();
     }
 
 

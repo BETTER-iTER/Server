@@ -74,8 +74,10 @@ public class ReviewService {
                 = this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(category, PageRequest.of(page, SIZE));
 
         List<GetReviewResponseDto> reviewResponse = result.getContent().stream()
-                .map(GetReviewResponseDto::of)
-                .collect(Collectors.toList());
+                .map(review -> GetReviewResponseDto.of(review,
+                        this.checkCurrentUserIsScrapReview(review),
+                        this.checkCurrentUserIsLikeReview(review))
+                ).collect(Collectors.toList());
 
         return new ReviewResponse(reviewResponse, result.hasNext(), !result.isEmpty());
     }
@@ -97,10 +99,22 @@ public class ReviewService {
 
         // 3. 데이터 갯수 null 아닌 경우
         List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent().stream()
-                .map(GetReviewResponseDto::of)
-                .collect(Collectors.toList());
+                .map(review -> GetReviewResponseDto.of(review,
+                        this.checkCurrentUserIsScrapReview(review),
+                        this.checkCurrentUserIsLikeReview(review))
+                ).collect(Collectors.toList());
 
         return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
+    }
+
+    private boolean checkCurrentUserIsLikeReview(Review review) {
+        Users currentUser = this.getCurrentUser();
+        return this.reviewLikeRepository.existsByReviewAndUsers(review, currentUser);
+    }
+
+    private boolean checkCurrentUserIsScrapReview(Review review) {
+        Users currentUser = this.getCurrentUser();
+        return this.reviewScrapRepository.existsByReviewAndUsers(review, currentUser);
     }
 
     @Nullable
@@ -109,8 +123,10 @@ public class ReviewService {
         if (Objects.requireNonNull(reviews).isEmpty()) {
             List<GetReviewResponseDto> result
                     = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc().stream()
-                    .map(GetReviewResponseDto::of)
-                    .collect(Collectors.toList());
+                    .map(review -> GetReviewResponseDto.of(review,
+                            this.checkCurrentUserIsScrapReview(review),
+                            this.checkCurrentUserIsLikeReview(review))
+                    ).collect(Collectors.toList());
             return new ReviewResponse(result, false, false);
         }
         return null;
@@ -242,34 +258,6 @@ public class ReviewService {
         this.reviewRepository.delete(review);
         return null;
     }
-
-//    private Slice<Review> getReviews(String name, String sort, int page, Category category, boolean expert) {
-//        Slice<Review> reviews = null;
-//        Pageable pageable = PageRequest.of(page, SIZE);
-//
-//        switch (sort) {
-//            // 최신순
-//            case "latest":
-//                reviews = this.reviewRepository
-//                        .findByProductNameOrderByCreatedAtDesc(name, pageable);
-//                break;
-//            // 좋아요 많은 순
-//            case "mostLiked":
-//                reviews = this.reviewRepository
-//                        .findByProductNameOrderByLikedCountDescCreatedAtDesc(name, pageable);
-//                break;
-//            // 스크랩 많은 순
-//            case "mostScraped":
-//                reviews = this.reviewRepository
-//                        .findByProductNameOrderByScrapedCountDescCreatedAtDesc(name, pageable);
-//
-//                // 리뷰 작성자의 팔로워가 많은 순
-//            case "mostFollowers":
-//                reviews = this.reviewRepository.findByProductNameOrderByMostWriterFollower(name, pageable);
-//                break;
-//        }
-//        return reviews;
-//    }
 
     private List<ReviewSpecData> getReviewSpecData(CreateReviewRequestDto request, Review review) {
         // 요청으로 들어온 specData 조회

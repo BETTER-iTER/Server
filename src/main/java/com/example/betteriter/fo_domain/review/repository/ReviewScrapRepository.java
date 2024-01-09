@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface ReviewScrapRepository extends JpaRepository<ReviewScrap, Long> {
     Optional<ReviewScrap> findByReviewAndUsers(Review review, Users users);
+
+    boolean existsByReviewAndUsers(Review review, Users users);
 }

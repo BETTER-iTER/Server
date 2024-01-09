@@ -249,62 +249,13 @@ public class ReviewServiceTest {
                 .build();
 
 
-        Review review01 = Review.builder()
-                .id(1L)
-                .category(PC)
-                .productName("productName01")
-                .price(100000)
-                .writer(user01)
-                .storeName(1)
-                .boughtAt(LocalDate.now())
-                .starPoint(0)
-                .shortReview("shortReview")
-                .goodPoint("goodPoint")
-                .badPoint("badPoint")
-                .build();
+        Review review01 = createReview(1L);
 
-        Review review02 = Review.builder()
-                .id(2L)
-                .category(PC)
-                .productName("productName02")
-                .writer(user01)
-                .price(100000)
-                .storeName(1)
-                .boughtAt(LocalDate.now())
-                .starPoint(0)
-                .shortReview("shortReview")
-                .goodPoint("goodPoint")
-                .badPoint("badPoint")
-                .build();
+        Review review02 = createReview(2L);
 
-        Review review03 = Review.builder()
-                .id(3L)
-                .category(PC)
-                .productName("productName01")
-                .writer(user01)
-                .price(100000)
-                .storeName(1)
-                .boughtAt(LocalDate.now())
-                .starPoint(0)
-                .shortReview("shortReview")
-                .goodPoint("goodPoint")
-                .badPoint("badPoint")
-                .build();
+        Review review03 = createReview(3L);
 
-        Review review04 = Review.builder()
-                .id(4L)
-                .category(PC)
-                .productName("productName01")
-                .writer(user01)
-                .price(100000)
-                .storeName(1)
-                .boughtAt(LocalDate.now())
-                .starPoint(0)
-                .shortReview("shortReview")
-                .goodPoint("goodPoint")
-                .badPoint("badPoint")
-                .build();
-
+        Review review04 = createReview(4L);
 
         given(reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
                 .willReturn(new SliceImpl<>(List.of(review01, review02, review03, review04)));
@@ -312,9 +263,13 @@ public class ReviewServiceTest {
         // when
         ReviewResponse result = this.reviewService.getReviewByCategory(PC, 1);
         // then
-        for (GetReviewResponseDto getReviewResponseDto : result.getGetReviewResponseDtoList()) {
-            System.out.println("getReviewResponseDto = " + getReviewResponseDto);
-        }
+        assertThat(result.getGetReviewResponseDtoList()).hasSize(4);
+        assertThat(result.getGetReviewResponseDtoList().get(0).isLike()).isFalse();
+        assertThat(result.getGetReviewResponseDtoList().get(0).isScrap()).isFalse();
+        assertThat(result.isExisted()).isTrue();
+        assertThat(result.isHasNext()).isFalse();
+        verify(this.reviewRepository, times(1))
+                .findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any());
     }
 
     @Test

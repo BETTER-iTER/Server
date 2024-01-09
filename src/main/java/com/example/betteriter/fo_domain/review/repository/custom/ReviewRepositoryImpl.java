@@ -60,9 +60,8 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
                 .leftJoin(follow)
                 .on(follow.followee.eq(review.writer))
                 .where(review.productName.eq(name),
-                        categoryEq(category),
-                        expertEq(expert)
-                )
+                        review.writer.isExpert.eq(expert),
+                        categoryEq(category))
                 .groupBy(review)
                 .orderBy(followerCount.desc(), review.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -76,9 +75,8 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
                 .where(review.productName.eq(name),
-                        categoryEq(category),
-                        expertEq(expert)
-                )
+                        review.writer.isExpert.eq(expert),
+                        categoryEq(category))
                 .orderBy(review.scrapedCount.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -91,9 +89,8 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
                 .where(review.productName.eq(name),
-                        categoryEq(category),
-                        expertEq(expert)
-                )
+                        review.writer.isExpert.eq(expert),
+                        categoryEq(category))
                 .orderBy(review.likedCount.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -106,9 +103,8 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
                 .where(review.productName.eq(name),
-                        categoryEq(category),
-                        expertEq(expert)
-                )
+                        review.writer.isExpert.eq(expert),
+                        categoryEq(category))
                 .orderBy(review.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -119,9 +115,5 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
 
     private BooleanExpression categoryEq(Category category) {
         return isEmpty(category) ? null : review.category.eq(category);
-    }
-
-    private BooleanExpression expertEq(Boolean expert) {
-        return isEmpty(expert) ? null : review.writer.isExpert.eq(expert);
     }
 }

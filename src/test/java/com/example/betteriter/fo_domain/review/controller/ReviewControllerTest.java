@@ -153,6 +153,88 @@ class ReviewControllerTest {
     }
 
     @Test
+    @DisplayName("카테고리 별 리뷰를 조회을 성공한다.")
+    void getReviewsByCategoryInSuccessTest() throws Exception {
+        // given
+        // given
+        Users user = Users.builder()
+                .usersDetail(UsersDetail.builder()
+                        .nickName("nickName")
+                        .profileImage("profileImage")
+                        .job(Job.SW_DEVELOPER)
+                        .build())
+                .build();
+
+        Review review = createReview(1L);
+
+        GetReviewResponseDto getReviewResponseDto = GetReviewResponseDto.builder()
+                .review(review)
+                .reviewSpecData(List.of("string", "string02"))
+                .firstImage("firstImage")
+                .isLike(true)
+                .isScrap(true)
+                .build();
+
+        ReviewResponse reviewResponse = ReviewResponse.builder()
+                .getReviewResponseDtoList(List.of(getReviewResponseDto))
+                .hasNext(false)
+                .isExisted(true)
+                .build();
+
+        given(this.reviewService.getReviewByCategory(any(Category.class), anyInt()))
+                .willReturn(reviewResponse);
+
+        // when && then
+        this.mockMvc.perform(get("/review/category")
+                        .param("category", "기타")
+                        .param("page", "0")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.reviews.size()").value(1));
+
+    }
+
+    @Test
+    @DisplayName("카테고리 별 리뷰를 조회을 성공한다. - 빈 결과")
+    void getEmptyReviewsByCategoryInSuccessTest() throws Exception {
+        // given
+        // given
+        Users user = Users.builder()
+                .usersDetail(UsersDetail.builder()
+                        .nickName("nickName")
+                        .profileImage("profileImage")
+                        .job(Job.SW_DEVELOPER)
+                        .build())
+                .build();
+
+        Review review = createReview(1L);
+
+
+        ReviewResponse reviewResponse = ReviewResponse.builder()
+                .getReviewResponseDtoList(List.of())
+                .hasNext(false)
+                .isExisted(false)
+                .build();
+
+        given(this.reviewService.getReviewByCategory(any(Category.class), anyInt()))
+                .willReturn(reviewResponse);
+
+        // when && then
+        this.mockMvc.perform(get("/review/category")
+                        .param("category", "기타")
+                        .param("page", "0")
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.reviews.size()").value(0))
+                .andExpect(jsonPath("$.result.existed").value(false));
+
+
+    }
+
+
+    @Test
     @WithMockUser(username = "choi")
     @DisplayName("상품 이름에 해당하는 리뷰 리스트를 조회 실패한다.")
     void getReviewsBySearchFailureTest() throws Exception {
