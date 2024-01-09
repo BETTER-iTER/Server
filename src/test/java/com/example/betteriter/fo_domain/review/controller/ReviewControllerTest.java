@@ -37,8 +37,7 @@ import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
 import static com.example.betteriter.global.constant.Status.ACTIVE;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -858,6 +857,32 @@ class ReviewControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.isSuccess").value(false))
                 .andExpect(jsonPath("$.code").value("REVIEW_LIKE_NOT_FOUND_400"));
+    }
+
+    @Test
+    @DisplayName("리뷰 스크랩을 한다 - 성공")
+    void reviewScrapInSuccess() throws Exception {
+        // given
+
+        // 스크랩 하는 리뷰
+        Review review = createReview(1L);
+
+        // 스크랩 하는 유저
+        Users users = Users.builder()
+                .id(1L)
+                .email("email")
+                .roleType(ROLE_USER)
+                .build();
+
+        doNothing().when(this.reviewService).reviewScrap(anyLong());
+
+
+        // when
+        this.mockMvc.perform(post("/review/{reviewId}/scrap/", 1L)
+                        .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isOk());
+
     }
 
     @Test

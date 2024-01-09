@@ -107,7 +107,7 @@ public class ReviewController {
     }
 
     /* 리뷰 스크랩 */
-    @PostMapping("{reviewId}/scrap/")
+    @PostMapping("{reviewId}/scrap")
     public ResponseDto<Void> reviewScrap(
             @PathVariable Long reviewId
     ) {
