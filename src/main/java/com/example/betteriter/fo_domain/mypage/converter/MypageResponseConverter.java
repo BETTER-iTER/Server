@@ -4,50 +4,21 @@ import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
+import com.example.betteriter.fo_domain.review.service.ReviewConnector;
 import com.example.betteriter.fo_domain.user.domain.Users;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class MypageResponseConverter {
 
-    public static ReviewResponse toReviewResponse(Slice<Review> reviews) {
-        List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent()
-                .stream()
-                .map(GetReviewResponseDto::of)
-                .collect(Collectors.toList());
-
-        return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), !reviews.isEmpty());
-    }
-
-    public static MypageResponse.ReviewListDto toReviewListDto(List<Review> reviewList) {
-        List<MypageResponse.ReviewDto> myReviewList = new ArrayList<>();
-
-        reviewList.forEach(r -> {
-            MypageResponse.ReviewDto reviewDto = MypageResponse.ReviewDto.builder()
-                    .reviewId(r.getId())
-                    .title(r.getProductName())
-                    .thumbnailImage((!r.getReviewImages().isEmpty()) ?
-                            r.getReviewImages().get(0).getImgUrl() : null)
-                    .writerId(r.getWriter().getId())
-                    .writerJob(r.getWriter().getUsersDetail().getJob())
-                    .writerNickname(r.getWriter().getUsersDetail().getNickName())
-                    .profileImage(r.getWriter().getUsersDetail().getProfileImage())
-                    .likeCount((long) r.getReviewLiked().size())
-                    .scrapCount((long) r.getReviewScraped().size())
-                    .isLike(r.getReviewLiked().stream().anyMatch(rl -> rl.getUsers().getId().equals(r.getWriter().getId())))
-                    .isScrap(r.getReviewScraped().stream().anyMatch(rs -> rs.getUsers().getId().equals(r.getWriter().getId())))
-                    .build();
-            myReviewList.add(reviewDto);
-        });
-
-        return MypageResponse.ReviewListDto.builder()
-                .reviewCount(reviewList.size())
-                .reviewList(myReviewList)
-                .build();
-    }
+    private final ReviewConnector reviewConnector;
 
     public static MypageResponse.FollowerListDto toFollowerListDto(List<Users> followerList, Integer totalCount) {
         List<MypageResponse.FollowerDto> followerDtoList = new ArrayList<>();
@@ -96,5 +67,51 @@ public class MypageResponseConverter {
                 .totalLikeCount(totalLikeCount)
                 .totalScrapCount(totalScrapCount)
                 .build();
+    }
+
+    public ReviewResponse toReviewResponse(Slice<Review> reviews) {
+        List<GetReviewResponseDto> getReviewResponseDtos = reviews.getContent()
+                .stream()
+                .map(review -> GetReviewResponseDto.of(review,
+                        this.checkCurrentUserIsScrapReview(review),
+                        this.checkCurrentUserIsLikeReview(review))
+                ).collect(Collectors.toList());
+
+        return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), !reviews.isEmpty());
+    }
+
+    public MypageResponse.ReviewListDto toReviewListDto(List<Review> reviewList) {
+        List<MypageResponse.ReviewDto> myReviewList = new ArrayList<>();
+
+        reviewList.forEach(r -> {
+            MypageResponse.ReviewDto reviewDto = MypageResponse.ReviewDto.builder()
+                    .reviewId(r.getId())
+                    .title(r.getProductName())
+                    .thumbnailImage((!r.getReviewImages().isEmpty()) ?
+                            r.getReviewImages().get(0).getImgUrl() : null)
+                    .writerId(r.getWriter().getId())
+                    .writerJob(r.getWriter().getUsersDetail().getJob())
+                    .writerNickname(r.getWriter().getUsersDetail().getNickName())
+                    .profileImage(r.getWriter().getUsersDetail().getProfileImage())
+                    .likeCount((long) r.getReviewLiked().size())
+                    .scrapCount((long) r.getReviewScraped().size())
+                    .isLike(r.getReviewLiked().stream().anyMatch(rl -> rl.getUsers().getId().equals(r.getWriter().getId())))
+                    .isScrap(r.getReviewScraped().stream().anyMatch(rs -> rs.getUsers().getId().equals(r.getWriter().getId())))
+                    .build();
+            myReviewList.add(reviewDto);
+        });
+
+        return MypageResponse.ReviewListDto.builder()
+                .reviewCount(reviewList.size())
+                .reviewList(myReviewList)
+                .build();
+    }
+
+    private boolean checkCurrentUserIsScrapReview(Review review) {
+        return this.reviewConnector.existsReviewScrapByReviewAndUsers(review);
+    }
+
+    private boolean checkCurrentUserIsLikeReview(Review review) {
+        return this.reviewConnector.existsReviewLikeByReviewAndUsers(review);
     }
 }

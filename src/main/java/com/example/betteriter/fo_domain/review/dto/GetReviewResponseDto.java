@@ -52,6 +52,7 @@ public class GetReviewResponseDto {
     public static GetReviewResponseDto of(Review review, boolean isScrap, boolean isLike) {
         List<String> reviewSpecDataToStr = getReviewSpecDataToStr(review);
         String firstImage = getFirstImageWithReview(review);
+
         return GetReviewResponseDto.builder()
                 .review(review)
                 .reviewSpecData(reviewSpecDataToStr)

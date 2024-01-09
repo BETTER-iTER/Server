@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,12 +106,12 @@ public class ReviewService {
         return new ReviewResponse(getReviewResponseDtos, reviews.hasNext(), true);
     }
 
-    private boolean checkCurrentUserIsLikeReview(Review review) {
+    public boolean checkCurrentUserIsLikeReview(Review review) {
         Users currentUser = this.getCurrentUser();
         return this.reviewLikeRepository.existsByReviewAndUsers(review, currentUser);
     }
 
-    private boolean checkCurrentUserIsScrapReview(Review review) {
+    public boolean checkCurrentUserIsScrapReview(Review review) {
         Users currentUser = this.getCurrentUser();
         return this.reviewScrapRepository.existsByReviewAndUsers(review, currentUser);
     }
@@ -120,7 +119,7 @@ public class ReviewService {
     @Nullable
     private ReviewResponse checkIsEmptyReviews(Slice<Review> reviews) {
         // 검색 결과 없는 경우
-        if (Objects.requireNonNull(reviews).isEmpty()) {
+        if (reviews.getContent().isEmpty()) {
             List<GetReviewResponseDto> result
                     = this.reviewRepository.findFirst20ByOrderByClickCountDescCreatedAtDesc().stream()
                     .map(review -> GetReviewResponseDto.of(review,
@@ -268,7 +267,7 @@ public class ReviewService {
     }
 
 
-    private Users getCurrentUser() {
+    public Users getCurrentUser() {
         return this.userConnector.getCurrentUser();
     }
 

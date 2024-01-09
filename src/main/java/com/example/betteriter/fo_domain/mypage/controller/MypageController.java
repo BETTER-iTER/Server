@@ -28,6 +28,7 @@ import java.util.List;
 public class MypageController {
 
     private final MypageService mypageService;
+    private final MypageResponseConverter mypageResponseConverter;
 
     /**
      * 내가 쓴 리뷰 조회
@@ -40,7 +41,7 @@ public class MypageController {
             @RequestParam int page
     ) {
         List<Review> reviewList = mypageService.getMyReviewList(page);
-        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
+        return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
     /**
@@ -54,7 +55,7 @@ public class MypageController {
             @RequestParam int page
     ) {
         List<Review> reviewList = mypageService.getScrapReviewList(page);
-        return ResponseDto.onSuccess(MypageResponseConverter.toReviewListDto(reviewList));
+        return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
     /**
@@ -68,7 +69,7 @@ public class MypageController {
             @RequestParam int page
     ) {
         Slice<Review> reviewList = mypageService.getLikeReviewList(page);
-        return ResponseDto.onSuccess(MypageResponseConverter.toReviewResponse(reviewList));
+        return ResponseDto.onSuccess(mypageResponseConverter.toReviewResponse(reviewList));
     }
 
     /**

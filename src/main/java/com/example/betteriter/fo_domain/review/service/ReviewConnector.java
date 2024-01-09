@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.review.service;
 
+import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
 
 import java.util.List;
@@ -11,4 +12,8 @@ public interface ReviewConnector {
     List<ReviewResponseDto> getFollowingReviews();
 
     List<ReviewResponseDto> getMostScrapedAndLikedReviews();
+
+    boolean existsReviewLikeByReviewAndUsers(Review review);
+
+    boolean existsReviewScrapByReviewAndUsers(Review review);
 }

@@ -59,7 +59,7 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
                 .fetchJoin()
                 .leftJoin(follow)
                 .on(follow.followee.eq(review.writer))
-                .where(review.productName.eq(name),
+                .where(review.productName.containsIgnoreCase(name),
                         review.writer.isExpert.eq(expert),
                         categoryEq(category))
                 .groupBy(review)
@@ -74,7 +74,7 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
     private Slice<Review> getReviewsByMostScraped(String name, Pageable pageable, Category category, Boolean expert) {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
-                .where(review.productName.eq(name),
+                .where(review.productName.containsIgnoreCase(name),
                         review.writer.isExpert.eq(expert),
                         categoryEq(category))
                 .orderBy(review.scrapedCount.desc())
@@ -88,7 +88,7 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
     private Slice<Review> getReviewsByMostLiked(String name, Pageable pageable, Category category, Boolean expert) {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
-                .where(review.productName.eq(name),
+                .where(review.productName.containsIgnoreCase(name),
                         review.writer.isExpert.eq(expert),
                         categoryEq(category))
                 .orderBy(review.likedCount.desc())
@@ -102,7 +102,7 @@ public class ReviewRepositoryImpl implements CustomReviewRepository {
     private Slice<Review> getReviewsByLatest(String name, Pageable pageable, Category category, Boolean expert) {
 
         List<Review> reviews = jpaQueryFactory.selectFrom(review)
-                .where(review.productName.eq(name),
+                .where(review.productName.containsIgnoreCase(name),
                         review.writer.isExpert.eq(expert),
                         categoryEq(category))
                 .orderBy(review.createdAt.desc())

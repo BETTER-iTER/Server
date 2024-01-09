@@ -26,11 +26,11 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._REVI
 public class ReviewConnectorImpl implements ReviewConnector {
     private static final int SIZE = 7;
     private final UserConnector userConnector;
+    private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
 
     @Override
     public Map<String, List<ReviewResponseDto>> getUserCategoryReviews() {
-        /* 유저가 관심 등록한 카테고리 리뷰 리스트 조회 메소드 */
         List<Category> categories = this.getCurrentUser().getCategories(); // 유저가 등록한 관심 카테고리
         return this.getLatest7ReviewsByCategories(categories); // 카테고리에 해당하는 최신 순 리뷰
     }
@@ -51,6 +51,16 @@ public class ReviewConnectorImpl implements ReviewConnector {
                 .stream()
                 .map(review -> review.of(this.getFirstImageWithReview(review)))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsReviewLikeByReviewAndUsers(Review review) {
+        return this.reviewService.checkCurrentUserIsLikeReview(review);
+    }
+
+    @Override
+    public boolean existsReviewScrapByReviewAndUsers(Review review) {
+        return this.reviewService.checkCurrentUserIsScrapReview(review);
     }
 
     private Map<String, List<ReviewResponseDto>> getLatest7ReviewsByCategories(List<Category> categories) {
@@ -76,6 +86,6 @@ public class ReviewConnectorImpl implements ReviewConnector {
     }
 
     private Users getCurrentUser() {
-        return this.userConnector.getCurrentUser();
+        return this.reviewService.getCurrentUser();
     }
 }
