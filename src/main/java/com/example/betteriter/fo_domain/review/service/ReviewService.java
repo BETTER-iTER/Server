@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -292,17 +293,17 @@ public class ReviewService {
                 .orElseThrow(() -> new ReviewHandler(_REVIEW_NOT_FOUND));
     }
 
-    public List<Review> getReviewList(Users user, int page, int size) {
+    public Page<Review> getReviewList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return this.reviewRepository.findAllByUser(user, pageable);
     }
 
-    public List<Review> getScrapReviewList(Users user, int page, int size) {
+    public Page<Review> getScrapReviewList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return this.reviewRepository.findAllByReviewScrapedUser(user, pageable);
     }
 
-    public Slice<Review> getLikeReviewList(Users user, int page, int size) {
+    public Page<Review> getLikeReviewList(Users user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return this.reviewRepository.findAllByReviewLikedUser(user, pageable);
     }

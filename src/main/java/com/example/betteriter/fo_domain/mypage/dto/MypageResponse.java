@@ -28,8 +28,20 @@ public class MypageResponse {
 
     @Getter
     @Builder
+    public static class PageDto {
+        private Integer page;       // 현재 페이지 번호
+        private Integer size;       // 한 페이지에 보여줄 요소 개수
+        private Integer totalPage;  // 전체 페이지 개수
+        private Long totalCount; // 전체 요소 개수
+
+        private Boolean hasNext;    // 다음 페이지 존재 여부
+        private Boolean hasPrev;    // 이전 페이지 존재 여부
+    }
+
+    @Getter
+    @Builder
     public static class ReviewListDto {
-        private Integer reviewCount;
+        private PageDto pageInfo;
         private List<ReviewDto> reviewList;
     }
 
@@ -46,6 +58,7 @@ public class MypageResponse {
     @Builder
     public static class FollowerListDto {
         private Integer totalCount;
+        private PageDto pageInfo;
         private List<FollowerDto> followerList;
     }
 
@@ -57,8 +70,6 @@ public class MypageResponse {
         private Job job;
         private Integer followerCount;
         private Integer followingCount;
-        private Integer reviewCount;
-        private Integer scrapCount;
     }
 
     @Getter

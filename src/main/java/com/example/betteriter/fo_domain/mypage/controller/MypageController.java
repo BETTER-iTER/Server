@@ -11,6 +11,8 @@ import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +42,7 @@ public class MypageController {
     public ResponseDto<MypageResponse.ReviewListDto> getReview(
             @RequestParam int page
     ) {
-        List<Review> reviewList = mypageService.getMyReviewList(page);
+        Page<Review> reviewList = mypageService.getMyReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
@@ -54,7 +56,7 @@ public class MypageController {
     public ResponseDto<MypageResponse.ReviewListDto> getScrapReview(
             @RequestParam int page
     ) {
-        List<Review> reviewList = mypageService.getScrapReviewList(page);
+        Page<Review> reviewList = mypageService.getScrapReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
@@ -68,7 +70,7 @@ public class MypageController {
     public ResponseDto<ReviewResponse> getLikeReview(
             @RequestParam int page
     ) {
-        Slice<Review> reviewList = mypageService.getLikeReviewList(page);
+        Page<Review> reviewList = mypageService.getLikeReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewResponse(reviewList));
     }
 
