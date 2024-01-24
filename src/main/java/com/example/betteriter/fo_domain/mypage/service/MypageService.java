@@ -9,6 +9,8 @@ import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,19 +29,19 @@ public class MypageService {
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public List<Review> getMyReviewList(int page) {
+    public Page<Review> getMyReviewList(int page) {
         Users user = userService.getCurrentUser();
         return reviewService.getReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getScrapReviewList(int page) {
+    public Page<Review> getScrapReviewList(int page) {
         Users user = userService.getCurrentUser();
         return reviewService.getScrapReviewList(user, page, SIZE);
     }
 
     @Transactional(readOnly = true)
-    public Slice<Review> getLikeReviewList(int page) {
+    public Page<Review> getLikeReviewList(int page) {
         Users user = userService.getCurrentUser();
         return reviewService.getLikeReviewList(user, page, SIZE);
     }
@@ -59,13 +61,11 @@ public class MypageService {
     @Transactional(readOnly = true)
     public MypageResponse.UserProfileDto getUserProfile() {
         Users user = userService.getCurrentUser();
-        Integer reviewCount = reviewService.getReviewCount(user);
-        Integer scrapCount = reviewService.getScrapCount(user);
         Integer followerCount = followService.getFollowerCount(user);
         Integer followeeCount = followService.getFolloweeCount(user);
 
         return MypageResponseConverter.toUserProfileDto(
-                user, reviewCount, scrapCount, followerCount, followeeCount
+                user, followerCount, followeeCount
         );
     }
 

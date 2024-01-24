@@ -11,8 +11,11 @@ import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,11 +39,11 @@ public class MypageController {
      * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/mine")
+    @GetMapping("/review/mine/{page}")
     public ResponseDto<MypageResponse.ReviewListDto> getReview(
-            @RequestParam int page
+            @PathVariable int page
     ) {
-        List<Review> reviewList = mypageService.getMyReviewList(page);
+        Page<Review> reviewList = mypageService.getMyReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
@@ -50,11 +53,11 @@ public class MypageController {
      * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/scrap")
+    @GetMapping("/review/mine/scrap/{page}")
     public ResponseDto<MypageResponse.ReviewListDto> getScrapReview(
-            @RequestParam int page
+            @PathVariable int page
     ) {
-        List<Review> reviewList = mypageService.getScrapReviewList(page);
+        Page<Review> reviewList = mypageService.getScrapReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewListDto(reviewList));
     }
 
@@ -64,11 +67,11 @@ public class MypageController {
      * @param page 페이지 번호
      * @return List<MypageResponse.MyReviewDto>
      */
-    @GetMapping("/review/like")
+    @GetMapping("/review/mine/like/{page}")
     public ResponseDto<ReviewResponse> getLikeReview(
-            @RequestParam int page
+            @PathVariable int page
     ) {
-        Slice<Review> reviewList = mypageService.getLikeReviewList(page);
+        Page<Review> reviewList = mypageService.getLikeReviewList(page);
         return ResponseDto.onSuccess(mypageResponseConverter.toReviewResponse(reviewList));
     }
 
@@ -78,9 +81,9 @@ public class MypageController {
      * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/followers")
+    @GetMapping("/followers/mine/{page}")
     public ResponseDto<MypageResponse.FollowerListDto> getFollower(
-            @RequestParam int page
+            @PathVariable int page
     ) {
         List<Users> followerList = mypageService.getFollowerList(page);
         Integer totalCount = mypageService.getFollowerCount();
@@ -93,9 +96,9 @@ public class MypageController {
      * @param page 페이지 번호
      * @return List<MypageResponse.FollowerDto>
      */
-    @GetMapping("/followings")
+    @GetMapping("/followings/mine/{page}")
     public ResponseDto<MypageResponse.FollowerListDto> getFollowee(
-            @RequestParam int page
+            @PathVariable int page
     ) {
         List<Users> followeeList = mypageService.getFollowingList(page);
         Integer totalCount = mypageService.getFollowingCount();
