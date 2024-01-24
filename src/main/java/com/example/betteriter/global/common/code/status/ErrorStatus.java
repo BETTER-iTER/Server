@@ -80,6 +80,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Follow
     _FOLLOW_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOLLOW_NOT_FOUND_400", "일치하는 팔로우 정보를 찾을 수 없습니다."),
+    _FOLLOW_MYSELF(HttpStatus.BAD_REQUEST, "FOLLOW_MYSELF_400", "자기 자신을 팔로우할 수 없습니다."),
+    _FOLLOW_ALREADY(HttpStatus.BAD_REQUEST, "FOLLOW_ALREADY_400", "이미 팔로우한 유저입니다."),
+    _FOLLOW_NOT_MATCH(HttpStatus.BAD_REQUEST, "FOLLOW_NOT_MATCH_400", "팔로우한 유저가 아닙니다."),
+
 
     ;
 

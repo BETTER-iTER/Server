@@ -34,18 +34,22 @@ public class FollowService {
     public Follow following(FollowRequest.FollowingDto followingRequestDto) {
         Users user = userService.getCurrentUser();
         Users targetUser = userService.getUserById(followingRequestDto.getTargetId());
-        Follow follow = FollowConverter.toFollowing(user, targetUser);
 
+        if (user.getId().equals(targetUser.getId())) throw new FollowHandler(ErrorStatus._FOLLOW_MYSELF);
+        if (isFollow(targetUser, user)) throw new FollowHandler(ErrorStatus._FOLLOW_ALREADY);
+
+        Follow follow = FollowConverter.toFollowing(user, targetUser);
         return followWriteRepository.save(follow);
     }
 
     @Transactional
     public void unfollowing(FollowRequest.UnfollowingDto unfollowingRequestDto) {
         Users user = userService.getCurrentUser();
-        Users targetUser = userService.getUserByEmail(unfollowingRequestDto.getEmail());
+        Users targetUser = userService.getUserById(unfollowingRequestDto.getTargetId());
+
+        if (!isFollow(targetUser, user)) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
 
         Follow follow = findFollowData(user, targetUser);
-
         followWriteRepository.delete(follow);
     }
 
