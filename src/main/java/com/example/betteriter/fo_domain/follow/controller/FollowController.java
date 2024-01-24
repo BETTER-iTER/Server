@@ -9,6 +9,8 @@ import com.example.betteriter.global.common.response.ResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +31,6 @@ public class FollowController {
      * 1. 팔로우
      * - /follow/following
      *
-     * TODO: 팔로우 요청시 api 메서드 호출도 되지 않은 시점에서 400 에러 발생
-     *
      * @param followingRequestDto : 팔로우 요청 DTO
      * @return followingResponseDto : 팔로우 응답 DTO
      */
@@ -49,7 +49,7 @@ public class FollowController {
      * @param unfollowingRequestDto : 언팔로우 요청 DTO
      * @return unfollowingResponseDto : 언팔로우 응답 DTO
      */
-    @PostMapping("/unfollowing")
+    @DeleteMapping("/unfollowing")
     public ResponseDto<FollowResponse.UnfollowingDto> unfollowing(
            @RequestBody @Valid FollowRequest.UnfollowingDto unfollowingRequestDto
     ) {

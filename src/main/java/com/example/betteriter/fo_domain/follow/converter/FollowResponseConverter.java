@@ -9,7 +9,6 @@ public class FollowResponseConverter {
         String message = follow.getFollowee().getUsername() + " 님을 팔로우 하였습니다.";
 
         return FollowResponse.FollowingDto.builder()
-                .email(follow.getFollowee().getEmail())
                 .message(message)
                 .build();
     }
