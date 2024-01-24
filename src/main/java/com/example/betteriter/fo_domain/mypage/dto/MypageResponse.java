@@ -64,12 +64,32 @@ public class MypageResponse {
 
     @Getter
     @Builder
-    public static class UserProfileDto {
+    public static class MyProfileDto {
         private String profileImage;
         private String nickname;
         private Job job;
         private Integer followerCount;
         private Integer followingCount;
+    }
+
+    @Getter
+    @Builder
+    public static class UserProfileDto {
+        private String profileImage;
+        private String nickname;
+        private Job job;
+        private Boolean isExpertise;
+
+        private Integer followerCount;
+        private Integer followingCount;
+        private Boolean isFollow;
+    }
+
+    @Getter
+    @Builder
+    public static class UserPageDto {
+        private UserProfileDto userProfile;
+        private ReviewListDto reviewList;
     }
 
     @Getter

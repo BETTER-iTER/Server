@@ -13,11 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -106,14 +104,31 @@ public class MypageController {
     }
 
     /**
-     * user profile 조회
+     * my user profile 조회
      *
      * @return MypageResponse.UserProfileDto
      */
-    @GetMapping("/profile")
-    public ResponseDto<MypageResponse.UserProfileDto> getUserProfile() {
-        MypageResponse.UserProfileDto result = mypageService.getUserProfile();
+    @GetMapping("/profile/mine")
+    public ResponseDto<MypageResponse.MyProfileDto> getUserProfile() {
+        MypageResponse.MyProfileDto result = mypageService.getMyProfile();
         return ResponseDto.onSuccess(result);
+    }
+
+    /**
+     * user page 조회
+     *
+     * @param userId 조회할 user id
+     * @return MypageResponse.UserProfileDto
+     */
+    @GetMapping("/profile/{userId}/{page}")
+    public ResponseDto<MypageResponse.UserPageDto> getUserProfile(
+            @PathVariable Long userId,
+            @PathVariable int page
+    ) {
+        Users user = mypageService.getCurrentUser();
+        MypageResponse.UserProfileDto profile = mypageService.getUserProfile(userId);
+        Page<Review> reviewPage = mypageService.getUserReviewList(userId, page);
+        return ResponseDto.onSuccess(mypageResponseConverter.toUserPageDto(user, profile, reviewPage));
     }
 
     /**

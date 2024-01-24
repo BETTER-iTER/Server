@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,14 +57,26 @@ public class MypageService {
         return followService.getFollowingList(user, page, SIZE);
     }
 
-    @Transactional(readOnly = true)
-    public MypageResponse.UserProfileDto getUserProfile() {
+    public MypageResponse.MyProfileDto getMyProfile() {
         Users user = userService.getCurrentUser();
         Integer followerCount = followService.getFollowerCount(user);
         Integer followeeCount = followService.getFolloweeCount(user);
 
-        return MypageResponseConverter.toUserProfileDto(
+        return MypageResponseConverter.toMyProfileDto(
                 user, followerCount, followeeCount
+        );
+    }
+
+    public MypageResponse.UserProfileDto getUserProfile(Long userId) {
+        Users user = userService.getCurrentUser();
+        Users targetUser = userService.getUserById(userId);
+        Integer followerCount = followService.getFollowerCount(user);
+        Integer followeeCount = followService.getFolloweeCount(user);
+
+        boolean isFollow = followService.isFollow(user, targetUser);
+
+        return MypageResponseConverter.toUserProfileDto(
+                targetUser, followerCount, followeeCount, isFollow
         );
     }
 
@@ -89,5 +100,10 @@ public class MypageService {
 
     public Integer getTotalScrapCount(Users user) {
         return reviewService.getTotalScrapCount(user);
+    }
+
+    public Page<Review> getUserReviewList(Long userId, int page) {
+        Users targetUser = userService.getUserById(userId);
+        return reviewService.getReviewList(targetUser, page, SIZE);
     }
 }
