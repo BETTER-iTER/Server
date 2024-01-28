@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: "firebase"
+
+firebase:
+  key: ${FIREBASE_KEY}
