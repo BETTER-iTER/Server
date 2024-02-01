@@ -1,5 +1,13 @@
 package com.example.betteriter.fo_domain.user.service;
 
+import static com.example.betteriter.global.common.code.status.ErrorStatus._AUTH_CODE_ALREADY_EXIT;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._AUTH_CODE_NOT_EXIST;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._AUTH_CODE_NOT_MATCH;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._AUTH_SHOULD_BE_KAKAO;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._EMAIL_DUPLICATION;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._EMAIL_NOT_FOUND;
+import static com.example.betteriter.global.common.code.status.ErrorStatus._USER_NOT_FOUND;
+
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.dto.JoinDto;
 import com.example.betteriter.fo_domain.user.dto.LoginDto;
@@ -14,9 +22,12 @@ import com.example.betteriter.global.config.properties.JwtProperties;
 import com.example.betteriter.global.config.security.UserAuthentication;
 import com.example.betteriter.global.util.JwtUtil;
 import com.example.betteriter.global.util.RedisUtil;
-import com.example.betteriter.infra.EmailAuthenticationDto;
-import com.example.betteriter.infra.EmailDto;
-import com.example.betteriter.infra.EmailService;
+import com.example.betteriter.infra.email.EmailAuthenticationDto;
+import com.example.betteriter.infra.email.EmailDto;
+import com.example.betteriter.infra.email.EmailService;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,16 +36,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Random;
-
-import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthService implements UserDetailsService {
+
     private final UsersRepository usersRepository;
     private final UserDetailRepository userDetailRepository;
 
@@ -48,7 +54,7 @@ public class AuthService implements UserDetailsService {
     @Override
     public Users loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         return this.usersRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
+            .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
     }
 
     /* (카카오,일반) 회원 가입 */
@@ -171,7 +177,7 @@ public class AuthService implements UserDetailsService {
     private Users checkEmailExistenceAndType(String email) {
         // 해당 유저가 있는지 확인
         Users users = this.usersRepository.findByEmail(email)
-                .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
+            .orElseThrow(() -> new UserHandler(_USER_NOT_FOUND));
         // 해당 유저의 회원가입 타입이 일반 회원가입인지 확인
         if (null != users.getOauthId()) {
             throw new UserHandler(_AUTH_SHOULD_BE_KAKAO);
@@ -212,6 +218,6 @@ public class AuthService implements UserDetailsService {
 
     private Long processJoin(JoinDto joinDto, String encryptPassword) {
         return this.usersRepository.save(joinDto.toUserEntity(encryptPassword, joinDto.toUserDetailEntity()))
-                .getId();
+            .getId();
     }
 }

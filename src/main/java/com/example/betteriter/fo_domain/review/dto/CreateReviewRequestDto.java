@@ -1,24 +1,24 @@
 package com.example.betteriter.fo_domain.review.dto;
 
+import static com.example.betteriter.global.constant.Status.ACTIVE;
+
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
+import java.time.LocalDate;
+import java.util.List;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.util.List;
-
-import static com.example.betteriter.global.constant.Status.ACTIVE;
-
 @Getter
 @NoArgsConstructor
 public class CreateReviewRequestDto {
+
     @NotNull(message = "카테고리는 필수 입력 값입니다.")
     private Category category; // 카테고리
 
@@ -53,14 +53,11 @@ public class CreateReviewRequestDto {
 
     private List<Long> specData; // specData id 리스트
 
-    private List<CreateReviewImageRequestDto> images; // 리뷰 이미지
-
     @Builder
     public CreateReviewRequestDto(Category category, String productName, LocalDate boughtAt,
-                                  String manufacturer, int price, int storeName,
-                                  String comparedProductName, String shortReview, int starPoint, String goodPoint,
-                                  String badPoint, List<Long> specData, List<CreateReviewImageRequestDto> images
-    ) {
+        String manufacturer, int price, int storeName,
+        String comparedProductName, String shortReview, int starPoint, String goodPoint,
+        String badPoint, List<Long> specData) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
@@ -73,36 +70,23 @@ public class CreateReviewRequestDto {
         this.goodPoint = goodPoint;
         this.badPoint = badPoint;
         this.specData = specData;
-        this.images = images;
     }
 
     public Review toEntity(Users users, Manufacturer manufacturer) {
         return Review.builder()
-                .writer(users)
-                .category(category)
-                .productName(productName)
-                .boughtAt(boughtAt)
-                .manufacturer(manufacturer)
-                .price(price)
-                .comparedProductName(comparedProductName)
-                .storeName(storeName)
-                .shortReview(shortReview)
-                .starPoint(starPoint)
-                .goodPoint(goodPoint)
-                .badPoint(badPoint)
-                .status(ACTIVE)
-                .build();
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class CreateReviewImageRequestDto {
-        @NotBlank
-        private String imgUrl;
-
-        @Builder
-        private CreateReviewImageRequestDto(String imgUrl) {
-            this.imgUrl = imgUrl;
-        }
+            .writer(users)
+            .category(category)
+            .productName(productName)
+            .boughtAt(boughtAt)
+            .manufacturer(manufacturer)
+            .price(price)
+            .comparedProductName(comparedProductName)
+            .storeName(storeName)
+            .shortReview(shortReview)
+            .starPoint(starPoint)
+            .goodPoint(goodPoint)
+            .badPoint(badPoint)
+            .status(ACTIVE)
+            .build();
     }
 }
