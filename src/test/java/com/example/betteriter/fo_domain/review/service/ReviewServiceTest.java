@@ -1,5 +1,19 @@
 package com.example.betteriter.fo_domain.review.service;
 
+import static com.example.betteriter.global.constant.Category.LAPTOP;
+import static com.example.betteriter.global.constant.Category.PC;
+import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
+import static com.example.betteriter.global.constant.Status.ACTIVE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerConnector;
 import com.example.betteriter.bo_domain.spec.domain.Spec;
@@ -11,16 +25,30 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.review.dto.*;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto.CreateReviewImageRequestDto;
+import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
+import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
+import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
+import com.example.betteriter.fo_domain.review.dto.ReviewCommentResponse;
+import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
+import com.example.betteriter.fo_domain.review.dto.ReviewLikeResponse;
+import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
-import com.example.betteriter.fo_domain.review.repository.*;
+import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewScrapRepository;
+import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.service.UserConnector;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Job;
 import com.example.betteriter.global.constant.RoleType;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,24 +58,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static com.example.betteriter.global.constant.Category.LAPTOP;
-import static com.example.betteriter.global.constant.Category.PC;
-import static com.example.betteriter.global.constant.RoleType.ROLE_USER;
-import static com.example.betteriter.global.constant.Status.ACTIVE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith({MockitoExtension.class})
-public class ReviewServiceTest {
+class ReviewServiceTest {
+
     @InjectMocks
     private ReviewService reviewService;
 
@@ -81,53 +97,52 @@ public class ReviewServiceTest {
     private Review createReview(long count) {
 
         Users writer = Users.builder()
-                .id(1L)
-                .email("email")
-                .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
-                .build();
+            .id(1L)
+            .email("email")
+            .roleType(ROLE_USER)
+            .usersDetail(UsersDetail.builder().nickName("nickname").job(Job.SW_DEVELOPER).build())
+            .build();
 
         Users user01 = Users.builder()
-                .id(2L)
-                .email("email01")
-                .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nick01").job(Job.SW_DEVELOPER).build())
-                .build();
+            .id(2L)
+            .email("email01")
+            .roleType(ROLE_USER)
+            .usersDetail(UsersDetail.builder().nickName("nick01").job(Job.SW_DEVELOPER).build())
+            .build();
 
         Users user02 = Users.builder()
-                .id(3L)
-                .email("email02")
-                .roleType(ROLE_USER)
-                .usersDetail(UsersDetail.builder().nickName("nick02").job(Job.CEO).build())
-                .build();
-
+            .id(3L)
+            .email("email02")
+            .roleType(ROLE_USER)
+            .usersDetail(UsersDetail.builder().nickName("nick02").job(Job.CEO).build())
+            .build();
 
         Review review = Review.builder()
-                .id(count)
-                .writer(writer)
-                .category(PC)
-                .productName("productName")
-                .category(PC)
-                .price(10)
-                .storeName(1)
-                .status(ACTIVE)
-                .manufacturer(Manufacturer.builder().coName("삼성").build())
-                .boughtAt(LocalDate.now())
-                .starPoint(1)
-                .likedCount(count + 2)
-                .shownCount(count)
-                .scrapedCount(count)
-                .goodPoint("goodPoint")
-                .badPoint("badPoint")
-                .clickCount(count)
-                .shortReview("short")
-                .build();
+            .id(count)
+            .writer(writer)
+            .category(PC)
+            .productName("productName")
+            .category(PC)
+            .price(10)
+            .storeName(1)
+            .status(ACTIVE)
+            .manufacturer(Manufacturer.builder().coName("삼성").build())
+            .boughtAt(LocalDate.now())
+            .starPoint(1)
+            .likedCount(count + 2)
+            .shownCount(count)
+            .scrapedCount(count)
+            .goodPoint("goodPoint")
+            .badPoint("badPoint")
+            .clickCount(count)
+            .shortReview("short")
+            .build();
 
         List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
-                ReviewLike.builder().review(review).users(user02).build());
+            ReviewLike.builder().review(review).users(user02).build());
 
         List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").status(ACTIVE).build(),
-                Comment.builder().users(user02).comment("comment02").status(ACTIVE).build());
+            Comment.builder().users(user02).comment("comment02").status(ACTIVE).build());
 
         review.setReviewsComment(comments);
         review.setReviewLikes(reviewLikes);
@@ -138,11 +153,11 @@ public class ReviewServiceTest {
 
     private ReviewImage createReviewImage(Review review) {
         return ReviewImage.builder()
-                .id(review.getId())
-                .review(review)
-                .orderNum(0)
-                .imgUrl("imgUrl")
-                .build();
+            .id(review.getId())
+            .review(review)
+            .orderNum(0)
+            .imgUrl("imgUrl")
+            .build();
     }
 
     @Test
@@ -150,62 +165,66 @@ public class ReviewServiceTest {
     void createReviewTest() {
         // given
         CreateReviewRequestDto requestDto =
-                CreateReviewRequestDto.builder()
-                        .category(LAPTOP)
-                        .productName("맥북1")
-                        .boughtAt(LocalDate.now())
-                        .manufacturer("기타")
-                        .price(100000)
-                        .storeName(1)
-                        .comparedProductName("에어팟 맥스")
-                        .shortReview("한줄 평")
-                        .starPoint(1)
-                        .goodPoint("goodPoint")
-                        .badPoint("badPoint")
-                        .specData(List.of(1L, 2L))
-                        .images(List.of(CreateReviewImageRequestDto.builder().imgUrl("imgUrl1").build(),
-                                CreateReviewImageRequestDto.builder().imgUrl("imgUrl2").build())
-                        ).build();
-
-        given(this.manufacturerConnector.findManufacturerByName(anyString()))
-                .willReturn(Manufacturer.createManufacturer("삼성")); // 삼성
-
-        given(this.specConnector.findAllSpecDataByIds(anyList()))
-                .willReturn(List.of(
-                        SpecData.builder()
-                                .spec(Spec.createSpec(LAPTOP, "title1"))
-                                .build(),
-                        SpecData.builder()
-                                .spec(Spec.createSpec(LAPTOP, "title2"))
-                                .build()
-                )); // specData
-
-
-        Review review = Review.builder()
-                .writer(Users.builder()
-                        .oauthId("oauthId")
-                        .email("danaver12@daum.net")
-                        .password("password")
-                        .roleType(ROLE_USER)
-                        .isExpert(true)
-                        .build())
-                .manufacturer(Manufacturer.createManufacturer("삼성"))
+            CreateReviewRequestDto.builder()
                 .category(LAPTOP)
-                .productName("상품명1")
-                .price(10000)
-                .storeName(1)
+                .productName("맥북1")
                 .boughtAt(LocalDate.now())
+                .manufacturer("기타")
+                .price(100000)
+                .storeName(1)
+                .comparedProductName("에어팟 맥스")
+                .shortReview("한줄 평")
                 .starPoint(1)
-                .shortReview("ShortReview")
                 .goodPoint("goodPoint")
                 .badPoint("badPoint")
+                .specData(List.of(1L, 2L))
                 .build();
 
+        List<MultipartFile> images = new ArrayList<>();
+        byte[] content = "file content".getBytes(StandardCharsets.UTF_8);
+
+        for (int i = 0; i < 5; i++) {
+            images.add(new MockMultipartFile("file" + i, "file" + i + ".txt", "text/plain", content));
+        }
+
+        given(this.manufacturerConnector.findManufacturerByName(anyString()))
+            .willReturn(Manufacturer.createManufacturer("삼성")); // 삼성
+
+        given(this.specConnector.findAllSpecDataByIds(anyList()))
+            .willReturn(List.of(
+                SpecData.builder()
+                    .spec(Spec.createSpec(LAPTOP, "title1"))
+                    .build(),
+                SpecData.builder()
+                    .spec(Spec.createSpec(LAPTOP, "title2"))
+                    .build()
+            ));
+
+        Review review = Review.builder()
+            .writer(Users.builder()
+                .oauthId("oauthId")
+                .email("danaver12@daum.net")
+                .password("password")
+                .roleType(ROLE_USER)
+                .isExpert(true)
+                .build())
+            .manufacturer(Manufacturer.createManufacturer("삼성"))
+            .category(LAPTOP)
+            .productName("상품명1")
+            .price(10000)
+            .storeName(1)
+            .boughtAt(LocalDate.now())
+            .starPoint(1)
+            .shortReview("ShortReview")
+            .goodPoint("goodPoint")
+            .badPoint("badPoint")
+            .build();
+
         given(this.reviewRepository.save(any(Review.class)))
-                .willReturn(review);
+            .willReturn(review);
 
         // when
-        Long result = this.reviewService.createReview(requestDto);
+        Long result = this.reviewService.createReview(requestDto, images);
 
         // then
         assertThat(result).isNotNull();
@@ -224,7 +243,7 @@ public class ReviewServiceTest {
         List<Spec> specs = List.of(spec01, spec02);
 
         given(this.specConnector.findAllSpecDataByCategory(any(Category.class)))
-                .willReturn(specs);
+            .willReturn(specs);
         // when
         GetReviewSpecResponseDto reviewSpecResponseDto = this.reviewService.getReviewSpecDataResponse(category);
         // then
@@ -238,16 +257,15 @@ public class ReviewServiceTest {
         // given
 
         Users user01 = Users.builder()
-                .oauthId("oauthId")
-                .email("danaver12@daum.net")
-                .password("1234")
-                .roleType(RoleType.ROLE_USER)
-                .isExpert(true)
-                .usersDetail(UsersDetail.builder()
-                        .nickName("nickname")
-                        .job(Job.SW_DEVELOPER).build())
-                .build();
-
+            .oauthId("oauthId")
+            .email("danaver12@daum.net")
+            .password("1234")
+            .roleType(RoleType.ROLE_USER)
+            .isExpert(true)
+            .usersDetail(UsersDetail.builder()
+                .nickName("nickname")
+                .job(Job.SW_DEVELOPER).build())
+            .build();
 
         Review review01 = createReview(1L);
 
@@ -257,8 +275,9 @@ public class ReviewServiceTest {
 
         Review review04 = createReview(4L);
 
-        given(reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
-                .willReturn(new SliceImpl<>(List.of(review01, review02, review03, review04)));
+        given(reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class),
+            any(Pageable.class)))
+            .willReturn(new SliceImpl<>(List.of(review01, review02, review03, review04)));
 
         // when
         ReviewResponse result = this.reviewService.getReviewByCategory(PC, 1);
@@ -269,7 +288,7 @@ public class ReviewServiceTest {
         assertThat(result.isExisted()).isTrue();
         assertThat(result.isHasNext()).isFalse();
         verify(this.reviewRepository, times(1))
-                .findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any());
+            .findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any());
     }
 
     @Test
@@ -280,10 +299,10 @@ public class ReviewServiceTest {
         Review review01 = createReview(2L);
         Review review02 = createReview(3L);
 
-
         Slice<Review> result = new SliceImpl<>(List.of(review00, review01, review02));
-        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
-                .willReturn(result);
+        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class),
+            any(Pageable.class)))
+            .willReturn(result);
         // when
         ReviewResponse response = this.reviewService.getReviewByCategory(PC, 2);
         // then
@@ -298,8 +317,9 @@ public class ReviewServiceTest {
     void getReviewByCategoryServiceTest02() {
         // given
         Slice<Review> result = new SliceImpl<>(List.of());
-        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class)))
-                .willReturn(result);
+        given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class),
+            any(Pageable.class)))
+            .willReturn(result);
         // when
         ReviewResponse response = this.reviewService.getReviewByCategory(PC, 2);
         // then
@@ -316,19 +336,19 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         Users currentUser = Users.builder()
-                .email("danaver12@daum.net")
-                .roleType(ROLE_USER)
-                .build();
+            .email("danaver12@daum.net")
+            .roleType(ROLE_USER)
+            .build();
 
         given(this.reviewRepository.findById(review.getId()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(currentUser);
+            .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 */
         given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
-                .willReturn(List.of(createReview(2L), createReview(3L), createReview(4L), createReview(5L)));
+            .willReturn(List.of(createReview(2L), createReview(3L), createReview(4L), createReview(5L)));
         // when
         ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
         // then
@@ -336,11 +356,13 @@ public class ReviewServiceTest {
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
         assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
-        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
+        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(
+            review.getWriter().getUsersDetail().getNickName());
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getShownCount()).isEqualTo(2L);
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getPrice()).isEqualTo(10);
         verify(reviewRepository, times(1)).findById(anyLong());
-        verify(reviewRepository, times(0)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
+        verify(reviewRepository, times(0)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class),
+            any(Pageable.class));
     }
 
     @Test
@@ -350,22 +372,22 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         Users currentUser = Users.builder()
-                .email("danaver12@daum.net")
-                .roleType(ROLE_USER)
-                .build();
+            .email("danaver12@daum.net")
+            .roleType(ROLE_USER)
+            .build();
 
         given(this.reviewRepository.findById(review.getId()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(currentUser);
+            .willReturn(currentUser);
 
         /* 동일한 제품명 리뷰 조회 (2개) */
         given(this.reviewRepository.findTop4ByProductNameOrderByScrapedCntPlusLikedCntDesc(anyString()))
-                .willReturn(List.of(createReview(2L), createReview(3L)));
+            .willReturn(List.of(createReview(2L), createReview(3L)));
         /* 동일한 카테고리 리뷰 조회 (2개) */
         given(this.reviewRepository.findReviewByCategoryOrderByScrapedCountAndLikedCount(any(), any()))
-                .willReturn(new SliceImpl<>(List.of(createReview(3L), createReview(4L))));
+            .willReturn(new SliceImpl<>(List.of(createReview(3L), createReview(4L))));
 
         // when
         ReviewDetailResponse reviewDetail = this.reviewService.getReviewDetail(1L);
@@ -374,10 +396,12 @@ public class ReviewServiceTest {
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getProductName()).isEqualTo(review.getProductName());
         assertThat(reviewDetail.getGetReviewDetailResponseDto().getScrapedCount()).isEqualTo(1L);
         assertThat(reviewDetail.getWriterInfo().getId()).isEqualTo(review.getWriter().getId());
-        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(review.getWriter().getUsersDetail().getNickName());
+        assertThat(reviewDetail.getWriterInfo().getNickName()).isEqualTo(
+            review.getWriter().getUsersDetail().getNickName());
 
         verify(reviewRepository, times(1)).findById(anyLong());
-        verify(reviewRepository, times(1)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class), any(Pageable.class));
+        verify(reviewRepository, times(1)).findReviewByCategoryOrderByScrapedCountAndLikedCount(any(Category.class),
+            any(Pageable.class));
     }
 
     @Test
@@ -390,19 +414,19 @@ public class ReviewServiceTest {
 
         // 좋아요 하는 유저
         Users users = Users.builder()
-                .id(1L)
-                .email("email")
-                .roleType(ROLE_USER)
-                .build();
+            .id(1L)
+            .email("email")
+            .roleType(ROLE_USER)
+            .build();
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(users);
+            .willReturn(users);
 
         given(this.reviewLikeRepository.save(any(ReviewLike.class)))
-                .willReturn(ReviewLike.builder().review(review).users(users).build());
+            .willReturn(ReviewLike.builder().review(review).users(users).build());
         // when
         ReviewLike reviewLike = null;
         // then
@@ -423,19 +447,19 @@ public class ReviewServiceTest {
 
         // 좋아요 하는 유저
         Users users = Users.builder()
-                .id(1L)
-                .email("email")
-                .roleType(ROLE_USER)
-                .build();
+            .id(1L)
+            .email("email")
+            .roleType(ROLE_USER)
+            .build();
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(users);
+            .willReturn(users);
 
         given(this.reviewScrapRepository.save(any(ReviewScrap.class)))
-                .willReturn(ReviewScrap.builder().review(review).users(users).build());
+            .willReturn(ReviewScrap.builder().review(review).users(users).build());
 
         // when
         // then
@@ -451,7 +475,7 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         // when
         List<ReviewLikeResponse> result = this.reviewService.getReviewDetailLikes(1L);
@@ -472,10 +496,10 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(Users.builder().id(1L).email("email").roleType(ROLE_USER).build());
+            .willReturn(Users.builder().id(1L).email("email").roleType(ROLE_USER).build());
         // when
         List<ReviewCommentResponse> result = this.reviewService.getReviewDetailComments(1L);
         // then
@@ -494,7 +518,7 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         // when
         this.reviewService.deleteReview(1L);
@@ -510,23 +534,23 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         Users user = Users.builder()
-                .roleType(ROLE_USER)
-                .email("danaver12@daum.net")
-                .build();
+            .roleType(ROLE_USER)
+            .email("danaver12@daum.net")
+            .build();
 
         ReviewLike reviewLike = ReviewLike.builder()
-                .review(review)
-                .users(user)
-                .build();
+            .review(review)
+            .users(user)
+            .build();
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.reviewLikeRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
-                .willReturn(Optional.of(reviewLike));
+            .willReturn(Optional.of(reviewLike));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(user);
+            .willReturn(user);
         // when
         this.reviewService.deleteReviewLike(1L);
 
@@ -545,24 +569,23 @@ public class ReviewServiceTest {
         long previousLikedCount = review.getLikedCount();
 
         Users user = Users.builder()
-                .roleType(ROLE_USER)
-                .email("danaver12@daum.net")
-                .build();
+            .roleType(ROLE_USER)
+            .email("danaver12@daum.net")
+            .build();
 
         ReviewScrap reviewScrap = ReviewScrap.builder()
-                .review(review)
-                .users(user)
-                .build();
+            .review(review)
+            .users(user)
+            .build();
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(user);
+            .willReturn(user);
 
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
-                .willReturn(Optional.of(reviewScrap));
-
+            .willReturn(Optional.of(reviewScrap));
 
         // when
         Void result = this.reviewService.deleteReviewScrap(1L);
@@ -580,23 +603,22 @@ public class ReviewServiceTest {
         Review review = createReview(1L);
 
         Users user = Users.builder()
-                .roleType(ROLE_USER)
-                .email("danaver12@daum.net")
-                .build();
-
+            .roleType(ROLE_USER)
+            .email("danaver12@daum.net")
+            .build();
 
         given(this.reviewRepository.findById(anyLong()))
-                .willReturn(Optional.of(review));
+            .willReturn(Optional.of(review));
 
         given(this.userConnector.getCurrentUser())
-                .willReturn(user);
+            .willReturn(user);
 
         given(this.reviewScrapRepository.findByReviewAndUsers(any(Review.class), any(Users.class)))
-                .willReturn(Optional.empty());
+            .willReturn(Optional.empty());
 
         // when && then
         assertThatThrownBy(() -> this.reviewService.deleteReviewScrap(1L))
-                .isInstanceOf(ReviewHandler.class);
+            .isInstanceOf(ReviewHandler.class);
         verify(this.reviewRepository, times(1)).findById(anyLong());
         verify(this.userConnector, times(1)).getCurrentUser();
     }
