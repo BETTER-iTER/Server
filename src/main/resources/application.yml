@@ -7,5 +7,5 @@ spring:
 
   profiles:
     group:
-      "dev": "dev, auth, datasource, mail, redis, docs" # 개발 환경 프로파일
-      "prod": "prod, auth, datasource, mail, redis, docs" # 운영 환경 프로파일
+      "dev": "dev, auth, datasource, mail, redis, docs, aws" # 개발 환경 프로파일
+      "prod": "prod, auth, datasource, mail, redis, docs, aws" # 운영 환경 프로파일
