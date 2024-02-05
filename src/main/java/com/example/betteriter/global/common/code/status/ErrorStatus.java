@@ -70,6 +70,7 @@ public enum ErrorStatus implements BaseErrorCode {
     _IMAGE_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "IMAGE_FILE_UPLOAD_FAILED", "이미지 파일 업로드에 실패했습니다."),
     _IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID(HttpStatus.BAD_REQUEST, "IMAGE_FILE_UPLOAD_IS_NOT_VALID",
         "이미지 파일 업로드 요청 형식이 올바르지 않습니다."),
+    _IMAGE_FILE_IS_NOT_EXIST(HttpStatus.BAD_REQUEST, "IMAGE_FILE_IS_NOT_EXISTED", "이미지 파일이 존재하지 않습니다."),
 
     // REVIEW_LIKE
     _REVIEW_LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_LIKE_NOT_FOUND_400", "일치하는 리뷰 좋아요 정보를 찾을 수 없습니다."),
@@ -92,7 +93,6 @@ public enum ErrorStatus implements BaseErrorCode {
     _FOLLOW_MYSELF(HttpStatus.BAD_REQUEST, "FOLLOW_MYSELF_400", "자기 자신을 팔로우할 수 없습니다."),
     _FOLLOW_ALREADY(HttpStatus.BAD_REQUEST, "FOLLOW_ALREADY_400", "이미 팔로우한 유저입니다."),
     _FOLLOW_NOT_MATCH(HttpStatus.BAD_REQUEST, "FOLLOW_NOT_MATCH_400", "팔로우한 유저가 아닙니다."),
-
 
     ;
 
