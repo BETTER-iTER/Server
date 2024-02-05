@@ -5,11 +5,12 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
-@ConfigurationProperties(prefix = "jwt")
 @Getter
 @ConstructorBinding
 @AllArgsConstructor
+@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
+
     private String bearer;
     private String secret;
     private String accessHeader;
