@@ -34,17 +34,14 @@ public enum ErrorStatus implements BaseErrorCode {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "AUTHORIZATION_403", "금지된 요청입니다."),
     _METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_405", "지원하지 않는 Http Method 입니다."),
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 에러가 발생했습니다."),
-    _METHOD_ARGUMENT_ERROR(HttpStatus.BAD_REQUEST, "METHOD_ARGUMENT_ERROR",
-        "올바르지 않은 클라이언트 요청값입니다."), // controller 에서 받은 요청 DTO 유효성 검증
+    _METHOD_ARGUMENT_ERROR(HttpStatus.BAD_REQUEST, "METHOD_ARGUMENT_ERROR", "올바르지 않은 클라이언트 요청값입니다."), // controller 에서 받은 요청 DTO 유효성 검증
 
     // JWT Error
     _JWT_IS_NOT_EXIST(HttpStatus.UNAUTHORIZED, "JWT_IS_NOT_EXIST", "Authorization 헤더에 JWT 정보가 존재하지 않습니다."),
     _JWT_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_IS_NOT_VALID", "Access Token 이 유효하지 않습니다."),
-    _JWT_REFRESH_TOKEN_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_VALID",
-        "Refresh Token 이 유효하지 않습니다."),
+    _JWT_REFRESH_TOKEN_IS_NOT_VALID(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_VALID", "Refresh Token 이 유효하지 않습니다."),
     _JWT_ACCESS_TOKEN_IS_VALID(HttpStatus.UNAUTHORIZED, "JWT_ACCESS_TOKEN_IS_VALID", "Access Token 이 유효합니다."),
-    _JWT_REFRESH_TOKEN_IS_NOT_MATCH(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_MATCH",
-        "Refresh Token 이 일치하지 않습니다."),
+    _JWT_REFRESH_TOKEN_IS_NOT_MATCH(HttpStatus.UNAUTHORIZED, "JWT_REFRESH_TOKEN_IS_NOT_MATCH", "Refresh Token 이 일치하지 않습니다."),
 
     // Example (For Test)
     TEST_BAD_REQUEST(HttpStatus.BAD_REQUEST, "TEST_400_001", "잘못된 요청 입니다. (For Test)"),
@@ -64,12 +61,13 @@ public enum ErrorStatus implements BaseErrorCode {
     _REVIEW_NOT_ACTIVATE(HttpStatus.BAD_REQUEST, "REVIEW_NOT_ACTIVATE_400", "삭제되었거나 비공개된 리뷰입니다."),
     _REVIEW_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_IMAGE_NOT_FOUND_400", "일치하는 리뷰 이미지 정보를 찾을 수 없습니다."),
     _REVIEW_WRITER_IS_NOT_MATCH(HttpStatus.BAD_REQUEST, "REVIEW_WRITER_IS_NOT_MATCH_400", "리뷰의 작성자가 아닙니다."),
+    _REVIEW_SPEC_DATA_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW_SPEC_DATA_NOT_FOUND_400", "리뷰 스펙 데이터를 찾을 수 없습니다."),
+    _REVIEW_UPDATE_IMAGE_ARGUMENT_ERROR(HttpStatus.BAD_REQUEST, "REVIEW_UPDATE_IMAGE_ARGUMENT_ERROR_400", "리뷰 이미지 수정 요청값이 올바르지 않습니다."),
 
     // IMAGE
     _IMAGE_FILE_NAME_IS_NOT_EXIST(HttpStatus.BAD_REQUEST, "IMAGE_FILE_NAME_IS_NOT_EXIST", "이미지 파일 이름이 존재하지 않습니다."),
     _IMAGE_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "IMAGE_FILE_UPLOAD_FAILED", "이미지 파일 업로드에 실패했습니다."),
-    _IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID(HttpStatus.BAD_REQUEST, "IMAGE_FILE_UPLOAD_IS_NOT_VALID",
-        "이미지 파일 업로드 요청 형식이 올바르지 않습니다."),
+    _IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID(HttpStatus.BAD_REQUEST, "IMAGE_FILE_UPLOAD_IS_NOT_VALID", "이미지 파일 업로드 요청 형식이 올바르지 않습니다."),
     _IMAGE_FILE_IS_NOT_EXIST(HttpStatus.BAD_REQUEST, "IMAGE_FILE_IS_NOT_EXISTED", "이미지 파일이 존재하지 않습니다."),
 
     // REVIEW_LIKE

@@ -8,4 +8,5 @@ public interface ImageUploadService {
 
     ReviewImage uploadImage(MultipartFile image, Review review, int orderNum);
 
+    void updateImage(MultipartFile multipartFile, ReviewImage reviewImage);
 }

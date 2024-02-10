@@ -59,6 +59,29 @@ public class S3Service implements ImageUploadService {
             .build();
     }
 
+    @Override
+    public void updateImage(MultipartFile multipartFile, ReviewImage reviewImage) {
+        validateImageFileExists(multipartFile);
+
+        String originalFilename = Optional.ofNullable(multipartFile.getOriginalFilename())
+            .orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String fileName = UUID.randomUUID().toString();
+        String key = FOLDER + "/" + reviewImage.getReview().getId().toString() + "/" + fileName + fileExtension;
+
+        ObjectMetadata objectMetaData = new ObjectMetadata();
+        objectMetaData.setContentType(multipartFile.getContentType());
+
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
+        } catch (Exception e) {
+            throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
+        }
+
+        reviewImage.updateImgUrl(getImageUrl(key));
+    }
+
     private void validateImageFileExists(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             throw new ReviewHandler(_IMAGE_FILE_IS_NOT_EXIST);

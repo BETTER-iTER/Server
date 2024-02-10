@@ -1,33 +1,22 @@
 package com.example.betteriter.fo_domain.review.controller;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus._METHOD_ARGUMENT_ERROR;
-
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewCommentResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewLikeResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.global.common.response.ResponseDto;
 import com.example.betteriter.global.constant.Category;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.util.List;
+
+import static com.example.betteriter.global.common.code.status.ErrorStatus._METHOD_ARGUMENT_ERROR;
 
 @Slf4j
 @RestController
@@ -148,6 +137,18 @@ public class ReviewController {
         return ResponseDto.onSuccess(null);
     }
 
+    /* 리뷰 수정 */
+    @PutMapping("/{reviewId}")
+    public ResponseDto<Void> updateReview(
+        @RequestPart(value = "files") List<MultipartFile> images,
+        @PathVariable Long reviewId,
+        @Valid @RequestBody UpdateReviewRequestDto request,
+        BindingResult bindingResult
+    ) {
+        this.checkRequestValidation(bindingResult);
+        this.reviewService.updateReview(reviewId, request, images);
+        return ResponseDto.onSuccess(null);
+    }
 
     private void checkRequestValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
