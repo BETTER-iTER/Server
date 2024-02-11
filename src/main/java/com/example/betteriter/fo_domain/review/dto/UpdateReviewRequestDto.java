@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,12 +25,10 @@ public class UpdateReviewRequestDto {
 
     private Integer storeName; // 구매처
 
-    private String comparedProductName; // 비교 제품
-
     private String shortReview; // 한줄평
 
     @Max(5)
-    private Integer starPoint; // 별점
+    private Double starPoint; // 별점
 
     private String goodPoint; // 좋은 점
 
@@ -43,29 +40,25 @@ public class UpdateReviewRequestDto {
 
     @Builder
     public UpdateReviewRequestDto(
-            Long id,
             Category category,
             String productName,
             LocalDate boughtAt,
             String manufacturer,
             Integer price,
             Integer storeName,
-            String comparedProductName,
             String shortReview,
-            Integer starPoint,
+            Double starPoint,
             String goodPoint,
             String badPoint,
             List<Long> specData,
             List<Integer> imageIndex
     ) {
-        this.id = id;
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
         this.manufacturer = manufacturer;
         this.price = price;
         this.storeName = storeName;
-        this.comparedProductName = comparedProductName;
         this.shortReview = shortReview;
         this.starPoint = starPoint;
         this.goodPoint = goodPoint;

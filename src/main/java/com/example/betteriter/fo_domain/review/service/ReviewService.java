@@ -379,8 +379,7 @@ public class ReviewService {
         Review review = this.findReviewById(reviewId);
 
         // 1. 리뷰 데이터 업데이트
-        Manufacturer manufacturer = manufacturerConnector.findManufacturerByName(request.getManufacturer());
-        review.updateReview(request, manufacturer);
+        this.updateReviewData(request, review);
 
         // 2. 리뷰 이미지 업데이트
         List<Integer> targetImageIds = request.getImageIndex();
@@ -392,7 +391,16 @@ public class ReviewService {
         this.updateReviewSpecData(nowReviewSpecDataList, newReviewSpecDataList);
     }
 
-    private void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
+    void updateReviewData(UpdateReviewRequestDto request, Review review) {
+        Manufacturer manufacturer = null;
+        if (!request.getManufacturer().isEmpty()) {
+            manufacturer = manufacturerConnector.findManufacturerByName(request.getManufacturer());
+        }
+
+        review.updateReview(request, manufacturer);
+    }
+
+    void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
         /*
          * 1. targetImageIds 가 null 일때,
          *   1-1. images 도 null 이면 이미지 업데이트 없이 리턴
@@ -430,7 +438,7 @@ public class ReviewService {
 
     }
 
-    private void updateReviewSpecData(List<ReviewSpecData> nowReviewSpecDataList, List<ReviewSpecData> newReviewSpecDataList) {
+    void updateReviewSpecData(List<ReviewSpecData> nowReviewSpecDataList, List<ReviewSpecData> newReviewSpecDataList) {
         /*
          * 1. nowReviewSpecDataList 와 newReviewSpecDataList 를 비교하여 변경된 데이터가 있는지 확인
          *   1-1. SpecData 의 specId 가 같으며 SpecData 의 id 가 다르다면 변경된 데이터로 판단

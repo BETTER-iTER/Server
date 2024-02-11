@@ -25,13 +25,7 @@ import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.domain.ReviewLike;
 import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewCommentResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewLikeResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
 import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
@@ -621,5 +615,45 @@ class ReviewServiceTest {
             .isInstanceOf(ReviewHandler.class);
         verify(this.reviewRepository, times(1)).findById(anyLong());
         verify(this.userConnector, times(1)).getCurrentUser();
+    }
+
+    @Test
+    @DisplayName("이미지와 스팩을 제외한 리뷰 내용을 수정한다 - 성공")
+    void updateReviewDataInSuccess() {
+        // given
+        Review review = createReview(1L);
+
+        UpdateReviewRequestDto dto = UpdateReviewRequestDto.builder()
+            .category(null)
+            .productName(null)
+            .boughtAt(null)
+            .manufacturer("삼성")
+            .price(10000)
+            .storeName(1)
+            .shortReview("shortReview")
+            .starPoint(3.0)
+            .goodPoint("goodPoint2")
+            .badPoint("badPoint2")
+            .specData(null)
+            .imageIndex(null)
+            .build();
+
+        given(this.manufacturerConnector.findManufacturerByName(dto.getManufacturer()))
+                .willReturn(Manufacturer.createManufacturer("삼성"));
+
+        // when
+        this.reviewService.updateReviewData(dto, review);
+
+        // then
+        verify(this.manufacturerConnector, times(1)).findManufacturerByName(anyString());
+        assertThat(review.getCategory()).isEqualTo(PC);
+        assertThat(review.getProductName()).isEqualTo("productName");
+        assertThat(review.getPrice()).isEqualTo(dto.getPrice());
+        assertThat(review.getStoreName()).isEqualTo(dto.getStoreName());
+        assertThat(review.getShortReview()).isEqualTo(dto.getShortReview());
+        assertThat(review.getStarPoint()).isEqualTo(dto.getStarPoint());
+        assertThat(review.getGoodPoint()).isEqualTo(dto.getGoodPoint());
+        assertThat(review.getBadPoint()).isEqualTo(dto.getBadPoint());
+
     }
 }

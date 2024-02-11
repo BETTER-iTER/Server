@@ -177,7 +177,6 @@ public class Review extends BaseEntity {
         this.manufacturer = manufacturer == null ? this.manufacturer : manufacturer;
         this.price = request.getPrice() == null ? this.price : request.getPrice();
         this.storeName = request.getStoreName() == null ? this.storeName : request.getStoreName();
-        this.comparedProductName = request.getComparedProductName() == null ? this.comparedProductName : request.getComparedProductName();
         this.shortReview = request.getShortReview() == null ? this.shortReview : request.getShortReview();
         this.starPoint = request.getStarPoint() == null ? this.starPoint : request.getStarPoint();
         this.goodPoint = request.getGoodPoint() == null ? this.goodPoint : request.getGoodPoint();
