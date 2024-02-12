@@ -10,4 +10,8 @@ public interface SpecConnector {
     List<SpecData> findAllSpecDataByIds(List<Long> id);
 
     List<Spec> findAllSpecDataByCategory(Category category);
+
+    List<Spec> saveAllSpec(List<Spec> specs);
+
+    List<SpecData> saveAllData(List<SpecData> specData);
 }

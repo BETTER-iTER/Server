@@ -275,7 +275,7 @@ public class ReviewService {
             .collect(Collectors.toList());
     }
 
-    private List<ReviewSpecData> getReviewSpecData(UpdateReviewRequestDto request, Review review) {
+    List<ReviewSpecData> getReviewSpecData(UpdateReviewRequestDto request, Review review) {
         return this.specConnector.findAllSpecDataByIds(request.getSpecData())
             .stream()
             .map(sd -> ReviewSpecData.createReviewSpecData(review, sd))
@@ -387,11 +387,11 @@ public class ReviewService {
 
         // 3. 리뷰 스펙 데이터 업데이트
         List<ReviewSpecData> nowReviewSpecDataList = reviewSpecDataRepository.findAllByReview(review);
-        List<ReviewSpecData> newReviewSpecDataList = this.getReviewSpecData(request, review);
-        this.updateReviewSpecData(nowReviewSpecDataList, newReviewSpecDataList);
+        List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
+        this.updateReviewSpecData(review, nowReviewSpecDataList, newSpecDataList);
     }
 
-    void updateReviewData(UpdateReviewRequestDto request, Review review) {
+     private void updateReviewData(UpdateReviewRequestDto request, Review review) {
         Manufacturer manufacturer = null;
         if (!request.getManufacturer().isEmpty()) {
             manufacturer = manufacturerConnector.findManufacturerByName(request.getManufacturer());
@@ -400,7 +400,7 @@ public class ReviewService {
         review.updateReview(request, manufacturer);
     }
 
-    void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
+     private void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
         /*
          * 1. targetImageIds 가 null 일때,
          *   1-1. images 도 null 이면 이미지 업데이트 없이 리턴
@@ -438,7 +438,7 @@ public class ReviewService {
 
     }
 
-    void updateReviewSpecData(List<ReviewSpecData> nowReviewSpecDataList, List<ReviewSpecData> newReviewSpecDataList) {
+     private void updateReviewSpecData(Review review, List<ReviewSpecData> nowReviewSpecDataList, List<SpecData> newSpecDataList) {
         /*
          * 1. nowReviewSpecDataList 와 newReviewSpecDataList 를 비교하여 변경된 데이터가 있는지 확인
          *   1-1. SpecData 의 specId 가 같으며 SpecData 의 id 가 다르다면 변경된 데이터로 판단
@@ -448,41 +448,51 @@ public class ReviewService {
          *   2-2. (1-2) 에서 추가된 데이터가 있다면 추가된 데이터를 insert
          */
 
-        newReviewSpecDataList.forEach(newReviewSpecData -> {
-            if (isChanged(newReviewSpecData, nowReviewSpecDataList)) {
+        log.info("nowReviewSpecDataList : {}", nowReviewSpecDataList);
+        log.info("newReviewSpecDataList : {}", newSpecDataList);
+
+        List<SpecData> nowSpecDataList = nowReviewSpecDataList.stream()
+            .map(ReviewSpecData::getSpecData)
+            .collect(Collectors.toList());
+
+        newSpecDataList.forEach(newSpecData -> {
+            if (isChanged(newSpecData, nowSpecDataList)) {
                 ReviewSpecData nowReviewSpecData = nowReviewSpecDataList.stream()
-                    .filter(nowData -> isSameSpecId(newReviewSpecData, nowData))
+                    .filter(nowData -> isSameSpecId(nowData, newSpecData))
                     .findFirst()
                     .orElseThrow(() -> new ReviewHandler(_REVIEW_SPEC_DATA_NOT_FOUND));
 
-                nowReviewSpecData.updateSpecData(newReviewSpecData.getSpecData());
+                nowReviewSpecData.updateSpecData(newSpecData);
             }
-            else if (isAdded(newReviewSpecData, nowReviewSpecDataList)) {
-                reviewSpecDataRepository.save(newReviewSpecData);
+            else if (isAdded(newSpecData, nowReviewSpecDataList)) {
+                reviewSpecDataRepository.save(ReviewSpecData.createReviewSpecData(review, newSpecData));
             }
         });
     }
 
-    private static boolean isSameSpecId(ReviewSpecData newData, ReviewSpecData nowData) {
-        return newData.getSpecData().getSpec().getId().equals(nowData.getSpecData().getSpec().getId());
+    private static boolean isSameSpecId(ReviewSpecData nowData, SpecData newData) {
+        return newData.getId().equals(nowData.getSpecData().getSpec().getId());
     }
 
-    private boolean isChanged(ReviewSpecData newReviewSpecData, List<ReviewSpecData> nowReviewSpecDataList) {
-        return nowReviewSpecDataList.stream()
-                .anyMatch(now -> isChanged(newReviewSpecData, now));
+    private boolean isChanged(SpecData newSpecData, List<SpecData> nowSpecDataList) {
+        return nowSpecDataList.stream()
+                .anyMatch(now -> isChanged(newSpecData, now));
     }
 
-    private static boolean isChanged(ReviewSpecData newReviewSpecData, ReviewSpecData nowReviewSpecData) {
-        SpecData newSpecData = newReviewSpecData.getSpecData();
-        SpecData nowSpecData = nowReviewSpecData.getSpecData();
-
+    private static boolean isChanged(SpecData newSpecData, SpecData nowSpecData) {
         return (!newSpecData.getId().equals(nowSpecData.getId())) &&
                 (newSpecData.getSpec().getId().equals(nowSpecData.getSpec().getId()));
     }
 
-    private static boolean isAdded(ReviewSpecData newReviewSpecData, List<ReviewSpecData> nowReviewSpecDataList) {
+    private static boolean isAdded(SpecData newSpecData, List<ReviewSpecData> nowReviewSpecDataList) {
         return nowReviewSpecDataList.stream()
-                .noneMatch(nowReviewSpecData -> newReviewSpecData.getSpecData().getId().equals(nowReviewSpecData.getSpecData().getId()));
+                .noneMatch(nowReviewSpecData -> newSpecData.getId().equals(nowReviewSpecData.getSpecData().getId()));
     }
 
+    public void checkReviewOwner(Long reviewId) {
+        Review review = this.findReviewById(reviewId);
+        if (review.getWriter().getId().equals(this.getCurrentUser().getId())) {
+            throw new ReviewHandler(_REVIEW_WRITER_IS_NOT_MATCH);
+        }
+    }
 }

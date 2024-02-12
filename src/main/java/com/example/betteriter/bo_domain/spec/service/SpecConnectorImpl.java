@@ -28,4 +28,16 @@ public class SpecConnectorImpl implements SpecConnector {
     public List<Spec> findAllSpecDataByCategory(Category category) {
         return this.specRepository.findAllByCategory(category);
     }
+
+    @Override
+    public List<Spec> saveAllSpec(List<Spec> specs) {
+        this.specRepository.saveAll(specs);
+        return specs;
+    }
+
+    @Override
+    public List<SpecData> saveAllData(List<SpecData> specData) {
+        this.specDataRepository.saveAll(specData);
+        return specData;
+    }
 }

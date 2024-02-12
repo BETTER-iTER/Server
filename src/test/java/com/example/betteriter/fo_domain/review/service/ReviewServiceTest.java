@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
@@ -21,10 +22,7 @@ import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecConnector;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.follow.service.FollowConnector;
-import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewLike;
-import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
+import com.example.betteriter.fo_domain.review.domain.*;
 import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
@@ -132,14 +130,39 @@ class ReviewServiceTest {
             .shortReview("short")
             .build();
 
+        List<Spec> specList = List.of(
+            Spec.builder().category(PC).title("OS").build(),
+            Spec.builder().category(PC).title("RAM").build(),
+            Spec.builder().category(PC).title("SSD/HDD").build()
+        );
+        this.specConnector.saveAllSpec(specList);
+
+        List<SpecData> specDataList = List.of(
+            SpecData.builder().spec(specList.get(0)).data("윈도우 11").build(),
+            SpecData.builder().spec(specList.get(0)).data("Mac OS").build(),
+            SpecData.builder().spec(specList.get(1)).data("32GB").build(),
+            SpecData.builder().spec(specList.get(1)).data("16GB").build(),
+            SpecData.builder().spec(specList.get(2)).data("512GB").build(),
+            SpecData.builder().spec(specList.get(2)).data("256GB").build()
+        );
+        this.specConnector.saveAllData(specDataList);
+
+        List<ReviewSpecData> reviewSpecDataList = List.of(
+            ReviewSpecData.builder().review(review).specData(specDataList.get(0)).build(),
+            ReviewSpecData.builder().review(review).specData(specDataList.get(2)).build(),
+            ReviewSpecData.builder().review(review).specData(specDataList.get(4)).build()
+        );
+        this.reviewSpecDataRepository.saveAll(reviewSpecDataList);
+
         List<ReviewLike> reviewLikes = List.of(ReviewLike.builder().review(review).users(user01).build(),
             ReviewLike.builder().review(review).users(user02).build());
+
+        review.setReviewLikes(reviewLikes);
 
         List<Comment> comments = List.of(Comment.builder().users(user01).comment("comment01").status(ACTIVE).build(),
             Comment.builder().users(user02).comment("comment02").status(ACTIVE).build());
 
         review.setReviewsComment(comments);
-        review.setReviewLikes(reviewLikes);
 
         review.setReviewImage(createReviewImage(review));
         return review;
@@ -623,7 +646,7 @@ class ReviewServiceTest {
         // given
         Review review = createReview(1L);
 
-        UpdateReviewRequestDto dto = UpdateReviewRequestDto.builder()
+        UpdateReviewRequestDto request = UpdateReviewRequestDto.builder()
             .category(null)
             .productName(null)
             .boughtAt(null)
@@ -635,25 +658,79 @@ class ReviewServiceTest {
             .goodPoint("goodPoint2")
             .badPoint("badPoint2")
             .specData(null)
-            .imageIndex(null)
+            .imageIndex(new ArrayList<>())
             .build();
 
-        given(this.manufacturerConnector.findManufacturerByName(dto.getManufacturer()))
+        List<MultipartFile> images = new ArrayList<>();
+
+        given(this.manufacturerConnector.findManufacturerByName(request.getManufacturer()))
                 .willReturn(Manufacturer.createManufacturer("삼성"));
 
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
         // when
-        this.reviewService.updateReviewData(dto, review);
+        this.reviewService.updateReview(review.getId(), request, images);
 
         // then
         verify(this.manufacturerConnector, times(1)).findManufacturerByName(anyString());
         assertThat(review.getCategory()).isEqualTo(PC);
         assertThat(review.getProductName()).isEqualTo("productName");
-        assertThat(review.getPrice()).isEqualTo(dto.getPrice());
-        assertThat(review.getStoreName()).isEqualTo(dto.getStoreName());
-        assertThat(review.getShortReview()).isEqualTo(dto.getShortReview());
-        assertThat(review.getStarPoint()).isEqualTo(dto.getStarPoint());
-        assertThat(review.getGoodPoint()).isEqualTo(dto.getGoodPoint());
-        assertThat(review.getBadPoint()).isEqualTo(dto.getBadPoint());
+        assertThat(review.getPrice()).isEqualTo(request.getPrice());
+        assertThat(review.getStoreName()).isEqualTo(request.getStoreName());
+        assertThat(review.getShortReview()).isEqualTo(request.getShortReview());
+        assertThat(review.getStarPoint()).isEqualTo(request.getStarPoint());
+        assertThat(review.getGoodPoint()).isEqualTo(request.getGoodPoint());
+        assertThat(review.getBadPoint()).isEqualTo(request.getBadPoint());
+    }
+
+    @Test
+    @DisplayName("이미지를 제외한 스팩 및 리뷰 내용을 수정한다. - 성공")
+    void updateReviewDataWithSpecDataInSuccess() {
+        // given
+        Review review = createReview(1L);
+
+        UpdateReviewRequestDto request = UpdateReviewRequestDto.builder()
+                .category(null)
+                .productName(null)
+                .boughtAt(null)
+                .manufacturer("삼성")
+                .price(10000)
+                .storeName(1)
+                .shortReview("shortReview")
+                .starPoint(3.0)
+                .goodPoint("goodPoint2")
+                .badPoint("badPoint2")
+                .specData(List.of(1L, 3L))
+                .imageIndex(new ArrayList<>())
+                .build();
+
+        List<MultipartFile> images = new ArrayList<>();
+
+        given(this.manufacturerConnector.findManufacturerByName(request.getManufacturer()))
+                .willReturn(Manufacturer.createManufacturer("삼성"));
+
+        given(this.reviewRepository.findById(anyLong()))
+                .willReturn(Optional.of(review));
+
+        // when
+        this.reviewService.updateReview(review.getId(), request, images);
+
+        // then
+        verify(this.manufacturerConnector, times(1)).findManufacturerByName(anyString());
+        assertThat(review.getCategory()).isEqualTo(PC);
+        assertThat(review.getProductName()).isEqualTo("productName");
+        assertThat(review.getPrice()).isEqualTo(request.getPrice());
+        assertThat(review.getStoreName()).isEqualTo(request.getStoreName());
+        assertThat(review.getShortReview()).isEqualTo(request.getShortReview());
+        assertThat(review.getStarPoint()).isEqualTo(request.getStarPoint());
+        assertThat(review.getGoodPoint()).isEqualTo(request.getGoodPoint());
+        assertThat(review.getBadPoint()).isEqualTo(request.getBadPoint());
+        assertThat(this.reviewSpecDataRepository.findAllByReview(review)).hasSize(3)
+                .extracting("specData")
+                .containsExactlyInAnyOrderElementsOf(
+                        specConnector.findAllSpecDataByIds(List.of(1L, 3L, 4L))
+                );
 
     }
 }

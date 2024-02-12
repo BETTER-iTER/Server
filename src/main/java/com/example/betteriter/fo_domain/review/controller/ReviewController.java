@@ -140,12 +140,14 @@ public class ReviewController {
     /* 리뷰 수정 */
     @PutMapping("/{reviewId}")
     public ResponseDto<Void> updateReview(
-        @RequestPart(value = "files") List<MultipartFile> images,
         @PathVariable Long reviewId,
-        @Valid @RequestBody UpdateReviewRequestDto request,
+        @RequestPart(value = "files") List<MultipartFile> images,
+        @Valid @RequestPart(value = "key") UpdateReviewRequestDto request,
         BindingResult bindingResult
     ) {
+        log.info("updateReview : {}", request);
         this.checkRequestValidation(bindingResult);
+        this.reviewService.checkReviewOwner(reviewId);
         this.reviewService.updateReview(reviewId, request, images);
         return ResponseDto.onSuccess(null);
     }

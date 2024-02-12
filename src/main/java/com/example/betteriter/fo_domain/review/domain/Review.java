@@ -164,6 +164,10 @@ public class Review extends BaseEntity {
         this.reviewComment = comments;
     }
 
+    public void setReviewSpecData(List<ReviewSpecData> reviewSpecData) {
+        this.specData = reviewSpecData;
+    }
+
     // 매주 월요일 자정 실행
     @Scheduled(cron = "0 0 0 ? * MON")
     public void resetClickCountsScheduler() {
