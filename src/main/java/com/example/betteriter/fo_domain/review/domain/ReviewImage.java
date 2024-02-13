@@ -43,4 +43,8 @@ public class ReviewImage {
                 .orderNum(orderNum)
                 .build();
     }
+
+    public void updateImgUrl(String imageUrl) {
+        this.imgUrl = imageUrl;
+    }
 }

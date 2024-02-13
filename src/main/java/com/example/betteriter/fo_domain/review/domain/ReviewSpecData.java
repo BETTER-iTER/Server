@@ -35,4 +35,8 @@ public class ReviewSpecData extends BaseEntity {
                 .specData(specData)
                 .build();
     }
+
+    public void updateSpecData(SpecData specData) {
+        this.specData = specData;
+    }
 }

@@ -1,41 +1,19 @@
 package com.example.betteriter.fo_domain.review.service;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_IMAGE_NOT_FOUND;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_LIKE_NOT_FOUND;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_NOT_FOUND;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_SCRAP_NOT_FOUND;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._REVIEW_WRITER_IS_NOT_MATCH;
-
+import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.bo_domain.menufacturer.service.ManufacturerConnector;
+import com.example.betteriter.bo_domain.spec.domain.SpecData;
 import com.example.betteriter.bo_domain.spec.service.SpecConnector;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.follow.service.FollowConnector;
-import com.example.betteriter.fo_domain.review.domain.Review;
-import com.example.betteriter.fo_domain.review.domain.ReviewImage;
-import com.example.betteriter.fo_domain.review.domain.ReviewLike;
-import com.example.betteriter.fo_domain.review.domain.ReviewScrap;
-import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
-import com.example.betteriter.fo_domain.review.dto.CreateReviewRequestDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewResponseDto;
-import com.example.betteriter.fo_domain.review.dto.GetReviewSpecResponseDto;
-import com.example.betteriter.fo_domain.review.dto.ReviewCommentResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewDetailResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewLikeResponse;
-import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
+import com.example.betteriter.fo_domain.review.domain.*;
+import com.example.betteriter.fo_domain.review.dto.*;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
-import com.example.betteriter.fo_domain.review.repository.ReviewImageRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewLikeRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewScrapRepository;
-import com.example.betteriter.fo_domain.review.repository.ReviewSpecDataRepository;
+import com.example.betteriter.fo_domain.review.repository.*;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.fo_domain.user.service.UserConnector;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.infra.s3.S3Service;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +25,12 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 
 @Slf4j
 @Service
@@ -291,6 +275,13 @@ public class ReviewService {
             .collect(Collectors.toList());
     }
 
+    List<ReviewSpecData> getReviewSpecData(UpdateReviewRequestDto request, Review review) {
+        return this.specConnector.findAllSpecDataByIds(request.getSpecData())
+            .stream()
+            .map(sd -> ReviewSpecData.createReviewSpecData(review, sd))
+            .collect(Collectors.toList());
+    }
+
 
     public Users getCurrentUser() {
         return this.userConnector.getCurrentUser();
@@ -380,6 +371,128 @@ public class ReviewService {
     private void checkUploadReviewImagesRequestValidation(List<MultipartFile> images) {
         if (images == null || images.isEmpty() || images.size() > 5) {
             throw new ReviewHandler(_IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID);
+        }
+    }
+
+    @Transactional
+    public void updateReview(Long reviewId, UpdateReviewRequestDto request, List<MultipartFile> images) {
+        Review review = this.findReviewById(reviewId);
+
+        // 1. 리뷰 데이터 업데이트
+        this.updateReviewData(request, review);
+
+        // 2. 리뷰 이미지 업데이트
+        List<Integer> targetImageIds = request.getImageIndex();
+        this.updateReviewImages(review, targetImageIds, images);
+
+        // 3. 리뷰 스펙 데이터 업데이트
+        List<ReviewSpecData> nowReviewSpecDataList = reviewSpecDataRepository.findAllByReview(review);
+        List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
+        this.updateReviewSpecData(review, nowReviewSpecDataList, newSpecDataList);
+    }
+
+     private void updateReviewData(UpdateReviewRequestDto request, Review review) {
+        Manufacturer manufacturer = null;
+        if (!request.getManufacturer().isEmpty()) {
+            manufacturer = manufacturerConnector.findManufacturerByName(request.getManufacturer());
+        }
+
+        review.updateReview(request, manufacturer);
+    }
+
+     private void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
+        /*
+         * 1. targetImageIds 가 null 일때,
+         *   1-1. images 도 null 이면 이미지 업데이트 없이 리턴
+         *   1-2. images 가 null 이 아니면 에러 리턴
+         * 2. targetImageIds 가 null 이 아닐때,
+         *   2-1. images 가 null 이면 에러 리턴
+         *   2-2. images 와 targetImageIds 의 길이가 다르면 에러 리턴
+         *   2-3. images 와 targetImageIds 의 길이가 같으면 이미지 업데이트 진행
+         * 3. 이미지 업데이트 진행시 (* targetImageIds 와 images 의 순서는 같음)
+         *   3-1. 현재 review image 에 해당하지 않는 targetImageId 는 insert
+         *   3-2. 현재 review image 에 해당하는 targetImageId 는 update
+         */
+
+        if (targetImageIds.isEmpty() && images.isEmpty()) {
+            return;
+        } else if (targetImageIds.size() == images.size()) {
+            List<ReviewImage> reviewImages = review.getReviewImages();
+
+            for (int i = 0; i < targetImageIds.size(); i++) {
+
+                int targetImageId = targetImageIds.get(i);
+                MultipartFile image = images.get(i);
+
+                if (reviewImages.stream().anyMatch(ri -> ri.getOrderNum() == targetImageId)) {
+                    ReviewImage reviewImage = reviewImageRepository.findByReviewAndOrderNum(review, targetImageId);
+                    s3Service.updateImage(image, reviewImage);
+                } else {
+                    reviewImageRepository.save(s3Service.uploadImage(image, review, targetImageId));
+                }
+            }
+
+        } else {
+            throw new ReviewHandler(_REVIEW_UPDATE_IMAGE_ARGUMENT_ERROR);
+        }
+
+    }
+
+     private void updateReviewSpecData(Review review, List<ReviewSpecData> nowReviewSpecDataList, List<SpecData> newSpecDataList) {
+        /*
+         * 1. nowReviewSpecDataList 와 newReviewSpecDataList 를 비교하여 변경된 데이터가 있는지 확인
+         *   1-1. SpecData 의 specId 가 같으며 SpecData 의 id 가 다르다면 변경된 데이터로 판단
+         *   1-2. SpecData 의 specId 가 존제하지 않았으면 추가된 데이터로 판단
+         * 2. 변경된 데이터가 있다면 변경된 데이터를 업데이트
+         *   2-1. (1-1) 에서 변경된 데이터가 있다면 같은 specId 를 가진 데이터를 update
+         *   2-2. (1-2) 에서 추가된 데이터가 있다면 추가된 데이터를 insert
+         */
+
+        log.info("nowReviewSpecDataList : {}", nowReviewSpecDataList);
+        log.info("newReviewSpecDataList : {}", newSpecDataList);
+
+        List<SpecData> nowSpecDataList = nowReviewSpecDataList.stream()
+            .map(ReviewSpecData::getSpecData)
+            .collect(Collectors.toList());
+
+        newSpecDataList.forEach(newSpecData -> {
+            if (isChanged(newSpecData, nowSpecDataList)) {
+                ReviewSpecData nowReviewSpecData = nowReviewSpecDataList.stream()
+                    .filter(nowData -> isSameSpecId(nowData, newSpecData))
+                    .findFirst()
+                    .orElseThrow(() -> new ReviewHandler(_REVIEW_SPEC_DATA_NOT_FOUND));
+
+                nowReviewSpecData.updateSpecData(newSpecData);
+            }
+            else if (isAdded(newSpecData, nowReviewSpecDataList)) {
+                reviewSpecDataRepository.save(ReviewSpecData.createReviewSpecData(review, newSpecData));
+            }
+        });
+    }
+
+    private static boolean isSameSpecId(ReviewSpecData nowData, SpecData newData) {
+        return newData.getId().equals(nowData.getSpecData().getSpec().getId());
+    }
+
+    private boolean isChanged(SpecData newSpecData, List<SpecData> nowSpecDataList) {
+        return nowSpecDataList.stream()
+                .anyMatch(now -> isChanged(newSpecData, now));
+    }
+
+    private static boolean isChanged(SpecData newSpecData, SpecData nowSpecData) {
+        return (!newSpecData.getId().equals(nowSpecData.getId())) &&
+                (newSpecData.getSpec().getId().equals(nowSpecData.getSpec().getId()));
+    }
+
+    private static boolean isAdded(SpecData newSpecData, List<ReviewSpecData> nowReviewSpecDataList) {
+        return nowReviewSpecDataList.stream()
+                .noneMatch(nowReviewSpecData -> newSpecData.getId().equals(nowReviewSpecData.getSpecData().getId()));
+    }
+
+    public void checkReviewOwner(Long reviewId) {
+        Review review = this.findReviewById(reviewId);
+        if (review.getWriter().getId().equals(this.getCurrentUser().getId())) {
+            throw new ReviewHandler(_REVIEW_WRITER_IS_NOT_MATCH);
         }
     }
 }

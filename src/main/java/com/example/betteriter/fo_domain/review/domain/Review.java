@@ -3,6 +3,7 @@ package com.example.betteriter.fo_domain.review.domain;
 import com.example.betteriter.bo_domain.menufacturer.domain.Manufacturer;
 import com.example.betteriter.fo_domain.comment.domain.Comment;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponseDto;
+import com.example.betteriter.fo_domain.review.dto.UpdateReviewRequestDto;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
@@ -163,9 +164,26 @@ public class Review extends BaseEntity {
         this.reviewComment = comments;
     }
 
+    public void setReviewSpecData(List<ReviewSpecData> reviewSpecData) {
+        this.specData = reviewSpecData;
+    }
+
     // 매주 월요일 자정 실행
     @Scheduled(cron = "0 0 0 ? * MON")
     public void resetClickCountsScheduler() {
         this.resetClickCounts();
+    }
+
+    public void updateReview(UpdateReviewRequestDto request, Manufacturer manufacturer) {
+        this.category = request.getCategory() == null ? this.category : request.getCategory();
+        this.productName = request.getProductName() == null ? this.productName : request.getProductName();
+        this.boughtAt = request.getBoughtAt() == null ? this.boughtAt : request.getBoughtAt();
+        this.manufacturer = manufacturer == null ? this.manufacturer : manufacturer;
+        this.price = request.getPrice() == null ? this.price : request.getPrice();
+        this.storeName = request.getStoreName() == null ? this.storeName : request.getStoreName();
+        this.shortReview = request.getShortReview() == null ? this.shortReview : request.getShortReview();
+        this.starPoint = request.getStarPoint() == null ? this.starPoint : request.getStarPoint();
+        this.goodPoint = request.getGoodPoint() == null ? this.goodPoint : request.getGoodPoint();
+        this.badPoint = request.getBadPoint() == null ? this.badPoint : request.getBadPoint();
     }
 }
