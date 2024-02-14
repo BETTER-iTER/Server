@@ -7,8 +7,8 @@ public class FollowConverter {
 
     public static Follow toFollowing(Users user, Users targetUser) {
         return Follow.builder()
-                .followee(user)
-                .follower(targetUser)
+                .followee(targetUser)
+                .follower(user)
                 .build();
     }
 
