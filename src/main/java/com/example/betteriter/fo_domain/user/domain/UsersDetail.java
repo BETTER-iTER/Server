@@ -1,5 +1,6 @@
 package com.example.betteriter.fo_domain.user.domain;
 
+import com.example.betteriter.fo_domain.mypage.dto.MypageRequest;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Job;
 import lombok.AccessLevel;
@@ -43,5 +44,11 @@ public class UsersDetail extends BaseEntity {
         this.profileImage = profileImage;
         this.point = point;
         this.quizCount = quizCount;
+    }
+
+    public void updateProfile(MypageRequest.UpdateProfileRequest request, String profileImageUrl) {
+        this.nickName = request.getNickname();
+        this.job = request.getJob();
+        this.profileImage = profileImageUrl;
     }
 }

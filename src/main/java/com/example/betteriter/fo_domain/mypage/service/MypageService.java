@@ -1,18 +1,27 @@
 package com.example.betteriter.fo_domain.mypage.service;
 
+import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
+
 import com.example.betteriter.fo_domain.follow.service.FollowService;
 import com.example.betteriter.fo_domain.mypage.converter.MypageResponseConverter;
+import com.example.betteriter.fo_domain.mypage.dto.MypageRequest;
 import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
+import com.example.betteriter.fo_domain.mypage.exception.MypageHandler;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.service.ReviewService;
 import com.example.betteriter.fo_domain.user.domain.Users;
+import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.service.UserService;
+import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.infra.s3.S3Service;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,10 +31,11 @@ import java.util.List;
 public class MypageService {
 
     private static final int SIZE = 10;
-
     private final UserService userService;
+
     private final ReviewService reviewService;
     private final FollowService followService;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public Page<Review> getMyReviewList(int page) {
@@ -105,5 +115,25 @@ public class MypageService {
     public Page<Review> getUserReviewList(Long userId, int page) {
         Users targetUser = userService.getUserById(userId);
         return reviewService.getReviewList(targetUser, page, SIZE);
+    }
+
+	public void updateUserProfile(Users user, MypageRequest.UpdateProfileRequest request, MultipartFile image) {
+	    // 1. 프로필 이미지 업로드
+        String profileImageUrl = this.uploadProfileImage(user, image);
+
+        // 2. 프로필 정보 수정
+        UsersDetail detail = user.getUsersDetail();
+        detail.updateProfile(request, profileImageUrl);
+    }
+
+    private String uploadProfileImage(Users user, MultipartFile image) {
+        this.checkUploadProfileImageRequestValidation(image);
+        return s3Service.uploadImage(image, user);
+    }
+
+    private void checkUploadProfileImageRequestValidation(MultipartFile image) {
+        if(image == null || image.isEmpty()) {
+            throw new MypageHandler(_IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID);
+        }
     }
 }
