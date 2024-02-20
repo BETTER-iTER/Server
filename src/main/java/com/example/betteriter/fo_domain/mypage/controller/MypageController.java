@@ -1,24 +1,30 @@
 package com.example.betteriter.fo_domain.mypage.controller;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.betteriter.fo_domain.mypage.converter.MypageResponseConverter;
+import com.example.betteriter.fo_domain.mypage.dto.MypageRequest;
 import com.example.betteriter.fo_domain.mypage.dto.MypageResponse;
 import com.example.betteriter.fo_domain.mypage.service.MypageService;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.dto.ReviewResponse;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.response.ResponseDto;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 
 @Tag(name = "MypageControllers", description = "Mypage API")
@@ -142,5 +148,21 @@ public class MypageController {
         Integer totalLikeCount = mypageService.getTotalLikeCount(user);
         Integer totalScrapCount = mypageService.getTotalScrapCount(user);
         return ResponseDto.onSuccess(MypageResponseConverter.toPointDetailDto(user, totalLikeCount, totalScrapCount));
+    }
+
+    /**
+     * user profile 수정
+     *
+     * @param request 수정할 user 정보
+     * @return void
+     */
+    @PutMapping("/profile")
+    public ResponseDto<Void> updateUserProfile(
+            @RequestPart(value = "files") MultipartFile image,
+            @Valid @RequestPart(value = "key") MypageRequest.UpdateProfileRequest request
+    ) {
+        Users user = mypageService.getCurrentUser();
+        mypageService.updateUserProfile(user, request, image);
+        return ResponseDto.onSuccess(null);
     }
 }

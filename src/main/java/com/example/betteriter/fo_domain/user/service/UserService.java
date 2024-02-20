@@ -10,10 +10,13 @@ import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepos
 import com.example.betteriter.global.common.code.status.ErrorStatus;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.global.util.SecurityUtil;
+import com.example.betteriter.infra.s3.S3Service;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -30,6 +33,7 @@ public class UserService {
     private final UsersWithdrawReasonRepository usersWithdrawReasonRepository;
     private final RedisUtil redisUtil;
     private final SecurityUtil securityUtil;
+    private final S3Service s3Service;
 
     /* 로그아웃 */
     @Transactional
@@ -94,4 +98,5 @@ public class UserService {
         return this.usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
+
 }

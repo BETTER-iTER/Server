@@ -10,6 +10,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
+import com.example.betteriter.fo_domain.user.domain.Users;
+
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,6 +59,29 @@ public class S3Service implements ImageUploadService {
             .imgUrl(getImageUrl(key))
             .orderNum(orderNum)
             .build();
+    }
+
+    @Override
+    public String uploadImage(MultipartFile image, Users user) {
+        String originalFilename = Optional.ofNullable(image.getOriginalFilename())
+                .orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String fileName = UUID.randomUUID().toString();
+        String key = FOLDER + "/" + user.getEmail() + "/" + user.getId().toString() + "/" + fileName + fileExtension;
+
+        ObjectMetadata objectMetaData = new ObjectMetadata();
+        objectMetaData.setContentType(image.getContentType());
+
+        try (InputStream inputStream = image.getInputStream()) {
+
+            s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
+
+        } catch (Exception e) {
+            throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
+        }
+
+        return getImageUrl(key);
     }
 
     @Override
