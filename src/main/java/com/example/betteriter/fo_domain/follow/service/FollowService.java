@@ -82,7 +82,7 @@ public class FollowService {
     }
 
     private Follow findFollowData(Users user, Users targetUser) {
-        Follow follow = followReadRepository.findByFolloweeIdAndFollowerId(user.getId(), targetUser.getId());
+        Follow follow = followReadRepository.findByFollowerIdAndFolloweeId(user.getId(), targetUser.getId());
         if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
 
         return follow;

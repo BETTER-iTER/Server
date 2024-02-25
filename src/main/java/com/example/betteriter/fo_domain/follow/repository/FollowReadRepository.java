@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FollowReadRepository extends JpaRepository<Follow, Long> {
 
-    Follow findByFolloweeIdAndFollowerId(Long followeeId, Long followerId);
+    Follow findByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
 
     List<Follow> findByFolloweeIdOrderByCreatedAt(Long followeeId, Pageable pageable); // 팔로위(나를 팔로우하는 사람) 목록 조회
 
