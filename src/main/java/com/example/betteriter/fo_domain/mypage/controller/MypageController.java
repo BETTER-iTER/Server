@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -163,6 +164,21 @@ public class MypageController {
     ) {
         Users user = mypageService.getCurrentUser();
         mypageService.updateUserProfile(user, request, image);
+        return ResponseDto.onSuccess(null);
+    }
+
+    /**
+     * user 관심 카테고리 수정
+     *
+     * @param request 수정할 user 정보
+     * @return void
+     */
+    @PutMapping("/category")
+    public ResponseDto<Void> updateUserCategory(
+            @Valid @RequestBody MypageRequest.UpdateCategoryRequest request
+    ) {
+        Users user = mypageService.getCurrentUser();
+        mypageService.updateUserCategory(user, request);
         return ResponseDto.onSuccess(null);
     }
 }
