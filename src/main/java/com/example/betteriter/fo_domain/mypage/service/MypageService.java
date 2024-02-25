@@ -136,4 +136,8 @@ public class MypageService {
             throw new MypageHandler(_IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID);
         }
     }
+
+	public void updateUserCategory(Users user, MypageRequest.UpdateCategoryRequest request) {
+	    user.setUsersCategory(request.getCategories());
+    }
 }
