@@ -119,11 +119,11 @@ public class MypageService {
 
 	public void updateUserProfile(Users user, MypageRequest.UpdateProfileRequest request, MultipartFile image) {
 	    // 1. 프로필 이미지 업로드
-        String profileImageUrl = this.uploadProfileImage(user, image);
+        String profileImageUrl = image != null? this.uploadProfileImage(user, image) : null;
 
         // 2. 프로필 정보 수정
         UsersDetail detail = user.getUsersDetail();
-        detail.updateProfile(request, profileImageUrl);
+        detail.updateProfile(request.getNickname(), request.getJob(), profileImageUrl);
         userService.updateUserDetail(detail);
     }
 
