@@ -5,6 +5,7 @@ import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.domain.UsersWithdrawReason;
 import com.example.betteriter.fo_domain.user.dto.info.GetUserInfoResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
+import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UsersRepository usersRepository;
+    private final UserDetailRepository userDetailRepository;
     private final UsersWithdrawReasonRepository usersWithdrawReasonRepository;
     private final RedisUtil redisUtil;
     private final SecurityUtil securityUtil;
@@ -99,4 +101,7 @@ public class UserService {
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
 
+    public void updateUserDetail(UsersDetail detail) {
+        this.userDetailRepository.save(detail);
+    }
 }
