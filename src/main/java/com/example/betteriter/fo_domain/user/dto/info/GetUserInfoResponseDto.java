@@ -15,14 +15,16 @@ import lombok.NoArgsConstructor;
 public class GetUserInfoResponseDto {
     private String nickName;
     private Job job;
+    private String email;
     private String profileImage;
     private boolean isExpert;
 
     @Builder
-    private GetUserInfoResponseDto(String nickName, Job job,
+    private GetUserInfoResponseDto(String nickName, Job job, String email,
                                    String profileImage, boolean isExpert) {
         this.nickName = nickName;
         this.job = job;
+        this.email = email;
         this.profileImage = profileImage;
         this.isExpert = isExpert;
     }
@@ -32,6 +34,7 @@ public class GetUserInfoResponseDto {
         return GetUserInfoResponseDto.builder()
                 .nickName(usersDetail.getNickName())
                 .job(usersDetail.getJob())
+                .email(users.getEmail())
                 .profileImage(usersDetail.getProfileImage())
                 .isExpert(users.isExpert())
                 .build();
