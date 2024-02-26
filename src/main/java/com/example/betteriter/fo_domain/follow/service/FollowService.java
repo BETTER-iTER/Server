@@ -46,9 +46,6 @@ public class FollowService {
     public void unfollowing(FollowRequest.UnfollowingDto unfollowingRequestDto) {
         Users user = userService.getCurrentUser();
         Users targetUser = userService.getUserById(unfollowingRequestDto.getTargetId());
-
-        if (!isFollow(targetUser, user)) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
-
         Follow follow = findFollowData(user, targetUser);
         followWriteRepository.delete(follow);
     }
@@ -82,10 +79,8 @@ public class FollowService {
     }
 
     private Follow findFollowData(Users user, Users targetUser) {
-        Follow follow = followReadRepository.findByFollowerIdAndFolloweeId(user.getId(), targetUser.getId());
-        if (follow == null) throw new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND);
-
-        return follow;
+        return followReadRepository.findByFollowerAndFollowee(user, targetUser)
+                .orElseThrow(() -> new FollowHandler(ErrorStatus._FOLLOW_NOT_FOUND));
     }
 
     public Integer getFollowerCount(Users user) {
