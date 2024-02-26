@@ -124,6 +124,7 @@ public class MypageService {
         // 2. 프로필 정보 수정
         UsersDetail detail = user.getUsersDetail();
         detail.updateProfile(request, profileImageUrl);
+        userService.updateUserDetail(detail);
     }
 
     private String uploadProfileImage(Users user, MultipartFile image) {
@@ -138,6 +139,6 @@ public class MypageService {
     }
 
 	public void updateUserCategory(Users user, MypageRequest.UpdateCategoryRequest request) {
-	    user.setUsersCategory(request.getCategories());
+        userService.updateUserCategory(user, request.getCategories());
     }
 }

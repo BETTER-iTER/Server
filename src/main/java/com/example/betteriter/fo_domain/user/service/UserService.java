@@ -5,9 +5,11 @@ import com.example.betteriter.fo_domain.user.domain.UsersDetail;
 import com.example.betteriter.fo_domain.user.domain.UsersWithdrawReason;
 import com.example.betteriter.fo_domain.user.dto.info.GetUserInfoResponseDto;
 import com.example.betteriter.fo_domain.user.exception.UserHandler;
+import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.infra.s3.S3Service;
@@ -16,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UsersRepository usersRepository;
+    private final UserDetailRepository userDetailRepository;
     private final UsersWithdrawReasonRepository usersWithdrawReasonRepository;
     private final RedisUtil redisUtil;
     private final SecurityUtil securityUtil;
@@ -99,4 +102,12 @@ public class UserService {
                 .orElseThrow(() -> new UserHandler(ErrorStatus._USER_NOT_FOUND));
     }
 
+    public void updateUserDetail(UsersDetail detail) {
+        this.userDetailRepository.save(detail);
+    }
+
+    public void updateUserCategory(Users user, List<Category> categories) {
+        user.setUsersCategory(categories);
+        this.usersRepository.save(user);
+    }
 }
