@@ -9,6 +9,7 @@ import com.example.betteriter.fo_domain.user.repository.UserDetailRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersRepository;
 import com.example.betteriter.fo_domain.user.repository.UsersWithdrawReasonRepository;
 import com.example.betteriter.global.common.code.status.ErrorStatus;
+import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.util.RedisUtil;
 import com.example.betteriter.global.util.SecurityUtil;
 import com.example.betteriter.infra.s3.S3Service;
@@ -17,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -103,5 +104,10 @@ public class UserService {
 
     public void updateUserDetail(UsersDetail detail) {
         this.userDetailRepository.save(detail);
+    }
+
+    public void updateUserCategory(Users user, List<Category> categories) {
+        user.setUsersCategory(categories);
+        this.usersRepository.save(user);
     }
 }

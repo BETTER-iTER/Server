@@ -139,6 +139,6 @@ public class MypageService {
     }
 
 	public void updateUserCategory(Users user, MypageRequest.UpdateCategoryRequest request) {
-	    user.setUsersCategory(request.getCategories());
+        userService.updateUserCategory(user, request.getCategories());
     }
 }
