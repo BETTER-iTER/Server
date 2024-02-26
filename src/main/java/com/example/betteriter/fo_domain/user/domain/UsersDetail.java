@@ -46,9 +46,9 @@ public class UsersDetail extends BaseEntity {
         this.quizCount = quizCount;
     }
 
-    public void updateProfile(MypageRequest.UpdateProfileRequest request, String profileImageUrl) {
-        this.nickName = request.getNickname();
-        this.job = request.getJob();
-        this.profileImage = profileImageUrl;
+    public void updateProfile(String nickName, Job job, String profileImageUrl) {
+        this.nickName = nickName == null? this.nickName : nickName;
+        this.job = job == null? this.job : job;
+        this.profileImage = profileImageUrl == null? this.profileImage : profileImageUrl;
     }
 }

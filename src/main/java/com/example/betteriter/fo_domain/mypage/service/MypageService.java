@@ -119,24 +119,22 @@ public class MypageService {
 
 	public void updateUserProfile(Users user, MypageRequest.UpdateProfileRequest request, MultipartFile image) {
 	    // 1. 프로필 이미지 업로드
-        String profileImageUrl = this.uploadProfileImage(user, image);
+        String profileImageUrl = uploadProfileImage(user, image);
 
         // 2. 프로필 정보 수정
         UsersDetail detail = user.getUsersDetail();
-        detail.updateProfile(request, profileImageUrl);
+        detail.updateProfile(request.getNickname(), request.getJob(), profileImageUrl);
         userService.updateUserDetail(detail);
     }
 
     private String uploadProfileImage(Users user, MultipartFile image) {
-        this.checkUploadProfileImageRequestValidation(image);
+        if (!isImageRequestValidation(image)) return null;
         return s3Service.uploadImage(image, user);
     }
 
-    private void checkUploadProfileImageRequestValidation(MultipartFile image) {
-        if(image == null || image.isEmpty()) {
-            throw new MypageHandler(_IMAGE_FILE_UPLOAD_REQUEST_IS_NOT_VALID);
-        }
-    }
+    private boolean isImageRequestValidation(MultipartFile image) {
+		return image != null && !image.isEmpty();
+	}
 
 	public void updateUserCategory(Users user, MypageRequest.UpdateCategoryRequest request) {
         userService.updateUserCategory(user, request.getCategories());

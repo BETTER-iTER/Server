@@ -5,6 +5,7 @@ import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAG
 import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAGE_FILE_UPLOAD_FAILED;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.betteriter.fo_domain.review.domain.Review;
@@ -115,6 +116,6 @@ public class S3Service implements ImageUploadService {
 
 
     private String getImageUrl(String key) {
-        return "https://" + bucketName + ".s3.amazonaws.com/" + key;
+        return s3Client.getUrl(bucketName, key).toString();
     }
 }

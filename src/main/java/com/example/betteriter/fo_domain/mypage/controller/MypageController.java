@@ -159,8 +159,8 @@ public class MypageController {
      */
     @PutMapping("/profile")
     public ResponseDto<Void> updateUserProfile(
-            @RequestPart(value = "files") MultipartFile image,
-            @Valid @RequestPart(value = "key") MypageRequest.UpdateProfileRequest request
+            @RequestPart(value = "files", required = false) MultipartFile image,
+            @Valid @RequestPart(value = "key", required = false) MypageRequest.UpdateProfileRequest request
     ) {
         Users user = mypageService.getCurrentUser();
         mypageService.updateUserProfile(user, request, image);
