@@ -1,6 +1,8 @@
 package com.example.betteriter.fo_domain.review.dto;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.global.constant.Category;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,7 @@ public class GetReviewDetailResponseDto {
     private Long reviewId; // 리뷰 아이디
     private String productName; // 리뷰 상품명
     private List<String> reviewSpecData; // 리뷰 스펙 데이터
+    private Category category; // 리뷰 카테고리
     private double starPoint; // 리뷰 별점
     private String goodPoint; // 리뷰 좋은점
     private String badPoint; // 리뷰 안좋은점
@@ -37,16 +40,18 @@ public class GetReviewDetailResponseDto {
 
 
     @Builder
-    public GetReviewDetailResponseDto(Long reviewId, String productName, List<String> reviewSpecData, double starPoint,
-                                      String goodPoint, String badPoint, String shortReview, String manufacturer,
-                                      int storeName, String comparedProductName, LocalDate boughtAt, LocalDate createdAt,
-                                      List<GetReviewImageResponseDto> reviewImages, int price, long shownCount,
-                                      long scrapedCount, long likedCount, long commentCount, boolean isScrap,
-                                      boolean isLike, boolean isFollow, boolean isMine
+    public GetReviewDetailResponseDto(
+            Long reviewId, String productName, List<String> reviewSpecData,  Category category,
+            double starPoint, String goodPoint, String badPoint, String shortReview,
+            String manufacturer, int storeName, String comparedProductName, LocalDate boughtAt,
+            LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages, int price,
+            long shownCount, long scrapedCount, long likedCount, long commentCount,
+            boolean isScrap, boolean isLike, boolean isFollow, boolean isMine
     ) {
         this.reviewId = reviewId;
         this.productName = productName;
         this.reviewSpecData = reviewSpecData;
+        this.category = category;
         this.starPoint = starPoint;
         this.goodPoint = goodPoint;
         this.badPoint = badPoint;
@@ -73,6 +78,7 @@ public class GetReviewDetailResponseDto {
                 .reviewId(review.getId())
                 .productName(review.getProductName())
                 .reviewSpecData(getReviewSpecDataToStr(review))
+                .category(review.getCategory())
                 .starPoint(review.getStarPoint())
                 .goodPoint(review.getGoodPoint())
                 .badPoint(review.getBadPoint())
