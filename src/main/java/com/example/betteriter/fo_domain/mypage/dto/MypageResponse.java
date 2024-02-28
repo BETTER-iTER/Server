@@ -100,6 +100,9 @@ public class MypageResponse {
         private Integer totalReviewCount;
         private Integer totalLikeCount;
         private Integer totalScrapCount;
+
+        private String nickname;
+        private String userLevel;
     }
 
 }
