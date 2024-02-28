@@ -7,13 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.repository.custom.CustomReviewRepository;
 import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.constant.Category;
 
-import io.lettuce.core.dynamic.annotation.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long>, CustomReviewRepository {
     List<Review> findFirst7ByCategoryOrderByCreatedAtDesc(Category category);
@@ -88,20 +88,20 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, CustomRev
     List<Review> findByProductNameOrderByScrapedCountAndLikedCountDescCreatedAtDesc(@Param("category") Category category);
 
     @Query("SELECT COUNT(r) FROM REVIEW r WHERE r.writer = :user")
-    Integer countByWriter(Users user);
+    Integer countByWriter(@Param("user")Users user);
 
     @Query("SELECT COALESCE(COUNT(r), 0) FROM REVIEW r " +
             "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
             "WHERE rs.users = :user")
-    Integer countByMyScrap(Users user);
+    Integer countByMyScrap(@Param("user")Users user);
 
     @Query("SELECT COALESCE(COUNT(rl), 0) FROM REVIEW r " +
             "LEFT JOIN REVIEW_LIKE rl on r.id = rl.id " +
             "WHERE r.writer = :user")
-    Integer countByReviewLiked(Users user);
+    Integer countByReviewLiked(@Param("user") Users user);
 
     @Query("SELECT COALESCE(COUNT(rs), 0) FROM REVIEW r " +
             "LEFT JOIN REVIEW_SCRAP rs on r.id = rs.id " +
             "WHERE r.writer = :user")
-    Integer countByReviewScraped(Users user);
+    Integer countByReviewScraped(@Param("user") Users user);
 }

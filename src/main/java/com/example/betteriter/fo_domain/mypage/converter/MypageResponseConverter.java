@@ -82,6 +82,8 @@ public class MypageResponseConverter {
                 .totalReviewCount(user.getReviews().size())
                 .totalLikeCount(totalLikeCount)
                 .totalScrapCount(totalScrapCount)
+                .nickname(user.getUsersDetail().getNickName())
+                .userLevel(user.getRoleType().getRoleName())
                 .build();
     }
 
