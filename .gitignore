@@ -38,5 +38,5 @@ out/
 .env
 
 ### QueryDsl
-/src/main/generated
+/src/main/generated/
 /iter_docker/.env
