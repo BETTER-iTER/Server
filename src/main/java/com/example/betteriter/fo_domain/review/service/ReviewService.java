@@ -299,6 +299,7 @@ public class ReviewService {
         if (!review.getWriter().getId().equals(this.getCurrentUser().getId())) {
             throw new ReviewHandler(_REVIEW_WRITER_IS_NOT_MATCH);
         }
+        this.deleteReviewImages(review.getReviewImages());
         this.reviewRepository.delete(review);
         return null;
     }
@@ -398,9 +399,16 @@ public class ReviewService {
     private void uploadReviewImages(List<MultipartFile> images, Review review) {
         this.checkUploadReviewImagesRequestValidation(images);
 
-        images.forEach(
-            image -> reviewImageRepository.save(s3Service.uploadImage(image, review, images.indexOf(image)))
-        );
+        List<ReviewImage> reviewImages = images.stream()
+            .map(image -> s3Service.uploadImage(image, review, images.indexOf(image)))
+            .collect(Collectors.toList());
+
+        reviewImageRepository.saveAll(reviewImages);
+    }
+
+
+    private void deleteReviewImages(List<ReviewImage> imageUrls) {
+        imageUrls.forEach(imageUrl -> s3Service.deleteImages(imageUrl.getImgUrl()));
     }
 
     private void checkUploadReviewImagesRequestValidation(List<MultipartFile> images) {

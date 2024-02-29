@@ -33,8 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/review")
 @RequiredArgsConstructor
+@RequestMapping("/review")
 @Tag(name = "ReviewController", description = "Review API")
 public class ReviewController {
 
