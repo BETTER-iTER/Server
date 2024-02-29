@@ -8,17 +8,32 @@ import com.example.betteriter.fo_domain.user.domain.Users;
 import com.example.betteriter.global.common.entity.BaseEntity;
 import com.example.betteriter.global.constant.Category;
 import com.example.betteriter.global.constant.Status;
-import lombok.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.scheduling.annotation.Scheduled;
-
-import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -28,6 +43,7 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE iterdb.review SET review.status = 'DELETED' WHERE review.id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -72,7 +88,6 @@ public class Review extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status; // ACTIVE, DELETED, INACTIVE
 
-    // --------------- Review 관련 엔티티 ---------------- //
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -88,9 +103,9 @@ public class Review extends BaseEntity {
 
     @Builder
     public Review(Long id, Users writer, Manufacturer manufacturer, long shownCount,
-                  Category category, String productName, int price, int storeName, String comparedProductName,
-                  LocalDate boughtAt, double starPoint, String shortReview, long clickCount, long likedCount,
-                  long scrapedCount, String goodPoint, String badPoint, Status status
+        Category category, String productName, int price, int storeName, String comparedProductName,
+        LocalDate boughtAt, double starPoint, String shortReview, long clickCount, long likedCount,
+        long scrapedCount, String goodPoint, String badPoint, Status status
 
     ) {
         this.id = id;
@@ -115,7 +130,9 @@ public class Review extends BaseEntity {
 
 
     public ReviewResponseDto of(String firstImageUrl) {
-        return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName).nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage()).isExpert(writer.isExpert()).build();
+        return ReviewResponseDto.builder().id(id).imageUrl(firstImageUrl).productName(productName)
+            .nickname(writer.getUsersDetail().getNickName()).profileImageUrl(writer.getUsersDetail().getProfileImage())
+            .isExpert(writer.isExpert()).build();
     }
 
     public void resetClickCounts() {
