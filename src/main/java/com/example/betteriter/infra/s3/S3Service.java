@@ -1,11 +1,17 @@
 package com.example.betteriter.infra.s3;
 
-import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAGE_FILE_IS_NOT_EXIST;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAGE_FILE_NAME_IS_NOT_EXIST;
-import static com.example.betteriter.global.common.code.status.ErrorStatus._IMAGE_FILE_UPLOAD_FAILED;
+import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
+
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.betteriter.fo_domain.review.domain.Review;
@@ -13,109 +19,97 @@ import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
 import com.example.betteriter.fo_domain.user.domain.Users;
 
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service implements ImageUploadService {
 
-    private static final String FOLDER = "iter";
+	private static final String FOLDER = "iter";
 
-    private final AmazonS3 s3Client;
+	private final AmazonS3 s3Client;
 
-    @Value("${spring.cloud.aws.s3.bucket}")
-    private String bucketName;
+	@Value("${spring.cloud.aws.s3.bucket}")
+	private String bucketName;
 
-    @Override
-    public ReviewImage uploadImage(MultipartFile image, Review review, int orderNum) {
-        String originalFilename = Optional.ofNullable(image.getOriginalFilename())
-            .orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+	@Override
+	public ReviewImage uploadImage(MultipartFile image, Review review, int orderNum) {
+		String key = getReviewImageKey(image, review.getId());
+		String imageUrl = getImageUrl(image, key);
 
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString();
-        String key = FOLDER + "/" + review.getId().toString() + "/" + fileName + fileExtension;
+		return ReviewImage.builder()
+				.review(review)
+				.imgUrl(imageUrl)
+				.orderNum(orderNum)
+				.build();
+	}
 
-        ObjectMetadata objectMetaData = new ObjectMetadata();
-        objectMetaData.setContentType(image.getContentType());
+	@Override
+	public void updateImage(MultipartFile multipartFile, ReviewImage reviewImage) {
+		validateImageFileExists(multipartFile);
 
-        try (InputStream inputStream = image.getInputStream()) {
+		String key = this.getReviewImageKey(multipartFile, reviewImage.getReview().getId());
+		String imageUrl = getImageUrl(multipartFile, key);
 
-            s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
+		reviewImage.updateImgUrl(imageUrl);
+	}
 
-        } catch (Exception e) {
-            throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
-        }
+	@Override
+	public String uploadImage(MultipartFile image, Users user) {
+		String key = getUserProfileImageKey(image, user);
+		return getImageUrl(image, key);
+	}
 
-        return ReviewImage.builder()
-            .review(review)
-            .imgUrl(getImageUrl(key))
-            .orderNum(orderNum)
-            .build();
-    }
+	public String uploadTemporaryImage(MultipartFile image, Review review) {
+		String key = getReviewImageKey(image, review.getId());
+		return getImageUrl(image, key);
+	}
 
-    @Override
-    public String uploadImage(MultipartFile image, Users user) {
-        String originalFilename = Optional.ofNullable(image.getOriginalFilename())
-                .orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+	private static String getUserProfileImageKey(MultipartFile image, Users user) {
+		String originalFilename = getFilename(image);
 
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString();
-        String key = FOLDER + "/" + user.getEmail() + "/" + user.getId().toString() + "/" + fileName + fileExtension;
+		String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+		String fileName = UUID.randomUUID().toString();
 
-        ObjectMetadata objectMetaData = new ObjectMetadata();
-        objectMetaData.setContentType(image.getContentType());
+		return FOLDER + "/" + user.getEmail() + "/" + user.getId().toString() + "/" + fileName + fileExtension;
+	}
 
-        try (InputStream inputStream = image.getInputStream()) {
+	private String getReviewImageKey(MultipartFile image, Long reviewId) {
+		String originalFilename = getFilename(image);
 
-            s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
+		String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+		String fileName = UUID.randomUUID().toString();
 
-        } catch (Exception e) {
-            throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
-        }
+		return FOLDER + "/" + reviewId.toString() + "/" + fileName + fileExtension;
+	}
 
-        return getImageUrl(key);
-    }
+	private static String getFilename(MultipartFile image) {
+		return Optional.ofNullable(image.getOriginalFilename())
+				.orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+	}
 
-    @Override
-    public void updateImage(MultipartFile multipartFile, ReviewImage reviewImage) {
-        validateImageFileExists(multipartFile);
+	private String getImageUrl(MultipartFile image, String key) {
+		ObjectMetadata objectMetaData = new ObjectMetadata();
+		objectMetaData.setContentType(image.getContentType());
 
-        String originalFilename = Optional.ofNullable(multipartFile.getOriginalFilename())
-            .orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
+		try (InputStream inputStream = image.getInputStream()) {
+			s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
+		} catch (Exception e) {
+			throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
+		}
 
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String fileName = UUID.randomUUID().toString();
-        String key = FOLDER + "/" + reviewImage.getReview().getId().toString() + "/" + fileName + fileExtension;
+		return getImageUrl(key);
+	}
 
-        ObjectMetadata objectMetaData = new ObjectMetadata();
-        objectMetaData.setContentType(multipartFile.getContentType());
+	private String getImageUrl(String key) {
+		return s3Client.getUrl(bucketName, key).toString();
+	}
 
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetaData));
-        } catch (Exception e) {
-            throw new ReviewHandler(_IMAGE_FILE_UPLOAD_FAILED);
-        }
-
-        reviewImage.updateImgUrl(getImageUrl(key));
-    }
-
-    private void validateImageFileExists(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
-            throw new ReviewHandler(_IMAGE_FILE_IS_NOT_EXIST);
-        }
-    }
-
-
-    private String getImageUrl(String key) {
-        return s3Client.getUrl(bucketName, key).toString();
-    }
+	private void validateImageFileExists(MultipartFile multipartFile) {
+		if (multipartFile.isEmpty()) {
+			throw new ReviewHandler(_IMAGE_FILE_IS_NOT_EXIST);
+		}
+	}
 }

@@ -489,6 +489,16 @@ public class ReviewService {
                 .noneMatch(nowReviewSpecData -> newSpecData.getId().equals(nowReviewSpecData.getSpecData().getId()));
     }
 
+    public String getTemporaryReviewImageUrl(Long reviewId, MultipartFile images) {
+        Review review = this.findReviewById(reviewId);
+        this.checkReviewOwner(review);
+        return s3Service.uploadTemporaryImage(images, review);
+    }
+
+    private void checkReviewOwner(Review review) {
+        this.checkReviewOwner(review.getId());
+    }
+
     public void checkReviewOwner(Long reviewId) {
         Review review = this.findReviewById(reviewId);
         if (review.getWriter().getId().equals(this.getCurrentUser().getId())) {

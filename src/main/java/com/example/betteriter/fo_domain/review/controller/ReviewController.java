@@ -152,6 +152,15 @@ public class ReviewController {
         return ResponseDto.onSuccess(null);
     }
 
+    @PostMapping("/image/{reviewId}")
+    public ResponseDto<String> getTemporaryReviewImageUrl(
+        @PathVariable Long reviewId,
+        @RequestPart(value = "file") MultipartFile images
+    ) {
+        String imageUrl = this.reviewService.getTemporaryReviewImageUrl(reviewId, images);
+        return ResponseDto.onSuccess(imageUrl);
+    }
+
     private void checkRequestValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             FieldError fieldError = bindingResult.getFieldErrors().get(0);
