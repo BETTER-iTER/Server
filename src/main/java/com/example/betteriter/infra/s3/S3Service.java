@@ -6,11 +6,11 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -62,6 +62,7 @@ public class S3Service implements ImageUploadService {
 		return getImageUrl(image, key);
 	}
 
+	@Override
 	public String uploadTemporaryImage(MultipartFile image, Review review) {
 		String key = getReviewImageKey(image, review.getId());
 		return getImageUrl(image, key);
@@ -90,6 +91,23 @@ public class S3Service implements ImageUploadService {
 				.orElseThrow(() -> new ReviewHandler(_IMAGE_FILE_NAME_IS_NOT_EXIST));
 	}
 
+	@Override
+	public void deleteImages(String imageUrl) {
+		try {
+			String key = imageUrl.substring(imageUrl.lastIndexOf(FOLDER));
+			boolean isObjectExists = s3Client.doesObjectExist(bucketName, key);
+			if (isObjectExists) {
+				s3Client.deleteObject(bucketName, key);
+			}
+		} catch (SdkClientException e) {
+			throw new ReviewHandler(_IMAGE_FILE_DELETE_FAILED);
+		}
+	}
+
+	private String getImageUrl(String key) {
+		return s3Client.getUrl(bucketName, key).toString();
+	}
+
 	private String getImageUrl(MultipartFile image, String key) {
 		ObjectMetadata objectMetaData = new ObjectMetadata();
 		objectMetaData.setContentType(image.getContentType());
@@ -101,10 +119,6 @@ public class S3Service implements ImageUploadService {
 		}
 
 		return getImageUrl(key);
-	}
-
-	private String getImageUrl(String key) {
-		return s3Client.getUrl(bucketName, key).toString();
 	}
 
 	private void validateImageFileExists(MultipartFile multipartFile) {
