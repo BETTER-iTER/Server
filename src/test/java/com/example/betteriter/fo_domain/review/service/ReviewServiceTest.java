@@ -658,7 +658,7 @@ class ReviewServiceTest {
             .goodPoint("goodPoint2")
             .badPoint("badPoint2")
             .specData(null)
-            .imageIndex(new ArrayList<>())
+            .imageList(new ArrayList<>())
             .build();
 
         List<MultipartFile> images = new ArrayList<>();
@@ -670,7 +670,7 @@ class ReviewServiceTest {
                 .willReturn(Optional.of(review));
 
         // when
-        this.reviewService.updateReview(review.getId(), request, images);
+        this.reviewService.updateReview(review.getId(), request);
 
         // then
         verify(this.manufacturerConnector, times(1)).findManufacturerByName(anyString());
@@ -702,7 +702,7 @@ class ReviewServiceTest {
                 .goodPoint("goodPoint2")
                 .badPoint("badPoint2")
                 .specData(List.of(1L, 3L))
-                .imageIndex(new ArrayList<>())
+                .imageList(new ArrayList<>())
                 .build();
 
         List<MultipartFile> images = new ArrayList<>();
@@ -714,7 +714,7 @@ class ReviewServiceTest {
                 .willReturn(Optional.of(review));
 
         // when
-        this.reviewService.updateReview(review.getId(), request, images);
+        this.reviewService.updateReview(review.getId(), request);
 
         // then
         verify(this.manufacturerConnector, times(1)).findManufacturerByName(anyString());

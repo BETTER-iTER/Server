@@ -414,20 +414,34 @@ public class ReviewService {
     }
 
     @Transactional
-    public void updateReview(Long reviewId, UpdateReviewRequestDto request, List<MultipartFile> images) {
+    public void updateReview(Long reviewId, UpdateReviewRequestDto request) {
         Review review = this.findReviewById(reviewId);
 
         // 1. 리뷰 데이터 업데이트
         this.updateReviewData(request, review);
 
         // 2. 리뷰 이미지 업데이트
-        List<Integer> targetImageIds = request.getImageIndex();
-        this.updateReviewImages(review, targetImageIds, images);
+        this.updateReviewImages(review, request.getImageList());
 
         // 3. 리뷰 스펙 데이터 업데이트
         List<ReviewSpecData> nowReviewSpecDataList = reviewSpecDataRepository.findAllByReview(review);
         List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
         this.updateReviewSpecData(review, nowReviewSpecDataList, newSpecDataList);
+
+        reviewRepository.save(review);
+
+        this.clearS3ReviewImage(review);
+    }
+
+    private void clearS3ReviewImage(Review review) {
+        List<String> s3ReviewImageUrls = this.getReviewImageUrls(review);
+        List<String> activeReviewImageUrls = review.getReviewImages().stream()
+            .map(ReviewImage::getImgUrl)
+            .collect(Collectors.toList());
+
+        s3ReviewImageUrls.stream()
+            .filter(s3ReviewImageUrl -> !activeReviewImageUrls.contains(s3ReviewImageUrl))
+            .forEach(s3Service::deleteImages);
     }
 
     private void updateReviewData(UpdateReviewRequestDto request, Review review) {
@@ -439,41 +453,14 @@ public class ReviewService {
         review.updateReview(request, manufacturer);
     }
 
-    private void updateReviewImages(Review review, List<Integer> targetImageIds, List<MultipartFile> images) {
-        /*
-         * 1. targetImageIds 가 null 일때,
-         *   1-1. images 도 null 이면 이미지 업데이트 없이 리턴
-         *   1-2. images 가 null 이 아니면 에러 리턴
-         * 2. targetImageIds 가 null 이 아닐때,
-         *   2-1. images 가 null 이면 에러 리턴
-         *   2-2. images 와 targetImageIds 의 길이가 다르면 에러 리턴
-         *   2-3. images 와 targetImageIds 의 길이가 같으면 이미지 업데이트 진행
-         * 3. 이미지 업데이트 진행시 (* targetImageIds 와 images 의 순서는 같음)
-         *   3-1. 현재 review image 에 해당하지 않는 targetImageId 는 insert
-         *   3-2. 현재 review image 에 해당하는 targetImageId 는 update
-         */
+    private void updateReviewImages(Review review, List<String> imageList) {
+        List<ReviewImage> nowReviewImages = review.getReviewImages();
+        reviewImageRepository.deleteAll(nowReviewImages);
 
-        if (targetImageIds.isEmpty() && images.isEmpty()) {
-        } else if (targetImageIds.size() == images.size()) {
-            List<ReviewImage> reviewImages = review.getReviewImages();
-
-            for (int i = 0; i < targetImageIds.size(); i++) {
-
-                int targetImageId = targetImageIds.get(i);
-                MultipartFile image = images.get(i);
-
-                if (reviewImages.stream().anyMatch(ri -> ri.getOrderNum() == targetImageId)) {
-                    ReviewImage reviewImage = reviewImageRepository.findByReviewAndOrderNum(review, targetImageId);
-                    s3Service.updateImage(image, reviewImage);
-                } else {
-                    reviewImageRepository.save(s3Service.uploadImage(image, review, targetImageId));
-                }
-            }
-
-        } else {
-            throw new ReviewHandler(_REVIEW_UPDATE_IMAGE_ARGUMENT_ERROR);
-        }
-
+        List<ReviewImage> newReviewImages = imageList.stream()
+            .map(image -> ReviewImage.createReviewImage(review, image, imageList.indexOf(image)))
+            .collect(Collectors.toList());
+        reviewImageRepository.saveAll(newReviewImages);
     }
 
     private void updateReviewSpecData(Review review, List<ReviewSpecData> nowReviewSpecDataList,
@@ -528,5 +515,9 @@ public class ReviewService {
         if (!review.getWriter().getId().equals(this.getCurrentUser().getId())) {
             throw new ReviewHandler(_REVIEW_WRITER_IS_NOT_MATCH);
         }
+    }
+
+    public List<String> getReviewImageUrls(Review review) {
+        return s3Service.getReviewImageUrlsInS3(review);
     }
 }

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -128,19 +129,21 @@ public class ReviewController {
 
     /* 리뷰 수정 */
     @PutMapping("/{reviewId}")
-    public ResponseDto<Void> updateReview(@PathVariable Long reviewId,
-        @RequestPart(value = "files") List<MultipartFile> images,
-        @Valid @RequestPart(value = "key") UpdateReviewRequestDto request, BindingResult bindingResult) {
+    public ResponseDto<Void> updateReview(
+            @PathVariable Long reviewId,
+            @Valid @RequestBody UpdateReviewRequestDto request,
+            BindingResult bindingResult
+    ) {
         this.checkRequestValidation(bindingResult);
         this.reviewService.checkReviewOwner(reviewId);
-        this.reviewService.updateReview(reviewId, request, images);
+        this.reviewService.updateReview(reviewId, request);
         return ResponseDto.onSuccess(null);
     }
 
     @PostMapping("/image/{reviewId}")
     public ResponseDto<String> getTemporaryReviewImageUrl(
-        @PathVariable Long reviewId,
-        @RequestPart(value = "file") MultipartFile images
+            @PathVariable Long reviewId,
+            @RequestPart(value = "file") MultipartFile images
     ) {
         String imageUrl = this.reviewService.getTemporaryReviewImageUrl(reviewId, images);
         return ResponseDto.onSuccess(imageUrl);

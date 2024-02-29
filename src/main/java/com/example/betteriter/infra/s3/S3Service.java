@@ -3,8 +3,10 @@ package com.example.betteriter.infra.s3;
 import static com.example.betteriter.global.common.code.status.ErrorStatus.*;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,8 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.example.betteriter.fo_domain.review.domain.Review;
 import com.example.betteriter.fo_domain.review.domain.ReviewImage;
 import com.example.betteriter.fo_domain.review.exception.ReviewHandler;
@@ -66,6 +71,26 @@ public class S3Service implements ImageUploadService {
 	public String uploadTemporaryImage(MultipartFile image, Review review) {
 		String key = getReviewImageKey(image, review.getId());
 		return getImageUrl(image, key);
+	}
+
+	@Override
+	public List<String> getReviewImageUrlsInS3(Review review) {
+		log.info("1");
+		ListObjectsV2Request request = new ListObjectsV2Request()
+				.withBucketName(bucketName)
+				.withPrefix(FOLDER + "/" + review.getId().toString() + "/");
+
+		log.info("2");
+		ListObjectsV2Result result = s3Client.listObjectsV2(request);
+
+		log.info("3");
+		List<S3ObjectSummary> objects = result.getObjectSummaries();
+
+		log.info("4");
+		return objects.stream()
+				.map(S3ObjectSummary::getKey)
+				.map(this::getImageUrl)
+				.collect(Collectors.toList());
 	}
 
 	private static String getUserProfileImageKey(MultipartFile image, Users user) {
