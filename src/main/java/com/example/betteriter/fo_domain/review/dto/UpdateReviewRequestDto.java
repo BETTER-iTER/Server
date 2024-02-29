@@ -48,12 +48,12 @@ public class UpdateReviewRequestDto {
 
     private List<Long> specData; // specData id 리스트
 
-    private List<Integer> imageIndex; // 바꾸고자 하는 이미지의 인덱스
+    private List<String> imageList; // 이미지 리스트
 
     @Builder
     public UpdateReviewRequestDto(Category category, String productName, LocalDate boughtAt, String manufacturer,
         Integer price, Integer storeName, String comparedProductName, String shortReview, Double starPoint,
-        String goodPoint, String badPoint, List<Long> specData, List<Integer> imageIndex) {
+        String goodPoint, String badPoint, List<Long> specData, List<String> imageList) {
         this.category = category;
         this.productName = productName;
         this.boughtAt = boughtAt;
@@ -66,6 +66,6 @@ public class UpdateReviewRequestDto {
         this.goodPoint = goodPoint;
         this.badPoint = badPoint;
         this.specData = specData;
-        this.imageIndex = imageIndex;
+        this.imageList = imageList;
     }
 }
