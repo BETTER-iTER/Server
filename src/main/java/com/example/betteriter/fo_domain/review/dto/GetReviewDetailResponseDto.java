@@ -1,22 +1,25 @@
 package com.example.betteriter.fo_domain.review.dto;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.example.betteriter.fo_domain.review.domain.Review;
+import com.example.betteriter.fo_domain.review.domain.ReviewSpecData;
 import com.example.betteriter.global.constant.Category;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
+@Slf4j
 @Getter
 @NoArgsConstructor
 public class GetReviewDetailResponseDto {
     private Long reviewId; // 리뷰 아이디
     private String productName; // 리뷰 상품명
-    private List<String> reviewSpecData; // 리뷰 스펙 데이터
+    private List<GetSpecDataDto> reviewSpecData; // 리뷰 스펙 데이터
     private Category category; // 리뷰 카테고리
     private double starPoint; // 리뷰 별점
     private String goodPoint; // 리뷰 좋은점
@@ -41,7 +44,7 @@ public class GetReviewDetailResponseDto {
 
     @Builder
     public GetReviewDetailResponseDto(
-            Long reviewId, String productName, List<String> reviewSpecData,  Category category,
+            Long reviewId, String productName, List<GetSpecDataDto> reviewSpecData,  Category category,
             double starPoint, String goodPoint, String badPoint, String shortReview,
             String manufacturer, int storeName, String comparedProductName, LocalDate boughtAt,
             LocalDate createdAt, List<GetReviewImageResponseDto> reviewImages, int price,
@@ -77,7 +80,7 @@ public class GetReviewDetailResponseDto {
         return GetReviewDetailResponseDto.builder()
                 .reviewId(review.getId())
                 .productName(review.getProductName())
-                .reviewSpecData(getReviewSpecDataToStr(review))
+                .reviewSpecData(getReviewSpecDataToDto(review.getSpecData()))
                 .category(review.getCategory())
                 .starPoint(review.getStarPoint())
                 .goodPoint(review.getGoodPoint())
@@ -99,6 +102,18 @@ public class GetReviewDetailResponseDto {
                 .isFollow(isFollow)
                 .isMine(isMine)
                 .build();
+    }
+
+    private static List<GetSpecDataDto> getReviewSpecDataToDto(List<ReviewSpecData> specData) {
+        log.debug("review.getSpecData() : {}", specData);
+
+        return specData.stream()
+                .map(reviewSpecData -> GetSpecDataDto.builder()
+                        .SpecId(reviewSpecData.getSpecData().getSpec().getId())
+                        .SpecDataId(reviewSpecData.getId())
+                        .data(reviewSpecData.getSpecData().getData())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private static List<String> getReviewSpecDataToStr(Review review) {
