@@ -110,7 +110,7 @@ public class GetReviewDetailResponseDto {
         return specData.stream()
                 .map(reviewSpecData -> GetSpecDataDto.builder()
                         .SpecId(reviewSpecData.getSpecData().getSpec().getId())
-                        .SpecDataId(reviewSpecData.getId())
+                        .SpecDataId(reviewSpecData.getSpecData().getId())
                         .data(reviewSpecData.getSpecData().getData())
                         .build())
                 .collect(Collectors.toList());
