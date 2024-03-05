@@ -430,7 +430,7 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        this.clearS3ReviewImage(review);
+        // this.clearS3ReviewImage(review);
     }
 
     private void clearS3ReviewImage(Review review) {
@@ -457,10 +457,13 @@ public class ReviewService {
         List<ReviewImage> nowReviewImages = review.getReviewImages();
         reviewImageRepository.deleteAll(nowReviewImages);
 
-        List<ReviewImage> newReviewImages = imageList.stream()
-            .map(image -> ReviewImage.createReviewImage(review, image, imageList.indexOf(image)))
-            .collect(Collectors.toList());
-        reviewImageRepository.saveAll(newReviewImages);
+        for (int i = 0; i < imageList.size(); i++) {
+            reviewImageRepository.save(ReviewImage.builder()
+                .review(review)
+                .imgUrl(imageList.get(i))
+                .orderNum(i)
+                .build());
+        }
     }
 
     private void updateReviewSpecData(Review review, List<ReviewSpecData> nowReviewSpecDataList,
