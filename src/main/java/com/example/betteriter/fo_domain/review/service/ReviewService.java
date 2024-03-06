@@ -424,9 +424,8 @@ public class ReviewService {
         this.updateReviewImages(review, request.getImageList());
 
         // 3. 리뷰 스펙 데이터 업데이트
-        List<ReviewSpecData> nowReviewSpecDataList = reviewSpecDataRepository.findAllByReview(review);
         List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
-        this.updateReviewSpecData(review, nowReviewSpecDataList, newSpecDataList);
+        this.updateReviewSpecData(review, newSpecDataList);
 
         reviewRepository.save(review);
 
@@ -466,36 +465,14 @@ public class ReviewService {
         }
     }
 
-    private void updateReviewSpecData(Review review, List<ReviewSpecData> nowReviewSpecDataList,
-        List<SpecData> newSpecDataList) {
-        /*
-         * 1. nowReviewSpecDataList 와 newReviewSpecDataList 를 비교하여 변경된 데이터가 있는지 확인
-         *   1-1. SpecData 의 specId 가 같으며 SpecData 의 id 가 다르다면 변경된 데이터로 판단
-         *   1-2. SpecData 의 specId 가 존제하지 않았으면 추가된 데이터로 판단
-         * 2. 변경된 데이터가 있다면 변경된 데이터를 업데이트
-         *   2-1. (1-1) 에서 변경된 데이터가 있다면 같은 specId 를 가진 데이터를 update
-         *   2-2. (1-2) 에서 추가된 데이터가 있다면 추가된 데이터를 insert
-         */
+    private void updateReviewSpecData(Review review, List<SpecData> newSpecDataList) {
+        List<ReviewSpecData> nowReviewSpecDataList = review.getSpecData();
+        reviewSpecDataRepository.deleteAll(nowReviewSpecDataList);
 
-        log.info("nowReviewSpecDataList : {}", nowReviewSpecDataList);
-        log.info("newReviewSpecDataList : {}", newSpecDataList);
-
-        List<SpecData> nowSpecDataList = nowReviewSpecDataList.stream()
-            .map(ReviewSpecData::getSpecData)
+        List<ReviewSpecData> newReviewSpecDataList = newSpecDataList.stream()
+            .map(specData -> ReviewSpecData.createReviewSpecData(review, specData))
             .collect(Collectors.toList());
-
-        newSpecDataList.forEach(newSpecData -> {
-            if (isChanged(newSpecData, nowSpecDataList)) {
-                ReviewSpecData nowReviewSpecData = nowReviewSpecDataList.stream()
-                    .filter(nowData -> isSameSpecId(nowData, newSpecData))
-                    .findFirst()
-                    .orElseThrow(() -> new ReviewHandler(_REVIEW_SPEC_DATA_NOT_FOUND));
-
-                nowReviewSpecData.updateSpecData(newSpecData);
-            } else if (isAdded(newSpecData, nowReviewSpecDataList)) {
-                reviewSpecDataRepository.save(ReviewSpecData.createReviewSpecData(review, newSpecData));
-            }
-        });
+        reviewSpecDataRepository.saveAll(newReviewSpecDataList);
     }
 
     private boolean isChanged(SpecData newSpecData, List<SpecData> nowSpecDataList) {
