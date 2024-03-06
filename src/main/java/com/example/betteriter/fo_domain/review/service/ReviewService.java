@@ -423,12 +423,16 @@ public class ReviewService {
         // 2. 리뷰 이미지 업데이트
         this.updateReviewImages(review, request.getImageList());
 
-        // 3. 리뷰 스펙 데이터 업데이트
+        // 3. 리뷰 스펙 데이터 삭제
+        this.clearReviewSpecData(review);
+
+        // 4. 리뷰 스펙 데이터 업데이트
         List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
         this.updateReviewSpecData(review, newSpecDataList);
 
         reviewRepository.save(review);
 
+        // 5. 필요없는 리뷰 이미지 삭제
         // this.clearS3ReviewImage(review);
     }
 
@@ -466,13 +470,15 @@ public class ReviewService {
     }
 
     private void updateReviewSpecData(Review review, List<SpecData> newSpecDataList) {
-        List<ReviewSpecData> nowReviewSpecDataList = review.getSpecData();
-        reviewSpecDataRepository.deleteAll(nowReviewSpecDataList);
-
         List<ReviewSpecData> newReviewSpecDataList = newSpecDataList.stream()
             .map(specData -> ReviewSpecData.createReviewSpecData(review, specData))
             .collect(Collectors.toList());
         reviewSpecDataRepository.saveAll(newReviewSpecDataList);
+    }
+
+    private void clearReviewSpecData(Review review) {
+        List<ReviewSpecData> nowReviewSpecDataList = review.getSpecData();
+        reviewSpecDataRepository.deleteAll(nowReviewSpecDataList);
     }
 
     private boolean isChanged(SpecData newSpecData, List<SpecData> nowSpecDataList) {
