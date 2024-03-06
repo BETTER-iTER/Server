@@ -458,18 +458,32 @@ public class ReviewService {
 
     private void updateReviewImages(Review review, List<String> imageList) {
         for (int i = 0; i < imageList.size(); i++) {
-            reviewImageRepository.save(ReviewImage.builder()
-                .review(review)
-                .imgUrl(imageList.get(i))
-                .orderNum(i)
-                .build());
+            ReviewImage reviewImage = ReviewImage.builder()
+                    .review(review)
+                    .imgUrl(imageList.get(i))
+                    .orderNum(i)
+                    .build();
+
+            log.debug("reviewImageId : {}", reviewImage.getId());
+            log.debug("review : {}", review);
+            log.debug("imgUrl : {}", imageList.get(i));
+            log.debug("orderNum : {}", i);
+
+            reviewImageRepository.save(reviewImage);
         }
     }
 
     private void clearReviewImages(Review review) {
         List<ReviewImage> nowReviewImages = review.getReviewImages();
-        reviewImageRepository.deleteAll(nowReviewImages);
+        // review.getReviewImages().removeAll(nowReviewImages);
+
+        List<Long> reviewImageIds = nowReviewImages.stream()
+                .map(ReviewImage::getId)
+                .collect(Collectors.toList());
+
+        reviewImageRepository.deleteAllByIdInBatch(reviewImageIds);
     }
+
 
     private void updateReviewSpecData(Review review, List<SpecData> newSpecDataList) {
         List<ReviewSpecData> newReviewSpecDataList = newSpecDataList.stream()
@@ -480,6 +494,7 @@ public class ReviewService {
 
     private void clearReviewSpecData(Review review) {
         List<ReviewSpecData> nowReviewSpecDataList = review.getSpecData();
+        review.getSpecData().removeAll(nowReviewSpecDataList);
         reviewSpecDataRepository.deleteAll(nowReviewSpecDataList);
     }
 
