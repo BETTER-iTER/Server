@@ -421,18 +421,16 @@ public class ReviewService {
         this.updateReviewData(request, review);
 
         // 2. 리뷰 이미지 업데이트
+        this.clearReviewImages(review);
         this.updateReviewImages(review, request.getImageList());
 
-        // 3. 리뷰 스펙 데이터 삭제
+        // 3. 리뷰 스펙 데이터 업데이트
         this.clearReviewSpecData(review);
 
-        // 4. 리뷰 스펙 데이터 업데이트
         List<SpecData> newSpecDataList = this.specConnector.findAllSpecDataByIds(request.getSpecData());
         this.updateReviewSpecData(review, newSpecDataList);
 
-        reviewRepository.save(review);
-
-        // 5. 필요없는 리뷰 이미지 삭제
+        // 4. 필요없는 리뷰 이미지 삭제
         // this.clearS3ReviewImage(review);
     }
 
@@ -454,12 +452,11 @@ public class ReviewService {
         }
 
         review.updateReview(request, manufacturer);
+
+        reviewRepository.save(review);
     }
 
     private void updateReviewImages(Review review, List<String> imageList) {
-        List<ReviewImage> nowReviewImages = review.getReviewImages();
-        reviewImageRepository.deleteAll(nowReviewImages);
-
         for (int i = 0; i < imageList.size(); i++) {
             reviewImageRepository.save(ReviewImage.builder()
                 .review(review)
@@ -467,6 +464,11 @@ public class ReviewService {
                 .orderNum(i)
                 .build());
         }
+    }
+
+    private void clearReviewImages(Review review) {
+        List<ReviewImage> nowReviewImages = review.getReviewImages();
+        reviewImageRepository.deleteAll(nowReviewImages);
     }
 
     private void updateReviewSpecData(Review review, List<SpecData> newSpecDataList) {
