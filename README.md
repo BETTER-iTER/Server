@@ -1,5 +1,6 @@
 # Iter - IT 초보자도 쉽게 이용할 수 있는 IT 똑똑이 서비스
 
+## 💻 프로젝트 소개
 <p align = "center" width="100%">
  <img width="49%" alt = "MOBILE_1" src="https://github.com/BETTER-iTER/Server/assets/96874318/86df95d7-1ce2-49a1-b5fc-e7f7108ce681">
  <img width="49%" alt = "MOBILE_2" src="https://github.com/BETTER-iTER/Server/assets/96874318/f12a2188-6a80-4f58-9d72-13105bd38e8f">
