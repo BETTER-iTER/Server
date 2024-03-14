@@ -1,6 +1,10 @@
 # Iter - IT 초보자도 쉽게 이용할 수 있는 IT 똑똑이 서비스
 
 ## 💻 프로젝트 소개
+
+오늘날, 시장에는 수많은 전자기기가 존재하며, 이로 인해 소비자들은 어떤 제품을 결정하고 구매해야 할지 종종 어려움을 겪습니다. Iter는 이러한 문제를 해결하기 위해 탄생한 웹 어플리케이션입니다. 전문가 리뷰를 통해 사용자가 보다 정보에 기반한 구매 결정을 내릴 수 있도록 돕고, IT 기술에 관한 퀴즈를 통해 지식을 넓힐 수 있는 기회를 제공합니다. IT 제품 구매 과정에서 사용자에게 등대와 같은 역할을 하는 Iter, 지금 바로 경험해 보세요.
+
+
 <p align = "center" width="100%">
  <img width="49%" alt = "MOBILE_1" src="https://github.com/BETTER-iTER/Server/assets/96874318/86df95d7-1ce2-49a1-b5fc-e7f7108ce681">
  <img width="49%" alt = "MOBILE_2" src="https://github.com/BETTER-iTER/Server/assets/96874318/f12a2188-6a80-4f58-9d72-13105bd38e8f">
