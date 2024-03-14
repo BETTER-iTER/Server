@@ -30,7 +30,83 @@
   <img width="100%" alt = "MOBILE_7" src="https://github.com/BETTER-iTER/Server/assets/96874318/1d081c2c-b722-4b9c-b558-a0f4945a7401">
 </p>
 
-## 🛠️ Tech Stack
+## 👥 Contributors
+
+
+<table align="center">
+  <tbody>
+    <tr>
+      <td align="center" colspan="1">PM</td>
+      <td align="center" colspan="1">DEGINER</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://github.com/alreadynyeong">
+          <img src="https://github.com/BETTER-iTER/Server/assets/96874318/f71f8f86-2fd9-44d8-a31a-6a135c6ca78b" width="200px" style="max-width: 100%;">
+        </a>
+      </td>
+      <td>
+         <a href="https://github.com/kimdavid0521">
+           <img src="https://github.com/BETTER-iTER/Server/assets/96874318/7d34c054-809b-4453-a356-2608663de0f1" width="200px" style="max-width: 100%;">
+         </a>
+       </td>
+    </tr>
+    <tr>
+      <td align="center">PM 송수경</a>
+      </td>
+      <td align="center">DESIGNER 문채원</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table align="center">
+  <tbody>
+    <tr>
+      <td align="center" colspan="2">FRONTEND</td>
+      <td align="center" colspan="2">BACKEND</td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://github.com/alreadynyeong">
+          <img src="https://github.com/BETTER-iTER/Server/assets/96874318/1e788ea1-3187-4c86-9c77-2622725ba66f" width="200px" style="max-width: 100%;">
+        </a>
+      </td>
+      <td>
+         <a href="https://github.com/kimdavid0521">
+           <img src="https://github.com/BETTER-iTER/Server/assets/96874318/c62fda50-a6f8-4df1-b10a-13669f069007" width="200px" style="max-width: 100%;">
+         </a>
+       </td>
+      <td>
+        <a href="https://github.com/choidongkuen">
+          <img src="https://github.com/BETTER-iTER/Server/assets/96874318/67f67bb1-e815-4982-8e91-8c7b8ebed278" width="200px" style="max-width: 100%;">
+        </a>
+      </td>
+      <td>
+        <a href="https://github.com/luke0408">
+          <img src="https://github.com/BETTER-iTER/Server/assets/96874318/f0d63931-d787-42d7-8ee5-e3d5b5ee0ef3" width="200px" style="max-width: 100%;">
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+          <a href="https://github.com/unoung">FE 이민형</a>
+      </td>
+      <td align="center">
+          <a href="https://github.com/kimdavid0521">FE 김태영</a>
+      </td>
+      <td align="center">
+          <a href="https://github.com/choidongkuen">BE 최동근</a>
+      </td>
+      <td align="center">
+          <a href="https://github.com/luke0408">BE 최선규</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+## 🛠️ Server Tech Stack
 <img src="https://img.shields.io/badge/Framework-555555?style=for-the-badge">![SpringBoot](https://img.shields.io/badge/springboot-%236DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white)![spring_data_JPA](https://img.shields.io/badge/spring_data_JPA-%236DB33F?style=for-the-badge&logo=databricks&logoColor=white)![SpringSecurity](https://img.shields.io/badge/spring_security-%236DB33F.svg?style=for-the-badge&logo=springsecurity&logoColor=white) <img src="https://img.shields.io/badge/build-555555?style=for-the-badge">![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
 
 <img src="https://img.shields.io/badge/Test-555555?style=for-the-badge">![junit5](https://img.shields.io/badge/junit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)![test_containers](https://img.shields.io/badge/test_containers-328ba3?style=for-the-badge&logo=reasonstudios&logoColor=white)
@@ -43,26 +119,6 @@
 
 
 
-## 👥 Contributors
 
-<table align="left">
-  <tbody>
-   <tr>
-    <td align="center" colspan="1"><a href = "https://github.com/choidongkuen">최동근</td>
-    <td align="center" colspan="1"><a href = "https://github.com/luke0408"> 최선규</td>
-  </tr>
-  <tr></tr>
-    <td>
-      <a href="https://github.com/choidongkuen">
-        <img src="https://github.com/BETTER-iTER/Server/assets/96874318/5d7a8d5c-c5f1-4479-b288-58e45b796a5e" width="200px" style="max-width: 100%;">
-      </a>
-    </td>
-    <td>
-      <a href="https://github.com/luke0408">
-        <img src="https://github.com/BETTER-iTER/Server/assets/96874318/61226a4f-d3dd-46f4-a782-e4e3669a261e" width="200px" style="max-width: 100%;">
-      </a>
-    </td>
-  </tbody>
-</table>
 
                                                     
