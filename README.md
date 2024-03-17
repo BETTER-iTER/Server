@@ -93,7 +93,7 @@
     </tr>
     <tr>
       <td align="center">
-          <a href="https://github.com/unoung">FE 이민형</a>
+          <a href="https://github.com/alreadynyeong">FE 이민형</a>
       </td>
       <td align="center">
           <a href="https://github.com/kimdavid0521">FE 김태영</a>
