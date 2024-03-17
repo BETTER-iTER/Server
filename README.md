@@ -30,6 +30,9 @@
   <img width="100%" alt = "MOBILE_7" src="https://github.com/BETTER-iTER/Server/assets/96874318/1d081c2c-b722-4b9c-b558-a0f4945a7401">
 </p>
 
+## 🌐 Server Architecture
+![스크린샷 2024-03-17 오후 1 43 39](https://github.com/BETTER-iTER/Server/assets/96874318/43a43aa5-a8ca-474a-bdfa-d7a04290d401)
+
 ## 👥 Contributors
 
 
